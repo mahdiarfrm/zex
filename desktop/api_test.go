@@ -187,6 +187,9 @@ func TestReviewQueue(t *testing.T) {
 	if r := get(t, h, "GET", "/zex/log", nil, ""); r.Code != 403 {
 		t.Fatalf("the log is for the page only, got %d", r.Code)
 	}
+	if r := get(t, h, "GET", "/zex/log?status=waiting", page, ""); !strings.Contains(r.Body.String(), `"items":[]`) {
+		t.Fatalf("an empty log should list no items, not null: %s", r.Body)
+	}
 	tok := conf(0.8, `{"refund":0.9}`, "")
 	first := run(tok)
 	if first["status"] != "review" || first["id"] == nil {

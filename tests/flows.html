@@ -168,7 +168,7 @@ async function goRoute(w, d, r) {
     ok("HOME-1 home shows quick run, connections, recent runs, stats and six tools", !!d.querySelector(".qr textarea") && !!d.querySelector(".hm-conn") && !!d.querySelector(".hm-recent") && !!d.querySelector(".hm-stats") && d.querySelectorAll(".opt-tile").length === 6);
     ok("HOME-2 clock shows the time", /\d\d:\d\d:\d\d/.test(d.querySelector(".hm-top .zclock")?.textContent || ""));
     ok("HOME-6 no landing-page call-to-action links", !d.querySelector(".h-hero, .h-desk, .h-cta, .big-link"));
-    ok("HOME-10 giant headline is the live server status", /Models? Ready\./.test(d.querySelector("[data-hmstatus]")?.textContent || ""), d.querySelector("[data-hmstatus]")?.textContent);
+    ok("HOME-10 the head says what matters now: ready, with the next step", /Ready To Decide\./.test(d.querySelector(".hm-brief .hm-status")?.textContent || "") && !!d.querySelector(".hm-brief .hm-acts .btn.solid"), d.querySelector(".hm-brief .hm-status")?.textContent);
     ok("HOME-11 3D mark and stippled desk drawn", !!d.querySelector(".hm-sky canvas.hero3d") && !!d.querySelector(".hm-desk canvas.hm-dots") && d.querySelector(".hm-dots").width > 0);
     ok("HOME-7 recent runs listed", d.querySelectorAll(".hm-recent .hist-item").length >= 1);
     ok("HOME-8 active connection shows its live status", /Online/.test(d.querySelector(".hm-conn [data-ctext]")?.textContent || ""));
@@ -269,9 +269,9 @@ async function goRoute(w, d, r) {
     await waitFor(() => d.querySelector(".rv-acc .eval-tiles"), 8000);
     ok("REVIEW-5 reviewed answers feed the accuracy view", !!d.querySelector(".rv-acc .eval-tiles") && /1 reviewed answer/.test(d.querySelector(".rv-acc-note")?.textContent || ""), d.querySelector(".rv-acc-note")?.textContent);
     await goRoute(w, d, "home");
-    await waitFor(() => d.querySelector(".hm-live"), 20000);
-    ok("REVIEW-6 Home shows the last 7 days of requests", d.querySelector(".hm-live .hm-cell b")?.textContent === "3", d.querySelector(".hm-live")?.textContent.slice(0, 90));
-    ok("REVIEW-7 Home flags answers waiting for a person", /waiting for a person/.test(d.querySelector(".hm-alerts")?.textContent || ""));
+    await waitFor(() => d.querySelector(".hm-live") && d.querySelector(".hm-kpis"), 20000);
+    ok("REVIEW-6 Home shows the week's numbers", d.querySelector(".hm-kpis .hm-kpi b")?.textContent === "3" && !!d.querySelector(".hm-live .hm-dec td.n"), d.querySelector(".hm-kpis")?.textContent.slice(0, 90));
+    ok("REVIEW-7 the head says answers need you, with Review now", /Need You\./.test(d.querySelector(".hm-brief .hm-status")?.textContent || "") && /Review now/.test(d.querySelector(".hm-brief .hm-acts")?.textContent || ""), d.querySelector(".hm-brief .hm-status")?.textContent);
     ok("REVIEW-8 the sidebar counts what is waiting", Number(d.querySelector("#reviewBadge")?.textContent || 0) >= 1 && !d.querySelector("#reviewBadge").hidden);
     await w.fetch("/zex/log/clear", { method: "POST", headers: page, body: "{}" });
     await goRoute(w, d, "api");

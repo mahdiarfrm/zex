@@ -793,12 +793,6 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .rv-acc { display: flex; flex-direction: column; gap: 12px; }
 .rv-acc-note { margin: 0; font-size: 13px; color: var(--text-muted); }
 .switch.sm { height: 24px; } .switch.sm .pix { font-size: 16px; }
-.hm-alerts { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; max-width: 64%; }
-.hm-alerts:empty { display: none; }
-.hm-alert { display: flex; align-items: center; gap: 12px; padding: 8px 10px 8px 8px; background: var(--winbody); border: 1.5px solid var(--desk-ink); box-shadow: 5px 5px 0 var(--desk-ink); font-size: 13.5px; }
-.hm-alert .ic { width: 26px; height: 26px; display: grid; place-items: center; font-size: 22px; background: var(--desk-ink); color: var(--desk); flex: none; }
-.hm-alert.a-bad .ic { background: var(--danger); color: #fff; } .hm-alert.a-warn .ic { background: var(--warn); color: #fff; }
-.hm-alert .tx { flex: 1; }
 .hm-live { display: flex; flex-direction: column; gap: 10px; }
 .hm-cell { text-align: left; padding: 8px 4px 10px; border-bottom: 1px dotted var(--border-strong); display: flex; flex-direction: column; }
 .hm-stats > .hm-cell:nth-child(odd) { border-right: 1px dotted var(--border-strong); padding-right: 10px; }
@@ -810,7 +804,34 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .lb { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; }
 .lb i { display: block; } .lb i.aut { background: var(--text); } .lb i.rev { background: repeating-linear-gradient(135deg, var(--text-muted) 0 1.5px, transparent 1.5px 4px); }
 .lbars-x { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); }
-@media (max-width: 1100px) { .rv-grid { grid-template-columns: minmax(0, 1fr); } .hm-alerts { max-width: none; } }
+@media (max-width: 1100px) { .rv-grid { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- home briefing ---------- */
+.hm-brief { max-width: calc(100% - 250px); }
+.hm-brief .hm-leader { margin: 34px 0 14px; max-width: none; gap: 0; }
+.hm-brief .hm-leader .dot { margin-right: 8px; }
+.hm-tone { display: inline-block; font-size: 17px; line-height: 19px; padding: 0 6px; background: var(--text); color: var(--bg); margin-bottom: 8px; }
+.tone-bad .hm-tone { background: var(--danger); color: #fff; } .tone-warn .hm-tone { background: var(--warn); color: #fff; }
+.tone-info .hm-tone { background: var(--accent); color: var(--on-accent); }
+.hm-brief .hm-status { font-size: clamp(40px, 5.2vw, 88px); line-height: 1.02; padding-top: .04em; max-width: none; min-height: 0; }
+.tone-bad .hm-status { color: var(--danger); }
+.hm-sub { margin: 12px 0 0; font-size: 15.5px; line-height: 1.45; max-width: 640px; }
+.hm-more { list-style: none; margin: 10px 0 0; padding: 0; font-size: 13px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
+.hm-acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+.hm-acts .btn { height: 34px; padding: 0 14px; }
+.hm-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 170px)); margin-top: 22px; border-top: 1.5px solid var(--text); border-left: 1.5px solid var(--text); width: max-content; max-width: 100%; }
+.hm-kpi { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 10px 14px 12px; border-right: 1.5px solid var(--text); border-bottom: 1.5px solid var(--text); background: color-mix(in srgb, var(--bg) 55%, transparent); min-width: 0; }
+.hm-kpi b { font-family: var(--pix); font-size: 40px; font-weight: 400; line-height: .95; }
+.hm-kpi span { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hm-kpi:hover { background: var(--bg); } .hm-kpi:hover b { color: var(--accent); }
+.hm-dec { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.hm-dec th { font: 15px var(--pix); text-transform: uppercase; color: var(--text-muted); text-align: right; padding: 0 0 4px 8px; font-weight: 400; }
+.hm-dec th:first-child { text-align: left; padding-left: 0; }
+.hm-dec td { padding: 6px 0 6px 8px; border-top: 1px dotted var(--border-strong); text-align: right; }
+.hm-dec td.n { text-align: left; padding-left: 0; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
+.hm-dec td.pix { font-size: 19px; } .hm-dec td.w { color: var(--accent); }
+.hm-dec tbody tr { cursor: pointer; } .hm-dec tbody tr:hover td { background: var(--surface-2); }
+@media (max-width: 900px) { .hm-brief { max-width: none; } .hm-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); width: auto; } }
 
 /* ---------- boot splash ---------- */
 #splash { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; overflow: hidden; background: var(--bg); color: var(--text);
@@ -1466,14 +1487,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     document.querySelectorAll("[data-cerr]").forEach((el) => { el.textContent = statusLine(el.dataset.cerr).error || ""; });
     document.querySelectorAll("[data-cmodels]").forEach((el) => el.replaceChildren(...modelChips(el.dataset.cmodels)));
     document.querySelectorAll("[data-coff]").forEach((el) => { el.hidden = cstat[el.dataset.coff]?.state !== "bad"; });
-    document.querySelectorAll("[data-hmstatus]").forEach((el) => { const t = homeStatus(); if (el.dataset.t !== t) { el.dataset.t = t; el.replaceChildren(...words(t)); } });
-  }
-  function homeStatus() {
-    const st = cstat[activeId];
-    if (!st || st.state === "checking") return "Connecting…";
-    if (st.state === "bad") return "No Model Server.";
-    if (st.state === "warn") return "Server Ready.";
-    return `${st.models.length} Model${st.models.length === 1 ? "" : "s"} Ready.`;
+    paintBrief();
   }
 
   function useConn(id) { activeId = id; saveConns(); syncModelSelect(); paintConnUI(); cmp.a = null; cmp.b = null; cmp.res = {}; if (route !== "playground") applyRoute(); }
@@ -2936,7 +2950,6 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       ac.kind === "ollaya" ? [h("code", {}, installCmds),
         h("div", { class: "btn-row" }, h("button", { class: "btn", type: "button", onclick: async () => toast((await copyText(installCmds)) ? "Commands copied" : "Copy failed") }, "Copy install commands"))] : null);
 
-    const status = homeStatus();
     const stat = (label, value, count, suffix = "") => h("div", {}, h("b", count != null ? { "data-count": String(count), "data-suffix": suffix } : {}, value), h("span", {}, label));
 
     return h("div", { class: "home" },
@@ -2945,12 +2958,10 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         h("div", { class: "hm-top" },
           h("span", { class: "tagline cursor" }, "Zex.OS 0.2"), h("h1", {}, "Home"), h("span", { class: "grow" }),
           h("span", { class: "zclock pix" }, `${fmtDate()} · ${fmtTime()}`)),
-        h("p", { class: "hm-leader" }, h("b", {}, ac.name), h("span", { class: "dl", "aria-hidden": "true" }), h("span", { class: "u" }, ac.url.replace(/^https?:\/\//, ""))),
-        h("div", { class: "giant hm-status", "data-hmstatus": "", "data-t": status, role: "status" }, words(status)),
+        (hmBriefEl = briefEl()),
         h("div", { class: "hm-mark" }, h("div", { class: "halftone" }), heroCanvas())),
       h("div", { class: "hm-desk-wrap" }, withDeskDots(h("section", { class: "hm-desk", "aria-label": "Workspace" },
         h("span", { class: "tagline" }, "Zex.OS1"),
-        (hmAlertsEl = alertsEl()),
         h("div", { class: "hm-grid" },
         win("Zex.Run", h("span", { "data-model": "" }, model), h("div", { class: "qr" }, ta, h("div", { class: "qr-row" }, sel, keys, runQ)), "qr-win"),
         win("Zex.Link", `${conns.length} saved`, h("div", { class: "hm-conn" },
@@ -3038,7 +3049,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   // as spot checks. Every review is a label, and labels feed the accuracy view and Home.
   const rv = { tab: "waiting", set: "", items: [], counts: {}, total: 0, sel: null, picks: {}, q: 0, evalKey: null, evalThr: {}, evalItems: null, loading: false, error: "" };
   let live = { stats: null, counts: null };
-  let rvBody = null, hmStatsEl = null, hmAlertsEl = null;
+  let rvBody = null, hmStatsEl = null;
   async function zexGet(path) { const r = await fetch(path, { headers: { "X-Zex": "1" } }); const d = await r.json(); if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`); return d; }
   async function zexPost(path, body) { const r = await fetch(path, { method: "POST", headers: { "X-Zex": "1", "Content-Type": "application/json" }, body: JSON.stringify(body) }); const d = await r.json(); if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`); return d; }
   const itemStatus = (it) => (it.review ? "reviewed" : it.error ? "error" : !it.all_auto ? "waiting" : it.audit ? "spot" : "auto");
@@ -3071,10 +3082,10 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       if (rv.tab === "accuracy") {
         if (!rv.set) rv.set = (curSet() || sets[0])?.slug || "";
         const d = await zexGet(`/zex/log?status=reviewed&limit=-1&set=${encodeURIComponent(rv.set)}`);
-        rv.evalItems = d.items; rv.counts = d.counts;
+        rv.evalItems = d.items || []; rv.counts = d.counts || {};
       } else {
         const d = await zexGet(`/zex/log?status=${rv.tab}&limit=200${setQ}`);
-        rv.items = d.items; rv.counts = d.counts; rv.total = d.total;
+        rv.items = d.items || []; rv.counts = d.counts || {}; rv.total = d.total || 0;
         if (!rv.items.some((x) => x.id === rv.sel)) { rv.sel = rv.items[0]?.id || null; rv.picks = {}; rv.q = 0; }
       }
     } catch (e) { rv.error = e.message; }
@@ -3269,17 +3280,11 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     if (L.waiting + L.spot) out.push({ kind: "info", text: `${fmtN(L.waiting)} answer${L.waiting === 1 ? " is" : "s are"} waiting for a person${L.spot ? `, and ${fmtN(L.spot)} spot check${L.spot === 1 ? "" : "s"}` : ""}.`, act: ["Review now", () => { rv.tab = L.waiting ? "waiting" : "spot"; go("review"); }] });
     for (const p of L.per) {
       const see = ["See accuracy", () => { rv.tab = "accuracy"; rv.set = p.slug; rv.evalItems = null; go("review"); }];
-      if (p.ac >= 10 && p.ag / p.ac < evalTarget) out.push({ kind: "bad", text: `${p.name}: AUTO answers were right ${pct(p.ag / p.ac)} of the time this week, below your aim of ${pct(evalTarget)}.`, act: see });
-      else if (p.ac >= 10 && p.pac >= 10 && p.pag / p.pac - p.ag / p.ac >= 0.05) out.push({ kind: "warn", text: `${p.name}: AUTO answers were right ${pct(p.ag / p.ac)} of the time this week, down from ${pct(p.pag / p.pac)} the week before.`, act: see });
-      if (p.req >= 10 && p.err / p.req > 0.1) out.push({ kind: "bad", text: `${p.name}: ${fmtN(p.err)} of ${fmtN(p.req)} requests failed this week. Check the connection.`, act: ["Connections", () => go("connections")] });
+      if (p.ac >= 10 && p.ag / p.ac < evalTarget) out.push({ kind: "bad", head: `${p.name} Is Below Your Aim.`, text: `${p.name}: AUTO answers were right ${pct(p.ag / p.ac)} of the time this week, below your aim of ${pct(evalTarget)}.`, act: see });
+      else if (p.ac >= 10 && p.pac >= 10 && p.pag / p.pac - p.ag / p.ac >= 0.05) out.push({ kind: "warn", head: `${p.name} Is Slipping.`, text: `${p.name}: AUTO answers were right ${pct(p.ag / p.ac)} of the time this week, down from ${pct(p.pag / p.pac)} the week before.`, act: see });
+      if (p.req >= 10 && p.err / p.req > 0.1) out.push({ kind: "bad", head: "Requests Are Failing.", text: `${p.name}: ${fmtN(p.err)} of ${fmtN(p.req)} requests failed this week. Check the connection.`, act: ["Connections", () => go("connections")] });
     }
     return out;
-  }
-  function alertsEl() {
-    const L = liveSummary(), list = L ? liveAlerts(L) : [];
-    return h("div", { class: "hm-alerts" }, list.map((a) => h("div", { class: "hm-alert a-" + a.kind, role: a.kind === "info" ? "status" : "alert" },
-      h("span", { class: "ic pix" }, a.kind === "info" ? "i" : "!"), h("span", { class: "tx" }, a.text),
-      h("button", { class: "btn", type: "button", onclick: a.act[1] }, a.act[0]))));
   }
   function statsCard() {
     const L = liveSummary();
@@ -3292,22 +3297,80 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         stat(`answers at ≥ ${Math.round(thr * 100)}%`, st.autoRate != null ? pct(st.autoRate) : "–", st.autoRate != null ? Math.round(st.autoRate * 100) : null, "%"),
         stat("last run", st.lastAt ? ago(st.lastAt) : "–")));
     }
-    const t = L.tot, ok = t.req - t.err, max = Math.max(1, ...L.daily.map((d) => d.req));
-    const cell = (label, value, sub, onclick) => h(onclick ? "button" : "div", onclick ? { type: "button", class: "hm-cell link", onclick } : { class: "hm-cell" }, h("b", {}, value), h("span", {}, label), sub ? h("small", {}, sub) : null);
+    const max = Math.max(1, ...L.daily.map((d) => d.req)), wt = live.stats.waiting || {}, sp = live.stats.spot || {};
     return win("Zex.Live", "7 days", h("div", { class: "hm-live" },
-      h("div", { class: "hm-stats" },
-        cell("requests", fmtN(t.req), t.err ? `${fmtN(t.err)} failed` : null),
-        cell("answered on its own", ok ? pct(t.auto / ok) : "–"),
-        cell("right when on its own", t.ac ? pct(t.ag / t.ac) : "–", t.ac ? `${fmtN(t.ac)} spot-checked` : "no spot checks yet", () => { rv.tab = t.ac ? "accuracy" : "spot"; go("review"); }),
-        cell("waiting for a person", fmtN(L.waiting + L.spot), null, () => { rv.tab = L.waiting ? "waiting" : "spot"; go("review"); })),
+      h("table", { class: "hm-dec" },
+        h("thead", {}, h("tr", {}, h("th", {}, "decision"), h("th", {}, "requests"), h("th", {}, "on its own"), h("th", {}, "right"), h("th", {}, "waiting"))),
+        h("tbody", {}, L.per.sort((a, b) => b.req - a.req).map((p) => {
+          const ok = p.req - p.err, w = (wt[p.slug] || 0) + (sp[p.slug] || 0);
+          return h("tr", { onclick: () => { rv.set = p.slug; rv.tab = w ? "waiting" : "accuracy"; rv.evalItems = null; go("review"); } },
+            h("td", { class: "n" }, p.name), h("td", { class: "pix" }, fmtN(p.req)), h("td", { class: "pix" }, ok ? pct(p.auto / ok) : "–"),
+            h("td", { class: "pix" }, p.ac ? pct(p.ag / p.ac) : "–"), h("td", { class: "pix" + (w ? " w" : "") }, fmtN(w)));
+        }))),
       h("div", { class: "lbars", title: "Requests per day: filled answered on its own, hatched went to a person" },
         L.daily.map((d) => h("div", { class: "lb", title: `${d.day}: ${d.req} requests, ${d.auto} on its own` },
           h("i", { class: "rev", style: `height:${((d.req - d.auto) / max) * 100}%` }), h("i", { class: "aut", style: `height:${(d.auto / max) * 100}%` })))),
       h("div", { class: "lbars-x pix" }, h("span", {}, L.daily[0].day.slice(5)), h("span", {}, "today"))));
   }
+
+  // The head of Home: the single most important thing right now, what to do about it, and
+  // the week's numbers. Problems come first, then work waiting, then how things are going.
+  let hmBriefEl = null;
+  function briefing() {
+    const c = activeConn(), st = cstat[activeId], L = liveSummary();
+    const toReview = (tab) => () => { rv.tab = tab; go("review"); };
+    if (!st || st.state === "checking") return { tone: "wait", tag: "CONNECTING", h: "Connecting…", s: `Looking for ${c.name} at ${c.url.replace(/^https?:\/\//, "")}.`, acts: [] };
+    if (st.state === "bad") return { tone: "bad", tag: "OFFLINE", h: "No Model Server.", s: `${c.name} isn't answering at ${c.url.replace(/^https?:\/\//, "")}. Start it, or switch to another connection.`, acts: [["Connections", () => go("connections"), true]] };
+    if (L) {
+      const alerts = liveAlerts(L), wait = L.waiting + L.spot;
+      const top = alerts.find((a) => a.kind === "bad") || alerts.find((a) => a.kind === "warn");
+      const rest = alerts.filter((a) => a !== top && a.kind !== "info");
+      if (top) return { tone: top.kind, tag: "ATTENTION", h: top.head, s: top.text, more: rest, acts: [[top.act[0], top.act[1], true], ...(wait ? [[`Review ${fmtN(wait)}`, toReview(L.waiting ? "waiting" : "spot")]] : [])] };
+      if (wait) {
+        const per = Object.entries(live.stats.waiting || {}).filter(([, n]) => n).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([slug, n]) => `${setName(slug)} has ${fmtN(n)} waiting`);
+        const spot = L.spot ? `plus ${fmtN(L.spot)} spot check${L.spot === 1 ? "" : "s"}` : "";
+        return { tone: "info", tag: "FOR YOU", h: `${fmtN(wait)} Answer${wait === 1 ? " Needs" : "s Need"} You.`, s: [...per, spot].filter(Boolean).join(", ") + ". Review them so Zex learns where to trust the model.", more: rest,
+          acts: [["Review now", toReview(L.waiting ? "waiting" : "spot"), true], ["See accuracy", () => { rv.tab = "accuracy"; rv.evalItems = null; go("review"); }]] };
+      }
+      const t = L.tot, ok = t.req - t.err;
+      return { tone: "ok", tag: "ALL CLEAR", h: ok ? `${pct(t.auto / ok)} Handled On Its Own.` : "All Clear.",
+        s: `${fmtN(t.req)} request${t.req === 1 ? "" : "s"} this week, nothing waiting. ` + (t.ac ? `Spot checks found the model right ${pct(t.ag / t.ac)} of the time.` : "Spot checks will show how often the model is right."), more: rest,
+        acts: [["See accuracy", () => { rv.tab = "accuracy"; rv.evalItems = null; go("review"); }, true]] };
+    }
+    const n = st.models.length;
+    return { tone: "ok", tag: "READY", h: "Ready To Decide.",
+      s: `${c.name} is online with ${n} model${n === 1 ? "" : "s"}. Try a set on a message below, or turn on the local API to put one to work.`,
+      acts: [["Open Playground", () => openMode("response"), true], [apiCfg.enabled ? "Local API" : "Turn on the local API", () => go("api")]] };
+  }
+  function briefEl() {
+    const b = briefing(), L = liveSummary(), c = activeConn(), sl = statusLine(c.id);
+    const key = [b.tone, b.h, b.s, b.acts.map((a) => a[0]).join(), (b.more || []).length, L ? [L.tot.req, L.tot.auto, L.tot.ac, L.waiting + L.spot].join() : ""].join("|");
+    const cell = (label, value, onclick) => h("button", { type: "button", class: "hm-kpi", onclick }, h("b", {}, value), h("span", {}, label));
+    const t = L?.tot, ok = t ? t.req - t.err : 0;
+    return h("div", { class: "hm-brief tone-" + b.tone, "data-key": key },
+      h("p", { class: "hm-leader" }, h("span", { class: sl.cls, "data-cdot": c.id }), h("b", {}, c.name), h("span", { class: "dl", "aria-hidden": "true" }),
+        h("span", { class: "u" }, `${model} · `, h("span", { "data-ctext": c.id }, sl.short))),
+      h("span", { class: "hm-tone pix" }, b.tag),
+      h("h2", { class: "giant hm-status", role: "status" }, words(b.h)),
+      h("p", { class: "hm-sub" }, b.s),
+      b.more?.length ? h("ul", { class: "hm-more" }, b.more.slice(0, 2).map((a) => h("li", {}, h("span", {}, a.text), " ", h("button", { class: "text-btn xs bordered", type: "button", onclick: a.act[1] }, a.act[0])))) : null,
+      b.acts.length ? h("div", { class: "hm-acts" }, b.acts.map(([label, fn, primary]) => h("button", { class: "btn" + (primary ? " solid" : ""), type: "button", onclick: fn }, label))) : null,
+      L ? h("div", { class: "hm-kpis", "aria-label": "The last 7 days" },
+        cell("requests this week", fmtN(t.req), () => { rv.tab = "all"; go("review"); }),
+        cell("handled on its own", ok ? pct(t.auto / ok) : "–", () => { rv.tab = "all"; go("review"); }),
+        cell("right when on its own", t.ac ? pct(t.ag / t.ac) : "–", () => { rv.tab = t.ac ? "accuracy" : "spot"; rv.evalItems = null; go("review"); }),
+        cell("waiting for you", fmtN(L.waiting + L.spot), () => { rv.tab = L.waiting ? "waiting" : "spot"; go("review"); })) : null);
+  }
+  function paintBrief() {
+    if (!hmBriefEl?.isConnected) return;
+    const n = briefEl();
+    if (n.dataset.key === hmBriefEl.dataset.key) return;
+    hmBriefEl.replaceWith(n); hmBriefEl = n;
+  }
+
   function paintLive() {
     if (hmStatsEl?.isConnected) { const n = statsCard(); hmStatsEl.replaceWith(n); hmStatsEl = n; }
-    if (hmAlertsEl?.isConnected) { const n = alertsEl(); hmAlertsEl.replaceWith(n); hmAlertsEl = n; }
+    paintBrief();
   }
 
   // ---------------------------------------------------------------- local API

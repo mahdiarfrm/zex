@@ -203,7 +203,7 @@ func handleLog(w http.ResponseWriter, r *http.Request, origins map[string]bool) 
 	defer logMu.Unlock()
 	loadLog()
 	counts := map[string]int{"waiting": 0, "spot": 0, "reviewed": 0, "error": 0, "auto": 0, "all": 0}
-	var match []*logItem
+	match := []*logItem{} // an empty list, never null, so the page can always read it
 	for i := len(logItems) - 1; i >= 0; i-- {
 		it := logItems[i]
 		if set != "" && it.Set != set {

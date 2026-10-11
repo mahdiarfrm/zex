@@ -94,7 +94,7 @@ Each review is a label. Zex uses the labels to show how often the model is right
 
 <img alt="Home: requests this week, the share answered on its own, accuracy from spot checks, and what is waiting" src="docs/screenshots/home-live.png">
 
-Home shows the last 7 days: requests, the share answered on its own, how often those answers were right, and what is waiting for a person. It warns you when accuracy falls below your aim, when it slips from the week before, and when requests start failing.
+Home leads with what matters right now: a problem to fix, answers waiting for you, or how the week went, with the button to act on it. Below it are the week's numbers (requests, the share handled on its own, how often those answers were right, what is waiting), and the Live card breaks them down by decision. Zex warns you when accuracy falls below your aim, when it slips from the week before, and when requests start failing.
 
 ## More
 
