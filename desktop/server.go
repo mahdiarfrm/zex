@@ -46,6 +46,8 @@ func newHandler(site fs.FS, port int) http.Handler {
 			handleReview(w, r, origins)
 		case r.URL.Path == "/zex/stats":
 			handleStats(w, r, origins)
+		case r.URL.Path == "/zex/points":
+			handlePoints(w, r, origins)
 		case r.URL.Path == "/api" || strings.HasPrefix(r.URL.Path, "/api/"):
 			handleAPI(w, r)
 		case r.Method == http.MethodGet || r.Method == http.MethodHead:

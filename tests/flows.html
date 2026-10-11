@@ -168,7 +168,7 @@ async function goRoute(w, d, r) {
     ok("HOME-1 home shows quick run, connections, recent runs, stats and six tools", !!d.querySelector(".qr textarea") && !!d.querySelector(".hm-conn") && !!d.querySelector(".hm-recent") && !!d.querySelector(".hm-stats") && d.querySelectorAll(".opt-tile").length === 6);
     ok("HOME-2 clock shows the time", /\d\d:\d\d:\d\d/.test(d.querySelector(".hm-top .zclock")?.textContent || ""));
     ok("HOME-6 no landing-page call-to-action links", !d.querySelector(".h-hero, .h-desk, .h-cta, .big-link"));
-    ok("HOME-10 the head says what matters now: ready, with the next step", /Ready To Decide\./.test(d.querySelector(".hm-brief .hm-status")?.textContent || "") && !!d.querySelector(".hm-brief .hm-acts .btn.solid"), d.querySelector(".hm-brief .hm-status")?.textContent);
+    ok("HOME-10 the head is a plain report: Overview, then what to do next", d.querySelector(".hm-brief .hm-status")?.textContent.trim() === "Overview" && /No requests yet/.test(d.querySelector(".hm-report")?.textContent || "") && !!d.querySelector(".hm-report .btn.solid"), d.querySelector(".hm-report")?.textContent.slice(0, 120));
     ok("HOME-11 3D mark and stippled desk drawn", !!d.querySelector(".hm-sky canvas.hero3d") && !!d.querySelector(".hm-desk canvas.hm-dots") && d.querySelector(".hm-dots").width > 0);
     ok("HOME-7 recent runs listed", d.querySelectorAll(".hm-recent .hist-item").length >= 1);
     ok("HOME-8 active connection shows its live status", /Online/.test(d.querySelector(".hm-conn [data-ctext]")?.textContent || ""));
@@ -271,12 +271,74 @@ async function goRoute(w, d, r) {
     await goRoute(w, d, "home");
     await waitFor(() => d.querySelector(".hm-live") && d.querySelector(".hm-kpis"), 20000);
     ok("REVIEW-6 Home shows the week's numbers", d.querySelector(".hm-kpis .hm-kpi b")?.textContent === "3" && !!d.querySelector(".hm-live .hm-dec td.n"), d.querySelector(".hm-kpis")?.textContent.slice(0, 90));
-    ok("REVIEW-7 the head says answers need you, with Review now", /Need You\./.test(d.querySelector(".hm-brief .hm-status")?.textContent || "") && /Review now/.test(d.querySelector(".hm-brief .hm-acts")?.textContent || ""), d.querySelector(".hm-brief .hm-status")?.textContent);
+    ok("REVIEW-7 the report lists answers waiting for review, with a Review button", /waiting for review/.test(d.querySelector(".hm-report .hm-items")?.textContent || "") && [...d.querySelectorAll(".hm-report .btn")].some((b) => b.textContent === "Review"), d.querySelector(".hm-report .hm-items")?.textContent.slice(0, 120));
+    await waitFor(() => /3 REQUESTS/.test(d.querySelector('.hm-atlas [data-at="count"]')?.textContent || ""), 15000);
+    ok("ATLAS-1 the atlas draws the week: globe, route, confidence, savings and trend", ["cv-globe", "cv-flow", "cv-hist", "cv-saved"].every((c) => d.querySelector(".hm-atlas canvas." + c)) && !!d.querySelector(".hm-atlas .at-trend-svg"));
+    ok("ATLAS-2 every request is a dot on the globe", /3 REQUESTS/.test(d.querySelector('.hm-atlas [data-at="count"]')?.textContent || "") && d.querySelector('.hm-atlas [data-at="empty"]').hidden, d.querySelector('.hm-atlas [data-at="count"]')?.textContent);
     ok("REVIEW-8 the sidebar counts what is waiting", Number(d.querySelector("#reviewBadge")?.textContent || 0) >= 1 && !d.querySelector("#reviewBadge").hidden);
     await w.fetch("/zex/log/clear", { method: "POST", headers: page, body: "{}" });
     await goRoute(w, d, "api");
     if (d.querySelector(".switch.on")) d.querySelector(".switch").click();
     await sleep(300);
+
+    // routes: a cheap stage first, a stronger one for what it isn't sure of, then a person
+    await goRoute(w, d, "sets");
+    const triCard = () => [...d.querySelectorAll(".set-win")].find((x) => /^Support triage/.test(x.querySelector(".win-title").textContent));
+    [...triCard().querySelectorAll(".route .text-btn")].find((b) => /route/i.test(b.textContent)).click(); await sleep(80);
+    let rrows = triCard().querySelectorAll(".re-row:not(.person)");
+    const m1 = rrows[0].querySelectorAll("select")[1]; m1.value = "laya:en"; m1.dispatchEvent(new Event("change", { bubbles: true }));
+    [...triCard().querySelectorAll(".route .btn")].find((b) => /Add a stage/.test(b.textContent)).click(); await sleep(80);
+    rrows = triCard().querySelectorAll(".re-row:not(.person)");
+    const m2 = rrows[1].querySelectorAll("select")[1]; m2.value = "laya:latest"; m2.dispatchEvent(new Event("change", { bubbles: true }));
+    const c2 = rrows[1].querySelector("input.cost"); c2.value = "2"; c2.dispatchEvent(new Event("input", { bubbles: true }));
+    [...triCard().querySelectorAll(".route .btn")].find((b) => b.textContent === "Save route").click(); await sleep(80);
+    const savedRoute = JSON.parse(w.localStorage.getItem("zex.sets")).find((x) => x.name === "Support triage")?.route || [];
+    ok("ROUTE-1 a route saves with its stages", savedRoute.length === 2 && savedRoute[0].model === "laya:en" && savedRoute[1].cost === 2 && /person/.test(triCard().querySelector(".route").textContent), JSON.stringify(savedRoute));
+    await goRoute(w, d, "api");
+    await waitFor(() => d.querySelector(".switch"), 3000);
+    if (!d.querySelector(".switch.on")) d.querySelector(".switch").click();
+    await waitFor(() => d.querySelector(".switch.on") && d.querySelector(".api-trywin"), 5000);
+    const cfg3 = await (await w.fetch("/zex/api-config", { headers: page })).json();
+    const r4 = await w.fetch("/api/sets/support-triage", { method: "POST", headers: { Authorization: "Bearer " + cfg3.token, "Content-Type": "application/json" }, body: JSON.stringify({ text: "I was charged twice, please refund one of them." }) });
+    const j4 = await r4.json();
+    ok("ROUTE-2 the API runs the route and says who answered", r4.status === 200 && j4.route?.[0]?.model === "laya:en" && typeof j4.answered_by === "string" && typeof j4.cost === "number", JSON.stringify(j4).slice(0, 160));
+    await goRoute(w, d, "sets");
+    triCard().querySelector(".btn.solid").click();
+    await waitFor(() => w.location.hash === "#/playground", 3000);
+    d.querySelector('[data-mode="batch"]').click(); await sleep(50);
+    [...d.querySelectorAll(".b-head [role=tab]")].find((b) => b.textContent === "File").click(); await sleep(50);
+    drop(d.querySelector(".b-win"), new w.File(['id,message,team\n1,"You charged my card twice, refund it",billing\n2,The app crashes when I open reports,technical\n3,"I can\'t sign in, the reset link expired",account\n'], "tickets.csv", { type: "text/csv" }));
+    await waitFor(() => d.querySelector(".b-map"), 3000);
+    ok("ROUTE-3 Batch offers the set's route", !!d.querySelector(".b-route input")?.checked && /laya:en → Ollaya · laya:latest → person/.test(d.querySelector(".b-route")?.textContent || ""), d.querySelector(".b-route")?.textContent);
+    [...d.querySelectorAll(".b-ctl .btn")].find((b) => b.textContent === "Run batch").click();
+    await waitFor(() => /Run again/.test(d.querySelector(".b-ctl .btn.solid")?.textContent || ""), 120000);
+    ok("ROUTE-4 Batch shows where each request finished and what it cost", !!d.querySelector(".b-routes") && d.querySelectorAll(".btable td .via").length === 3 && /Spent \$/.test(d.querySelector(".b-cost")?.textContent || ""), d.querySelector(".b-cost")?.textContent);
+
+    // replay: try an edit on every labeled example before saving it
+    const qed2 = d.querySelector("#qBody .ce-input"), qv2 = JSON.parse(qed2.value);
+    qv2.team.instructions = "Which team should handle this customer's message?";
+    type(qed2, JSON.stringify(qv2, null, 2)); await sleep(80);
+    d.querySelector('[data-mode="replay"]').click();
+    await waitFor(() => [...d.querySelectorAll(".pane .btn.solid")].some((b) => /^Replay on/.test(b.textContent)), 8000);
+    ok("REPLAY-1 replay finds the labeled examples and what changed", /3 labeled examples/.test(d.querySelector(".rp-src")?.textContent || "") && /Changed: team/.test(d.querySelector(".rp-src")?.textContent || ""), d.querySelector(".rp-src")?.textContent);
+    [...d.querySelectorAll(".pane .btn.solid")].find((b) => /^Replay on/.test(b.textContent)).click();
+    await waitFor(() => d.querySelector(".rp-body .eval-tiles"), 120000);
+    ok("REPLAY-2 replay shows accuracy and automation before and after", d.querySelectorAll(".rp-body .etile").length === 4 && /was \d+%/.test(d.querySelector(".rp-body .etile .es")?.textContent || ""), d.querySelector(".rp-body .eval-tiles")?.textContent.slice(0, 120));
+    const vBefore = JSON.parse(w.localStorage.getItem("zex.sets")).find((x) => x.name === "Support triage").version;
+    [...d.querySelectorAll(".rp-body .btn.solid")].find((b) => /^Save as v/.test(b.textContent)).click(); await sleep(80);
+    ok("REPLAY-3 saving after a replay makes a new version", JSON.parse(w.localStorage.getItem("zex.sets")).find((x) => x.name === "Support triage").version === vBefore + 1 && !d.querySelector("#setChip").classList.contains("dirty"));
+    await w.fetch("/zex/log/clear", { method: "POST", headers: page, body: "{}" });
+    await goRoute(w, d, "api");
+    if (d.querySelector(".switch.on")) d.querySelector(".switch").click();
+    await sleep(300);
+
+    // clicking a button that re-renders the page keeps the scroll and replays nothing
+    await goRoute(w, d, "sets");
+    d.querySelector("#page").scrollTop = 260; await sleep(50);
+    const before2 = d.querySelector("#page").scrollTop;
+    [...triCard().querySelectorAll(".route .text-btn")].find((b) => /route/i.test(b.textContent)).click(); await sleep(80);
+    ok("UI-5 a click re-renders quietly: scroll kept, no entrance animation", before2 > 0 && Math.abs(d.querySelector("#page").scrollTop - before2) < 4 && d.querySelector("#page > .quiet") !== null, `${before2} → ${d.querySelector("#page").scrollTop}`);
+    [...triCard().querySelectorAll(".route .btn")].find((b) => b.textContent === "Cancel").click(); await sleep(50);
     w.localStorage.clear();
   } catch (e) {
     results.push("FAIL harness " + e.message);

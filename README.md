@@ -37,9 +37,9 @@ Chat models answer in sentences you have to parse. Typed-decision models answer 
 
 ### Question sets
 
-<img alt="Question sets: saved groups of typed questions" src="docs/screenshots/sets.png">
+<img alt="Question sets: saved groups of typed questions, each with its route" src="docs/screenshots/sets-route.png">
 
-Save the questions you write as a **set**: a named, versioned group you can reuse in the Playground, in Batch, from Home and through the local API. A set can give each question its own AUTO threshold. Export a set as a `.zex.json` file to share it or keep it next to your code, and drop one onto the Sets page to import it.
+Save the questions you write as a **set**: a named, versioned group you can reuse in the Playground, in Batch, from Home and through the local API. A set can give each question its own AUTO threshold and its own route. Export a set as a `.zex.json` file to share it or keep it next to your code, and drop one onto the Sets page to import it.
 
 ### Files in, accuracy out
 
@@ -54,6 +54,18 @@ If the file also has a column with the answer you expect, Zex measures how often
 - calibration: when it said 90%, how often it was right.
 
 Pick the accuracy you need, and Zex suggests the threshold that automates the most while staying above it. One click saves that threshold to the set.
+
+### Send the cheap model first
+
+<img alt="A batch run through a route: where each request was finished, and the money saved" src="docs/screenshots/route-batch.png">
+
+Give a set a **route**: a free local model first, a stronger or paid one next, a person last. Every question starts at the first stage. Only the questions a stage isn't sure about go on to the next, and whatever is still unsure waits in Review. If a stage is down, the next one covers for it. Zex shows where each request was finished and what it cost, against sending everything to the strongest model. Run a labeled file through the route in Batch to see the accuracy and the savings before you switch it on.
+
+### Replay an edit before you save it
+
+<img alt="Replay: accuracy and automation before and after an edit, and every answer that flipped" src="docs/screenshots/replay.png">
+
+Change a question's wording, an option or a model, and **Replay** runs the edit on every labeled example you have, from your reviews and from labeled files. It shows accuracy and automation before and after, and every answer that flipped to right or to wrong. Save it as a new version, or throw it away.
 
 ### A local API for every set
 
@@ -80,7 +92,7 @@ curl -s http://127.0.0.1:18765/api/sets/support-triage \
 }
 ```
 
-Requests use your active connection and the thresholds saved in the set, so `all_auto` tells your workflow when to act on its own and when to hand the item to a person. Send `{"items": [...]}` for up to 100 texts at once. `GET /api/sets` lists your sets.
+Requests use the set's route (or your active connection) and the thresholds saved in the set, so `all_auto` tells your workflow when to act on its own and when to hand the item to a person. With a route, responses also say which stage answered (`answered_by`) and what the request cost (`cost`). Send `{"items": [...]}` for up to 100 texts at once. `GET /api/sets` lists your sets.
 
 ### Review what the model isn't sure about
 
@@ -92,9 +104,14 @@ Each review is a label. Zex uses the labels to show how often the model is right
 
 ### Know how it's doing
 
-<img alt="Home: requests this week, the share answered on its own, accuracy from spot checks, and what is waiting" src="docs/screenshots/home-live.png">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/atlas-dark.png">
+  <img alt="The Atlas: every request of the week as a dot on a globe, the route as flowing particles, confidence, savings and accuracy" src="docs/screenshots/atlas.png">
+</picture>
 
-Home leads with what matters right now: a problem to fix, answers waiting for you, or how the week went, with the button to act on it. Below it are the week's numbers (requests, the share handled on its own, how often those answers were right, what is waiting), and the Live card breaks them down by decision. Zex warns you when accuracy falls below your aim, when it slips from the week before, and when requests start failing.
+Home opens with an **Overview**: a short report of what needs you (an accuracy alert, answers waiting for review) or how the week went, with the button to act on it, and the week's numbers. Zex warns you when accuracy falls below your aim, when it slips from the week before, and when requests start failing.
+
+Further down, the **Atlas** draws the week. Every request is a dot on a turning globe, higher where the model was surer. The route plays as particles flowing to the stage that finished them, next to the spread of confidence, the money the route saved and the accuracy trend.
 
 ## More
 

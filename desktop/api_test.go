@@ -255,3 +255,93 @@ func TestReviewQueue(t *testing.T) {
 		t.Fatalf("clear: %v", counts)
 	}
 }
+
+func TestRouteEscalatesOnlyUnsureQuestions(t *testing.T) {
+	var strongGot map[string]any
+	cheap := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{"model":"cheap","answers":{
+			"team":{"type":"choice","choice":"billing","probabilities":{"billing":0.92,"technical":0.08}},
+			"refund":{"type":"noul","noul":0.6},
+			"mood":{"type":"score","probabilities":{"0":0.3,"1":0.6,"2":0.1}}}}`)
+	}))
+	defer cheap.Close()
+	strong := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		var body map[string]any
+		json.NewDecoder(r.Body).Decode(&body)
+		strongGot, _ = body["questions"].(map[string]any)
+		io.WriteString(w, `{"model":"strong","answers":{
+			"refund":{"type":"noul","noul":0.95},
+			"mood":{"type":"score","probabilities":{"0":0.05,"1":0.9,"2":0.05}}}}`)
+	}))
+	defer strong.Close()
+	h := setup(t)
+	route := `[{"connection":{"kind":"custom","name":"Down","url":"http://127.0.0.1:1"},"model":"x","cost":5},
+		{"connection":{"kind":"custom","name":"Cheap","url":"` + cheap.URL + `"},"model":"c1","cost":0},
+		{"connection":{"kind":"custom","name":"Strong","url":"` + strong.URL + `"},"model":"s1","cost":2}]`
+	cfg := configure(t, h, `{"enabled":true,"thr":0.8,"audit":0,"sets":[{"slug":"triage","name":"Triage","route":`+route+`,
+		"questions":{"team":{"type":"choice"},"refund":{"type":"noul"},"mood":{"type":"score"}}}]}`)
+	auth := map[string]string{"Authorization": "Bearer " + cfg["token"].(string), "Content-Type": "application/json"}
+	r := get(t, h, "POST", "/api/sets/triage", auth, `{"text":"refund me"}`)
+	var out struct {
+		Status     string
+		AnsweredBy string `json:"answered_by"`
+		Cost       float64
+		Decisions  map[string]map[string]any
+		Route      []stageLog
+	}
+	json.Unmarshal(r.Body.Bytes(), &out)
+	if r.Code != 200 || out.Status != "auto" || out.AnsweredBy != "Strong · s1" {
+		t.Fatalf("route result: %d %s", r.Code, r.Body)
+	}
+	if len(strongGot) != 2 || strongGot["team"] != nil {
+		t.Fatalf("only the unsure questions should reach the strong model, it got %v", strongGot)
+	}
+	if out.Decisions["team"]["by"] != "Cheap · c1" || out.Decisions["refund"]["by"] != "Strong · s1" {
+		t.Fatalf("each answer says which stage gave it: %v", out.Decisions)
+	}
+	if len(out.Route) != 3 || out.Route[0].Error == "" || out.Route[1].Auto != 1 || out.Route[2].Asked != 2 {
+		t.Fatalf("a stage that is down is skipped and logged: %+v", out.Route)
+	}
+	if out.Cost != 0.002 {
+		t.Fatalf("cost should be the strong stage only, got %v", out.Cost)
+	}
+
+	page := map[string]string{"X-Zex": "1"}
+	r = get(t, h, "GET", "/zex/stats?days=7", page, "")
+	var st struct {
+		Sets   map[string]map[string][]float64
+		Routes map[string]map[string]int
+	}
+	json.Unmarshal(r.Body.Bytes(), &st)
+	if st.Routes["triage"]["Strong · s1"] != 1 || st.Sets["triage"]["spent"][6] != 0.002 || st.Sets["triage"]["baseline"][6] != 0.002 {
+		t.Fatalf("stats: %s", r.Body)
+	}
+	r = get(t, h, "GET", "/zex/points", page, "")
+	var pts struct {
+		Sets   []string
+		Points [][]float64
+	}
+	json.Unmarshal(r.Body.Bytes(), &pts)
+	if len(pts.Points) != 1 || pts.Sets[0] != "triage" || pts.Points[0][2] != 0.9 || pts.Points[0][3] != 0 || pts.Points[0][4] != 2 {
+		t.Fatalf("points: %s", r.Body)
+	}
+}
+
+func TestRouteStatsCountRequestsFinishedEarly(t *testing.T) {
+	sure := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		io.WriteString(w, `{"model":"cheap","answers":{"refund":{"type":"noul","noul":0.97}}}`)
+	}))
+	defer sure.Close()
+	h := setup(t)
+	cfg := configure(t, h, `{"enabled":true,"thr":0.8,"audit":0,"sets":[{"slug":"refunds","name":"Refunds","questions":{"refund":{"type":"noul"}},"route":[
+		{"connection":{"kind":"custom","name":"Cheap","url":"`+sure.URL+`"},"model":"c1"},
+		{"connection":{"kind":"custom","name":"Strong","url":"http://127.0.0.1:1"},"model":"s1","cost":2}]}]}`)
+	auth := map[string]string{"Authorization": "Bearer " + cfg["token"].(string), "Content-Type": "application/json"}
+	get(t, h, "POST", "/api/sets/refunds", auth, `{"text":"refund me"}`)
+	r := get(t, h, "GET", "/zex/stats?days=7", map[string]string{"X-Zex": "1"}, "")
+	var st struct{ Routes map[string]map[string]int }
+	json.Unmarshal(r.Body.Bytes(), &st)
+	if st.Routes["refunds"]["Cheap · c1"] != 1 {
+		t.Fatalf("a request finished by the first stage counts for it: %s", r.Body)
+	}
+}

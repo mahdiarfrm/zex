@@ -40,6 +40,12 @@ type logItem struct {
 	AuditRate float64         `json:"audit_rate,omitempty"`
 	Error     string          `json:"error,omitempty"`
 	Review    *logReview      `json:"review,omitempty"`
+	Stages    []stageLog      `json:"stages,omitempty"`
+	By        int             `json:"by"`
+	Cost      float64         `json:"cost,omitempty"`
+	Baseline  float64         `json:"baseline,omitempty"`
+	Ms        int64           `json:"ms,omitempty"`
+	RouteLen  int             `json:"route_len,omitempty"` // stages in the set's route when it ran
 }
 
 // status says where an item is: waiting for a person, set aside as a spot check, reviewed,
@@ -270,16 +276,19 @@ func handleStats(w http.ResponseWriter, r *http.Request, origins map[string]bool
 		labels[i] = start.AddDate(0, 0, i).Format("2006-01-02")
 	}
 	type series struct {
-		Requests      []int `json:"requests"`
-		Auto          []int `json:"auto"`
-		Errors        []int `json:"errors"`
-		AuditChecked  []int `json:"audit_checked"`
-		AuditAgreed   []int `json:"audit_agreed"`
-		ReviewChecked []int `json:"review_checked"`
-		ReviewAgreed  []int `json:"review_agreed"`
+		Requests      []int     `json:"requests"`
+		Auto          []int     `json:"auto"`
+		Errors        []int     `json:"errors"`
+		AuditChecked  []int     `json:"audit_checked"`
+		AuditAgreed   []int     `json:"audit_agreed"`
+		ReviewChecked []int     `json:"review_checked"`
+		ReviewAgreed  []int     `json:"review_agreed"`
+		Spent         []float64 `json:"spent"`
+		Baseline      []float64 `json:"baseline"`
 	}
 	sets := map[string]*series{}
 	waiting, spot := map[string]int{}, map[string]int{}
+	routes := map[string]map[string]int{} // last 7 days: which stage finished each request
 	logMu.Lock()
 	defer logMu.Unlock()
 	loadLog()
@@ -300,10 +309,22 @@ func handleStats(w http.ResponseWriter, r *http.Request, origins map[string]bool
 		}
 		s := sets[it.Set]
 		if s == nil {
-			s = &series{make([]int, days), make([]int, days), make([]int, days), make([]int, days), make([]int, days), make([]int, days), make([]int, days)}
+			s = &series{make([]int, days), make([]int, days), make([]int, days), make([]int, days), make([]int, days), make([]int, days), make([]int, days), make([]float64, days), make([]float64, days)}
 			sets[it.Set] = s
 		}
 		s.Requests[d]++
+		s.Spent[d] += it.Cost
+		s.Baseline[d] += it.Baseline
+		if it.RouteLen > 1 && d >= days-7 && it.Error == "" {
+			label := "person"
+			if it.AllAuto && it.By >= 0 && it.By < len(it.Stages) {
+				label = it.Stages[it.By].label()
+			}
+			if routes[it.Set] == nil {
+				routes[it.Set] = map[string]int{}
+			}
+			routes[it.Set][label]++
+		}
 		if it.Error != "" {
 			s.Errors[d]++
 			continue
@@ -321,7 +342,7 @@ func handleStats(w http.ResponseWriter, r *http.Request, origins map[string]bool
 			}
 		}
 	}
-	writeJSON(w, 200, map[string]any{"days": labels, "sets": sets, "waiting": waiting, "spot": spot})
+	writeJSON(w, 200, map[string]any{"days": labels, "sets": sets, "waiting": waiting, "spot": spot, "routes": routes})
 }
 
 // handleLogClear forgets logged requests, for one set or all: POST /zex/log/clear

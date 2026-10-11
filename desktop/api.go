@@ -29,6 +29,7 @@ type apiSet struct {
 	Name       string             `json:"name"`
 	Questions  json.RawMessage    `json:"questions"`
 	Thresholds map[string]float64 `json:"thresholds,omitempty"`
+	Route      []apiStage         `json:"route,omitempty"`
 }
 
 type apiConn struct {
@@ -210,7 +211,7 @@ func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) 
 		writeJSON(w, 404, map[string]any{"error": fmt.Sprintf("No set called %q. GET /api/sets lists them.", slug)})
 		return
 	}
-	if cfg.Connection == nil || cfg.Connection.URL == "" {
+	if len(set.Route) == 0 && (cfg.Connection == nil || cfg.Connection.URL == "") {
 		writeJSON(w, 503, map[string]any{"error": "Zex has no connection to answer with. Open Zex and pick one in Connections."})
 		return
 	}
@@ -235,28 +236,30 @@ func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) 
 	if model == "" {
 		model = cfg.Model
 	}
-	// one answers a single state and records it for the review queue
+	// one answers a single state, through the set's route, and records it for the review queue
 	one := func(state json.RawMessage) map[string]any {
 		it := &logItem{ID: newID(), At: time.Now().UnixMilli(), Set: set.Slug, Model: model, State: state, AuditRate: auditRate(cfg)}
+		rr := runRoute(cfg, set, model, state)
+		it.Stages, it.By, it.Cost, it.Baseline, it.Ms, it.RouteLen = rr.Stages, rr.By, rr.Cost, rr.Baseline, rr.Ms, len(set.Route)
 		var res map[string]any
-		data, err := callModel(*cfg.Connection, model, state, set.Questions)
-		if err != nil {
-			it.Error = err.Error()
+		if rr.Err != nil {
+			it.Error = rr.Err.Error()
 			res = map[string]any{"id": it.ID, "error": it.Error}
 		} else {
-			answers, _ := data["answers"].(map[string]any)
-			dec, allAuto := decide(answers, set.Thresholds, cfg.Thr)
-			m := data["model"]
-			if m == nil {
-				m = model
-			}
-			it.Model, it.Decisions, it.Answers, it.AllAuto = fmt.Sprint(m), dec, answers, allAuto
+			it.Model, it.Decisions, it.Answers, it.AllAuto = rr.Model, rr.Decisions, rr.Answers, rr.AllAuto
 			status := "review"
-			if allAuto {
+			if rr.AllAuto {
 				status = "auto"
 				it.Audit = logOn(cfg) && chance(it.AuditRate)
 			}
-			res = map[string]any{"id": it.ID, "set": set.Slug, "model": m, "status": status, "decisions": dec, "all_auto": allAuto, "answers": answers}
+			res = map[string]any{"id": it.ID, "set": set.Slug, "model": rr.Model, "status": status, "decisions": rr.Decisions, "all_auto": rr.AllAuto, "answers": rr.Answers}
+			if len(set.Route) > 1 {
+				by := "person"
+				if rr.By >= 0 {
+					by = rr.Stages[rr.By].label()
+				}
+				res["route"], res["answered_by"], res["cost"] = rr.Stages, by, rr.Cost
+			}
 		}
 		if logOn(cfg) {
 			recordItem(it)

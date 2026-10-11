@@ -118,6 +118,58 @@ class UpstreamError(Exception):
     pass
 
 
+# ---------------------------------------------------------------- routes (cascades)
+# A set can send its questions to a cheap model first, ask a stronger one only about what the
+# first wasn't sure of, and leave the rest for a person. A stage that is down is skipped.
+def run_route(cfg: dict, s: dict, model: str, state) -> dict:
+    route = s.get("route") or [{"connection": cfg.get("connection") or {}, "model": model, "cost": 0}]
+    questions = s.get("questions") or {}
+    remaining = sorted(questions)
+    res = {"answers": {}, "decisions": {}, "stages": [], "by": -1, "cost": 0.0,
+           "baseline": float(route[-1].get("cost") or 0) / 1000, "model": model}
+    start, last_err = time.time(), None
+    for i, st in enumerate(route):
+        conn = st.get("connection") or {}
+        t0 = time.time()
+        sl = {"name": conn.get("name") or conn.get("url", ""), "model": st.get("model", ""), "asked": len(remaining), "auto": 0}
+        try:
+            data = call_model(conn, st.get("model", ""), state, {k: questions[k] for k in remaining})
+        except UpstreamError as e:
+            sl.update(ms=int((time.time() - t0) * 1000), error=str(e))
+            res["stages"].append(sl)
+            last_err = e
+            continue
+        sl["ms"] = int((time.time() - t0) * 1000)
+        sl["cost"] = float(st.get("cost") or 0) / 1000
+        res["cost"] += sl["cost"]
+        answers = data.get("answers") or {}
+        dec, _ = decide(answers, s.get("thresholds") or {}, cfg.get("thr") or 0.8)
+        res["model"] = data.get("model") or st.get("model", "")
+        nxt = []
+        for k in remaining:
+            if k not in answers:
+                nxt.append(k)
+                continue
+            d = dec[k]
+            if len(route) > 1:
+                d["by"] = f"{sl['name']} · {sl['model']}"
+            res["answers"][k], res["decisions"][k] = answers[k], d
+            if d["verdict"] == "auto":
+                sl["auto"] += 1
+            else:
+                nxt.append(k)
+        res["stages"].append(sl)
+        remaining = nxt
+        if not remaining:
+            res["by"] = i
+            break
+    res["ms"] = int((time.time() - start) * 1000)
+    res["all_auto"] = not remaining and bool(questions)
+    if not res["answers"] and last_err:
+        res["error"] = str(last_err)
+    return res
+
+
 # ---------------------------------------------------------------- request log and review queue
 # Every API answer is recorded on this computer. Answers the model wasn't sure about wait for
 # a person, and a share of the sure ones are set aside as spot checks; reviews become labels.
@@ -219,7 +271,7 @@ def call_model(conn: dict, model: str, state, questions) -> dict:
         req = urllib.request.Request(base + path, data=body, method="POST")
         req.add_header("Content-Type", "application/json")
         req.add_header("Accept", "application/json")
-        req.add_header("User-Agent", "Zex/0.2")
+        req.add_header("User-Agent", "Zex/0.3")
         if conn.get("key"):
             req.add_header("Authorization", "Bearer " + conn["key"])
         opener = DIRECT if urllib.parse.urlparse(base).hostname in LOOPBACK else DEFAULT
@@ -244,7 +296,7 @@ def call_model(conn: dict, model: str, state, questions) -> dict:
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
-    server_version = "Zex/0.2"
+    server_version = "Zex/0.3"
     allowed_origins: set[str] = set()
 
     def log_message(self, fmt, *args):
@@ -284,7 +336,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         req = urllib.request.Request(target, data=body, method=self.command)
         req.add_header("Content-Type", self.headers.get("Content-Type", "application/json"))
         req.add_header("Accept", "application/json")
-        req.add_header("User-Agent", "Zex/0.2")
+        req.add_header("User-Agent", "Zex/0.3")
         key = self.headers.get("X-Zex-Key")
         if key:
             req.add_header("Authorization", "Bearer " + key)
@@ -349,7 +401,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         path = urllib.parse.urlparse(self.path).path.rstrip("/")
         sets = cfg.get("sets") or []
         if path == "/api" and self.command == "GET":
-            return self._json(200, {"ok": True, "app": "zex", "version": "0.2.1", "sets": len(sets)})
+            return self._json(200, {"ok": True, "app": "zex", "version": "0.3.0", "sets": len(sets)})
         if path == "/api/sets" and self.command == "GET":
             return self._json(200, {"sets": [{"slug": s["slug"], "name": s["name"], "endpoint": "/api/sets/" + s["slug"],
                                               "questions": {k: (v or {}).get("type") for k, v in (s.get("questions") or {}).items()}} for s in sets]})
@@ -360,7 +412,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if not s:
             return self._json(404, {"error": f'No set called "{slug}". GET /api/sets lists them.'})
         conn = cfg.get("connection") or {}
-        if not conn.get("url"):
+        if not s.get("route") and not conn.get("url"):
             return self._json(503, {"error": "Zex has no connection to answer with. Open Zex and pick one in Connections."})
         raw = self._raw
         body: dict = {}
@@ -376,19 +428,21 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         def one(state):
             item = {"id": new_id(), "at": int(time.time() * 1000), "set": slug, "model": model, "state": state,
                     "all_auto": False, "audit_rate": audit_rate(cfg)}
-            try:
-                data = call_model(conn, model, state, s.get("questions") or {})
-            except UpstreamError as e:
-                item["error"] = str(e)
-                res = {"id": item["id"], "error": str(e)}
+            rr = run_route(cfg, s, model, state)
+            item.update(stages=rr["stages"], by=rr["by"], cost=rr["cost"], baseline=rr["baseline"], ms=rr["ms"], route_len=len(s.get("route") or []))
+            if "error" in rr:
+                item["error"] = rr["error"]
+                res = {"id": item["id"], "error": rr["error"]}
             else:
-                answers = data.get("answers") or {}
-                dec, all_auto = decide(answers, s.get("thresholds") or {}, cfg.get("thr") or 0.8)
-                item.update(model=data.get("model") or model, decisions=dec, answers=answers, all_auto=all_auto)
+                all_auto = rr["all_auto"]
+                item.update(model=rr["model"], decisions=rr["decisions"], answers=rr["answers"], all_auto=all_auto)
                 if all_auto and log_on(cfg) and secrets.randbelow(1_000_000) < item["audit_rate"] * 1_000_000:
                     item["audit"] = True
                 res = {"id": item["id"], "set": slug, "model": item["model"], "status": "auto" if all_auto else "review",
-                       "decisions": dec, "all_auto": all_auto, "answers": answers}
+                       "decisions": rr["decisions"], "all_auto": all_auto, "answers": rr["answers"]}
+                if len(s.get("route") or []) > 1:
+                    by = rr["stages"][rr["by"]] if rr["by"] >= 0 else None
+                    res.update(route=rr["stages"], answered_by=f"{by['name']} · {by['model']}" if by else "person", cost=rr["cost"])
             if log_on(cfg):
                 record(item)
             return res
@@ -453,10 +507,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         days = days if 0 < days <= 90 else 14
         start = datetime.datetime.combine(datetime.date.today(), datetime.time()) - datetime.timedelta(days=days - 1)
         labels = [(start + datetime.timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)]
-        keys = ("requests", "auto", "errors", "audit_checked", "audit_agreed", "review_checked", "review_agreed")
+        keys = ("requests", "auto", "errors", "audit_checked", "audit_agreed", "review_checked", "review_agreed", "spent", "baseline")
         sets: dict = {}
         waiting: dict = {}
         spot: dict = {}
+        routes: dict = {}
         with LOG_LOCK:
             for it in log_items():
                 st, name = item_status(it), it.get("set")
@@ -469,6 +524,14 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     continue
                 s = sets.setdefault(name, {k: [0] * days for k in keys})
                 s["requests"][d] += 1
+                s["spent"][d] += float(it.get("cost") or 0)
+                s["baseline"][d] += float(it.get("baseline") or 0)
+                stages = it.get("stages") or []
+                if int(it.get("route_len") or 0) > 1 and d >= days - 7 and not it.get("error"):
+                    by = it.get("by", -1)
+                    label = f"{stages[by]['name']} · {stages[by]['model']}" if it.get("all_auto") and 0 <= by < len(stages) else "person"
+                    routes.setdefault(name, {})
+                    routes[name][label] = routes[name].get(label, 0) + 1
                 if it.get("error"):
                     s["errors"][d] += 1
                     continue
@@ -479,7 +542,35 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     side = "audit" if it.get("all_auto") else "review"
                     s[side + "_checked"][d] += int(rv.get("checked") or 0)
                     s[side + "_agreed"][d] += int(rv.get("agreed") or 0)
-        return self._json(200, {"days": labels, "sets": sets, "waiting": waiting, "spot": spot})
+        return self._json(200, {"days": labels, "sets": sets, "waiting": waiting, "spot": spot, "routes": routes})
+
+    def _points(self) -> None:
+        """One small row per recent request for the Home atlas:
+        [time, set, weakest confidence, status, stage that finished it, milliseconds].
+        Status: 0 auto, 1 waiting, 2 spot check, 3 reviewed and right, 4 reviewed and corrected, 5 error."""
+        if not self._from_page():
+            return
+        q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        days = int((q.get("days") or ["7"])[0] or 7)
+        since = (time.time() - (days if 0 < days <= 90 else 7) * 86400) * 1000
+        codes = {"auto": 0, "waiting": 1, "spot": 2, "reviewed": 3, "error": 5}
+        sets: list = []
+        points: list = []
+        with LOG_LOCK:
+            for it in reversed(log_items()):
+                if it.get("at", 0) < since or len(points) >= 4000:
+                    break
+                if it.get("set") not in sets:
+                    sets.append(it.get("set"))
+                confs = [d.get("confidence", 1) for d in (it.get("decisions") or {}).values() if isinstance(d, dict)]
+                weakest = 0 if it.get("error") else min(confs + [1.0])
+                code = codes[item_status(it)]
+                rv = it.get("review") or {}
+                if rv and int(rv.get("agreed") or 0) < int(rv.get("checked") or 0):
+                    code = 4
+                by = it.get("by", -1) if it.get("all_auto") else -1
+                points.append([it.get("at"), sets.index(it.get("set")), weakest, code, by, it.get("ms", 0)])
+        return self._json(200, {"sets": sets, "points": points})
 
     def _log_clear(self) -> None:
         global _log
@@ -510,6 +601,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._log()
         if self.path.startswith("/zex/stats"):
             return self._stats()
+        if self.path.startswith("/zex/points"):
+            return self._points()
         if self.path == "/api" or self.path.startswith("/api/") or self.path.startswith("/api?"):
             return self._api()
         return super().do_GET()

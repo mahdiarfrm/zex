@@ -810,15 +810,17 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .hm-brief { max-width: calc(100% - 250px); }
 .hm-brief .hm-leader { margin: 34px 0 14px; max-width: none; gap: 0; }
 .hm-brief .hm-leader .dot { margin-right: 8px; }
-.hm-tone { display: inline-block; font-size: 17px; line-height: 19px; padding: 0 6px; background: var(--text); color: var(--bg); margin-bottom: 8px; }
+.hm-tone { display: inline-block; font-size: 16px; line-height: 19px; padding: 0 6px; background: var(--text); color: var(--bg); white-space: nowrap; }
 .tone-bad .hm-tone { background: var(--danger); color: #fff; } .tone-warn .hm-tone { background: var(--warn); color: #fff; }
 .tone-info .hm-tone { background: var(--accent); color: var(--on-accent); }
-.hm-brief .hm-status { font-size: clamp(40px, 5.2vw, 88px); line-height: 1.02; padding-top: .04em; max-width: none; min-height: 0; }
-.tone-bad .hm-status { color: var(--danger); }
-.hm-sub { margin: 12px 0 0; font-size: 15.5px; line-height: 1.45; max-width: 640px; }
-.hm-more { list-style: none; margin: 10px 0 0; padding: 0; font-size: 13px; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px; }
-.hm-acts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
-.hm-acts .btn { height: 34px; padding: 0 14px; }
+.hm-brief .hm-status { font-size: clamp(48px, 6vw, 96px); line-height: 1.02; padding-top: .04em; max-width: none; min-height: 0; margin: 2px 0 0; }
+.hm-items { list-style: none; margin: 18px 0 0; padding: 0; display: flex; flex-direction: column; gap: 10px; max-width: 820px; }
+.hm-items li { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: 12px; align-items: center; font-size: 15px; line-height: 1.4; }
+.hm-items .hm-tone { margin: 0; justify-self: start; }
+.hm-items .acts { display: flex; gap: 6px; } .hm-items .btn { height: 32px; padding: 0 12px; white-space: nowrap; }
+.tone-ok .hm-tone { background: var(--text); color: var(--bg); } .tone-wait .hm-tone { background: var(--surface-2); color: var(--text-muted); }
+.quiet, .quiet *:not(.dot) { animation-duration: 0s !important; animation-delay: 0s !important; }
+.quiet .reveal { opacity: 1; transform: none; transition: none; }
 .hm-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 170px)); margin-top: 22px; border-top: 1.5px solid var(--text); border-left: 1.5px solid var(--text); width: max-content; max-width: 100%; }
 .hm-kpi { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 10px 14px 12px; border-right: 1.5px solid var(--text); border-bottom: 1.5px solid var(--text); background: color-mix(in srgb, var(--bg) 55%, transparent); min-width: 0; }
 .hm-kpi b { font-family: var(--pix); font-size: 40px; font-weight: 400; line-height: .95; }
@@ -831,7 +833,88 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .hm-dec td.n { text-align: left; padding-left: 0; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 140px; }
 .hm-dec td.pix { font-size: 19px; } .hm-dec td.w { color: var(--accent); }
 .hm-dec tbody tr { cursor: pointer; } .hm-dec tbody tr:hover td { background: var(--surface-2); }
-@media (max-width: 900px) { .hm-brief { max-width: none; } .hm-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); width: auto; } }
+@media (max-width: 900px) { .hm-brief { max-width: none; } .hm-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); width: auto; } .hm-items li { grid-template-columns: minmax(0, 1fr); } }
+
+/* ---------- routes and replay ---------- */
+.route { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; padding: 8px 0; border-top: 1px dotted var(--border-strong); }
+.route .rk, .route.editing .rk { font-family: var(--pix); font-size: 16px; color: var(--text-muted); text-transform: uppercase; }
+.rchips { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; flex: 1; min-width: 0; }
+.rchip { display: inline-flex; align-items: center; gap: 5px; font: 11.5px var(--mono); padding: 2px 6px; border: 1px solid var(--text); background: var(--bg); }
+.rchip b { font-size: 14px; font-weight: 400; background: var(--text); color: var(--bg); padding: 0 3px; line-height: 14px; }
+.rchip small { color: var(--text-muted); font-size: 10.5px; }
+.rchip.person { border-style: dashed; color: var(--text-muted); }
+.rarr { color: var(--text-muted); font-size: 12px; }
+.route.editing { flex-direction: column; align-items: stretch; }
+.re-note { margin: 0; font-size: 12px; color: var(--text-muted); }
+.re-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) minmax(0, 1fr) 96px 26px 26px 26px; gap: 6px; align-items: center; }
+.re-row b { font-size: 16px; font-weight: 400; }
+.re-row.person { grid-template-columns: 18px 1fr; color: var(--text-muted); font-size: 12.5px; }
+.re-row .chip-select, .re-row .fld { width: 100%; min-width: 0; }
+.re-cost { display: flex; align-items: center; gap: 3px; font: 12px var(--mono); } .re-cost .fld { padding: 3px 4px; } .re-cost span { color: var(--text-muted); white-space: nowrap; font-size: 10.5px; }
+.b-route { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 12.5px; margin: -2px 0 10px; }
+.b-route .mono { font: 11.5px var(--mono); color: var(--text-muted); }
+.b-routes { margin-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+.b-cost { margin: 6px 0 0; font-size: 12.5px; color: var(--text-muted); } .b-cost b { color: var(--success); font-weight: 600; }
+.btable td .via { font: 10.5px var(--mono); color: var(--accent); margin-top: 4px; white-space: nowrap; }
+.rp-src { margin: 0; font-size: 12.5px; color: var(--text-muted); }
+.rp-body { display: flex; flex-direction: column; gap: 14px; }
+.rp-t.up .ev { color: var(--success); } .rp-t.down .ev { color: var(--danger); }
+.rp-flips { display: flex; flex-direction: column; max-height: 420px; overflow: auto; border-top: 1px solid var(--border); }
+.rp-flip { display: grid; grid-template-columns: auto auto minmax(0, 1fr) auto auto; gap: 10px; align-items: center; padding: 7px 2px; border-bottom: 1px solid var(--border); font-size: 12.5px; }
+.rp-flip .q { font: 12px var(--mono); } .rp-flip .tx { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rp-flip .ch { font-size: 16px; white-space: nowrap; } .rp-flip .lab { color: var(--text-muted); font-size: 11.5px; white-space: nowrap; }
+.rp-flip.k-fixed .rv-tag { color: var(--success); } .rp-flip.k-broke .rv-tag { color: var(--danger); } .rp-flip.k-changed .rv-tag { color: var(--text-muted); }
+.meta.warn { color: var(--danger); }
+
+/* ---------- the atlas ---------- */
+.hm-atlas { --at-bg: #0b0a0d; --at-line: rgba(243, 138, 162, .22); background: var(--at-bg); color: #f4f1ee; padding: 34px 28px 36px; position: relative; overflow: hidden; }
+.hm-atlas::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(243, 138, 162, .12) 1px, transparent 1.3px); background-size: 6px 6px; -webkit-mask-image: linear-gradient(180deg, #000, transparent 70%); mask-image: linear-gradient(180deg, #000, transparent 70%); pointer-events: none; }
+.at-head { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 24px; align-items: end; margin-bottom: 22px; }
+.at-head .tagline { grid-column: 1 / -1; justify-self: start; background: #f38aa2; color: #160a0f; }
+.at-title { margin: 6px 0 0; font-size: clamp(38px, 4.4vw, 72px); line-height: 1.02; letter-spacing: -.05em; font-weight: 650; }
+.at-lede { grid-column: 1; margin: 0; max-width: 620px; color: rgba(244, 241, 238, .72); font-size: 14.5px; }
+.at-legend { grid-column: 2; grid-row: 2 / 4; display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; font-size: 12px; color: rgba(244, 241, 238, .72); }
+.at-legend span { display: inline-flex; align-items: center; gap: 6px; } .at-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
+.lg-auto i { background: #f38aa2; } .lg-wait i { border: 1.5px solid #f4f1ee; } .lg-spot i { background: #2dd4bf; } .lg-ok i { background: #f4f1ee; } .lg-fix i { background: #ffb02e; }
+.at-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto auto; gap: 14px; }
+.at-cell { position: relative; border: 1px solid var(--at-line); background: rgba(255, 255, 255, .02); padding: 10px 12px 12px; min-width: 0; }
+.at-t { display: flex; align-items: center; gap: 8px; font-size: 16px; letter-spacing: .04em; color: #f38aa2; }
+.at-t .grow { flex: 1; } .at-t [data-at] { color: rgba(244, 241, 238, .55); }
+.at-t .at-sub { color: rgba(244, 241, 238, .55); font-size: 14px; }
+.at-globe { grid-row: 1 / 3; display: flex; flex-direction: column; }
+.cv-globe { width: 100%; flex: 1; min-height: 400px; cursor: grab; touch-action: none; display: block; }
+.cv-globe:active { cursor: grabbing; }
+.at-poles { position: absolute; right: 14px; top: 44px; bottom: 26px; display: flex; flex-direction: column; justify-content: space-between; font-size: 14px; color: rgba(244, 241, 238, .45); text-align: right; pointer-events: none; }
+.at-tip { position: absolute; z-index: 3; display: flex; flex-direction: column; gap: 2px; min-width: 170px; padding: 7px 9px; background: #160a0f; border: 1px solid #f38aa2; box-shadow: 4px 4px 0 #f38aa2; font-size: 12px; pointer-events: none; }
+.at-tip b { font-weight: 600; } .at-tip span { color: rgba(244, 241, 238, .75); }
+.at-empty { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 26px; color: #f38aa2; pointer-events: none; text-align: center; }
+.at-empty small { font-family: var(--sans); font-size: 12.5px; color: rgba(244, 241, 238, .6); }
+.at-flow { grid-column: 2 / 4; }
+.cv-flow { width: 100%; height: 150px; display: block; }
+.at-nodes { position: relative; height: 62px; margin-top: -12px; }
+.at-node { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; text-align: center; width: 130px; }
+.at-node b { font-size: 30px; font-weight: 400; line-height: 1; color: #f38aa2; } .at-node.person b { color: #f4f1ee; }
+.at-node .m { font: 11.5px var(--mono); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.at-node small { font-size: 10.5px; color: rgba(244, 241, 238, .5); white-space: nowrap; }
+.at-note { margin: 6px 0 0; font-size: 12px; color: rgba(244, 241, 238, .6); }
+.cv-hist { width: 100%; height: 150px; display: block; margin-top: 6px; }
+.at-axis { display: flex; justify-content: space-between; font-size: 14px; color: rgba(244, 241, 238, .45); }
+.at-saved { display: flex; flex-direction: column; }
+.cv-saved { width: 100%; height: 120px; display: block; }
+.at-big { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
+.at-big b { font-size: 44px; font-weight: 400; line-height: 1; background: linear-gradient(90deg, #9be7ff, #f5a8ff, #fff2a1); -webkit-background-clip: text; background-clip: text; color: transparent; padding-top: .04em; }
+.at-big span { font-size: 11.5px; color: rgba(244, 241, 238, .6); max-width: 240px; }
+.at-trend { grid-column: 1 / -1; }
+.at-trend-svg { width: 100%; height: auto; display: block; margin-top: 6px; }
+.at-trend-svg .vol { fill: rgba(243, 138, 162, .25); }
+.at-trend-svg path { fill: none; stroke-width: 2; } .at-trend-svg path.acc { stroke: #f38aa2; stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 3; } .at-trend-svg path.agr { stroke: #f4f1ee; stroke-dasharray: 5 4; }
+.at-trend-svg rect.acc { fill: #f38aa2; } .at-trend-svg rect.agr { fill: #f4f1ee; }
+.at-trend-svg .lab { font-family: var(--pix); font-size: 14px; fill: rgba(244, 241, 238, .45); }
+.at-key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: rgba(244, 241, 238, .6); margin-top: 4px; }
+.at-key span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: middle; }
+.at-key .acc::before { background: #f38aa2; } .at-key .agr::before { background: #f4f1ee; } .at-key .vol::before { background: rgba(243, 138, 162, .35); border-radius: 50%; }
+@media (max-width: 1180px) { .at-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .at-globe { grid-row: auto; grid-column: 1 / -1; } .cv-globe { min-height: 360px; } .at-flow, .at-trend { grid-column: 1 / -1; } }
+@media (max-width: 900px) { .hm-atlas { padding: 26px 16px; } .at-grid { grid-template-columns: minmax(0, 1fr); } .at-head { grid-template-columns: minmax(0, 1fr); } .at-legend { grid-column: 1; grid-row: auto; justify-content: flex-start; } .at-poles { display: none; } }
 
 /* ---------- boot splash ---------- */
 #splash { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; overflow: hidden; background: var(--bg); color: var(--text);
@@ -874,7 +957,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     <div class="sp-mark"><div class="halftone"></div></div>
     <div class="sp-name"><span style="--i:0">Z</span><span style="--i:1">e</span><span style="--i:2">x</span></div>
     <div class="win sp-log">
-      <div class="win-title">Zex.OS 0.2<span class="grow"></span>boot</div>
+      <div class="win-title">Zex.OS 0.3<span class="grow"></span>boot</div>
       <div class="win-body">
         <div class="sp-line" style="--d:0"><span>loading workbench</span><i></i><b class="ok">ok</b></div>
         <div class="sp-line" style="--d:1"><span>starting relay</span><i></i><b id="spRelay"></b></div>
@@ -978,6 +1061,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         <button role="tab" data-mode="batch" aria-selected="false">Batch</button>
         <button role="tab" data-mode="compare" aria-selected="false">Compare</button>
         <button role="tab" data-mode="history" aria-selected="false">History</button>
+        <button role="tab" data-mode="replay" aria-selected="false">Replay</button>
       </div>
       <span class="name" id="outTitle"></span>
       <button class="thr-chip" id="thrChip" title="Confidence threshold for AUTO answers">AUTO ≥ 80%</button>
@@ -1490,22 +1574,22 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     paintBrief();
   }
 
-  function useConn(id) { activeId = id; saveConns(); syncModelSelect(); paintConnUI(); cmp.a = null; cmp.b = null; cmp.res = {}; if (route !== "playground") applyRoute(); }
+  function useConn(id) { activeId = id; saveConns(); syncModelSelect(); paintConnUI(); cmp.a = null; cmp.b = null; cmp.res = {}; if (route !== "playground") rerender(); }
   function addConn(kind) {
     const k = KINDS[kind];
     const c = { id: "c-" + Math.random().toString(36).slice(2, 8), kind, name: k.label, url: k.url, key: "" };
-    conns.push(c); saveConns(); applyRoute(); checkConn(c);
+    conns.push(c); saveConns(); rerender(); checkConn(c);
   }
   function removeConn(id) {
     conns = conns.filter((c) => c.id !== id);
     if (activeId === id) activeId = conns[0].id;
-    saveConns(); syncModelSelect(); paintConnUI(); applyRoute();
+    saveConns(); syncModelSelect(); paintConnUI(); rerender();
   }
 
   const relayReady = fetch("/zex/health").then((r) => (r.ok ? r.json() : {})).then((d) => { hasRelay = !!d.relay; }).catch(() => { hasRelay = false; });
   async function bootConns() {
     await relayReady;
-    if (route === "connections") applyRoute();
+    if (route === "connections") rerender();
     paintConnUI(); syncModelSelect();
     await Promise.all(conns.map((c) => checkConn(c)));
   }
@@ -1635,6 +1719,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     if (mode === "batch") { paintOut(renderBatch()); return; }
     if (mode === "compare") { paintOut(renderCompare()); return; }
     if (mode === "history") { paintOut(renderHistory()); return; }
+    if (mode === "replay") { paintOut(renderReplay()); return; }
     $("#viewTable").setAttribute("aria-pressed", String(outView === "table"));
     $("#viewCode").setAttribute("aria-pressed", String(outView === "code"));
     if (outView === "code") { paintOut(renderCode()); return; }
@@ -1737,7 +1822,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("div", { class: "vstrip", "aria-hidden": "true" }, STRIP),
       h("div", { class: "ex-hero" },
         h("div", {},
-          h("span", { class: "tagline" }, "Zex.OS 0.2"),
+          h("span", { class: "tagline" }, "Zex.OS 0.3"),
           h("div", { class: "eyebrow" }, "Start here"),
           h("div", { class: "corners", style: "display:inline-block;margin-top:14px" }, h("i", { class: "tl" }), h("i", { class: "tr" }), h("i", { class: "bl" }), h("i", { class: "br" }),
             h("h2", {}, "Ask a model something"))),
@@ -1933,6 +2018,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   let batchPar = store.get("zex.batchPar", 0);           // requests at a time, 0 = automatic
   let bfile = null;                                      // { name, columns, rows, textCol, expect: { key: column } }
   let batchFilter = "all", batchShow = 200, evalKey = null, evalTarget = store.get("zex.evalTarget", 0.95);
+  let batchUseRoute = store.get("zex.batchRoute", true);
   let batchResultsEl = null, batchCtlEl = null, fillTimer = 0;
   const blankBatch = () => ({ running: false, paused: false, done: 0, total: 0, cursor: 0, items: [], results: [], questions: null, setId: null, error: null, evalThr: {} });
   const scheduleFill = () => { if (!fillTimer) fillTimer = setTimeout(() => { fillTimer = 0; if (mode === "batch" && route === "playground") fillBatch(); }, 160); };
@@ -2160,19 +2246,25 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       if (!items.length) { batch = { ...blankBatch(), error: batchSrc === "file" ? (bfile ? "No rows have text in the column you chose." : "Choose a file first.") : "Paste at least one line." }; fillBatch(); return; }
       batch = { ...blankBatch(), items, results: new Array(items.length), total: items.length, questions: q.questions,
         setId: setMatchesPlayground(curSet()) ? curSetId : null, conn: activeConn(), model,
+        route: batchUseRoute && setMatchesPlayground(curSet()) && (curSet().route || []).length ? curSet().route.map((st) => ({ ...st })) : null,
         source: batchSrc === "file" && bfile ? bfile.name : "pasted lines", columns: batchSrc === "file" && bfile ? bfile.columns : ["text"] };
       batchFilter = "all"; batchShow = 200; evalKey = null;
     }
     const b = batch;
     b.running = true; b.paused = false; b.error = null; b.resumedAt = Date.now(); b.doneAtResume = b.done;
     fillBatch();
-    const par = batchPar || (isLocalConn(b.conn) ? 1 : 4);
+    const par = batchPar || (isLocalConn(b.route ? stageConn(b.route[0]) || b.conn : b.conn) ? 1 : 4);
     const worker = async () => {
       while (!b.paused && b.cursor < b.items.length) {
         const it = b.items[b.cursor++];
         try {
-          const { data, rtt } = await decide({ model: b.model, state: it.text, questions: b.questions }, b.conn);
-          b.results[it.i] = { answers: data.answers || {}, rtt };
+          if (b.route) {
+            const r = await decideRoute(b.route, b.questions, setById(b.setId), it.text);
+            b.results[it.i] = { answers: r.answers, by: r.by, finished: r.finished, cost: r.cost, rtt: r.ms };
+          } else {
+            const { data, rtt } = await decide({ model: b.model, state: it.text, questions: b.questions }, b.conn);
+            b.results[it.i] = { answers: data.answers || {}, rtt };
+          }
         } catch (e) { b.results[it.i] = { error: e.message.split("\n")[0] }; }
         b.done++; scheduleFill();
       }
@@ -2213,6 +2305,9 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         h("div", { class: "b-head" },
           h("div", { class: "code-tabs", role: "tablist", "aria-label": "Where the messages come from" }, tab("file", "File"), tab("paste", "Paste")),
           h("span", { class: "grow" }), h("label", { class: "b-set" }, h("span", {}, "Questions"), setSel)),
+        matches && (x.route || []).length ? h("label", { class: "b-route" },
+          h("input", { type: "checkbox", checked: batchUseRoute || undefined, onchange: (e) => { batchUseRoute = e.target.checked; store.set("zex.batchRoute", batchUseRoute); } }),
+          h("span", {}, "Run through the route: "), h("span", { class: "mono" }, [...x.route.map(stageLabel), "person"].join(" → "))) : null,
         src, batchCtlEl));
     if (batchSrc === "file") dropTarget(winEl, loadBatchFile);
     batchResultsEl = h("div", { class: "b-results" });
@@ -2300,6 +2395,15 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         if (small) cells.push(v);
       }
     });
+    let routeBlock = null;
+    if (batch.route) {
+      const done = batch.results.filter((r) => r && !r.error), n = done.length || 1;
+      const spent = done.reduce((m, r) => m + (r.cost || 0), 0), base = done.length * ((Number(batch.route[batch.route.length - 1].cost) || 0) / 1000);
+      const row = (label, k) => { const c = done.filter((r) => r.finished === k).length; return h("div", { class: "qbar-row" }, h("span", { class: "k" }, label), h("div", { class: "qbar" }, h("i", { class: k < 0 ? "review" : "auto", style: `width:${(c / n) * 100}%` })), h("span", { class: "v pix" }, `${Math.round((c / n) * 100)}%`), h("span", { class: "t pix" }, fmtN(c))); };
+      routeBlock = h("div", { class: "b-routes" }, h("div", { class: "eh" }, "Where each request was finished"),
+        batch.route.map((st, i) => row(`${i + 1} · ${stageLabel(st)}`, i)), row("person", -1),
+        h("p", { class: "b-cost" }, `Spent ${money(spent)}`, base > 0 ? ` · ${money(base)} with everything on ${stageLabel(batch.route[batch.route.length - 1])} · ` : "", base > 0 ? h("b", {}, `${Math.round((1 - spent / base) * 100)}% saved`) : null));
+    }
     return h("div", { class: "win shadow" },
       h("div", { class: "win-title" }, "Zex.Confidence", h("span", { class: "grow" }), set ? set.name : "thresholds"),
       h("div", { class: "win-body" },
@@ -2311,7 +2415,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
             h("div", { class: "qbar" }, h("i", { class: "auto", style: `width:${(c.auto / n) * 100}%` }), h("i", { class: "review", style: `width:${(c.review / n) * 100}%` }), h("i", { class: "err", style: `width:${(c.err / n) * 100}%` })),
             h("span", { class: "v pix" }, `${Math.round((c.auto / n) * 100)}% auto`),
             h("span", { class: "t pix", title: "AUTO threshold for this question" }, `≥${Math.round(thrFor(k, set) * 100)}`));
-        }))));
+        })), routeBlock));
   }
   const etile = (k, v, sub) => h("div", { class: "etile" }, h("span", { class: "ek" }, k), h("b", { class: "ev" }, v), h("span", { class: "es" }, sub));
   const evalShell = (right, ...body) => h("div", { class: "win shadow eval" }, h("div", { class: "win-title" }, "Zex.Eval", h("span", { class: "grow" }), right), h("div", { class: "win-body" }, ...body));
@@ -2424,7 +2528,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const table = h("table", { class: "btable" },
       h("thead", {}, h("tr", {}, h("th", {}, "#"), h("th", {}, "text"), keys.map((k) => h("th", {}, k)))),
       h("tbody", {}, shown.slice(0, batchShow).map(({ it, r }) => h("tr", {},
-        h("td", { class: "pp" }, String(it.i + 1)),
+        h("td", { class: "pp" }, String(it.i + 1), batch.route && !r.error ? h("div", { class: "via" }, r.finished >= 0 ? batch.route[r.finished].model : "person") : null),
         h("td", { class: "st", dir: "auto", title: it.text }, it.text),
         r.error ? h("td", { class: "err", colspan: String(keys.length) }, r.error) : keys.map((k) => {
           const a = r.answers?.[k], ta = topAnswer(a), auto = isAuto(a, k, set);
@@ -2465,6 +2569,113 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       return [d.answer, d.p.toFixed(3), d.verdict, ...(exp.includes(k) ? [d.expected ?? "", d.correct == null ? "" : d.correct ? "yes" : "no"] : [])];
     }), r.error || ""].map(qv).join(","));
     download(`${base}.csv`, "﻿" + [head.map(qv).join(","), ...lines].join("\n") + "\n", "text/csv;charset=utf-8");
+  }
+
+  // ---------------------------------------------------------------- replay
+  // Before an edit to a set is saved, run it on every labeled example and see what changes.
+  let rpl = { setId: null, examples: null, loading: false, running: false, done: 0, result: null, key: "" };
+  async function loadReplayExamples(x) {
+    rpl.loading = true;
+    const ex = [];
+    if (apiCfg.available) {
+      try {
+        const d = await zexGet(`/zex/log?status=reviewed&limit=500&set=${encodeURIComponent(x.slug)}`);
+        for (const it of d.items || []) ex.push({ text: typeof it.state === "string" ? it.state : JSON.stringify(it.state), labels: it.review.labels, before: it.answers || {}, from: "review" });
+      } catch { /* the page still has batch examples */ }
+    }
+    if (batch.setId === x.id) {
+      batch.items.forEach((it, i) => {
+        const r = batch.results[i];
+        if (!r || r.error || !Object.values(it.expected).some(hasValue)) return;
+        const labels = {};
+        for (const [k, v] of Object.entries(it.expected)) { const c = canonExpected(x.questions[k], v); if (c != null) labels[k] = c; }
+        ex.push({ text: it.text, labels, before: r.answers || {}, from: "batch" });
+      });
+    }
+    rpl = { ...rpl, setId: x.id, examples: ex, loading: false };
+    if (mode === "replay") renderOut();
+  }
+  async function runReplay(x, draft) {
+    const ex = rpl.examples || [];
+    rpl.running = true; rpl.done = 0; rpl.result = null;
+    renderOut();
+    const route = (x.route || []).length ? x.route : null, after = new Array(ex.length);
+    let next = 0;
+    const worker = async () => {
+      while (next < ex.length) {
+        const i = next++;
+        try {
+          after[i] = route ? (await decideRoute(route, draft, x, ex[i].text)).answers : (await decide({ model, state: ex[i].text, questions: draft })).data.answers || {};
+        } catch (e) { after[i] = { __error: e.message.split("\n")[0] }; }
+        rpl.done++;
+        if (mode === "replay" && rpl.done % 2 === 0) renderOut();
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(isLocalConn(route ? stageConn(route[0]) || activeConn() : activeConn()) ? 1 : 4, ex.length) }, worker));
+    const keys = Object.keys(draft).filter((k) => k in x.questions);
+    let bOk = 0, aOk = 0, n = 0, bAuto = 0, aAuto = 0;
+    const flips = [];
+    ex.forEach((e, i) => {
+      const A = after[i];
+      if (A.__error) return;
+      if (Object.keys(x.questions).every((k) => isAuto(e.before[k], k, x))) bAuto++;
+      if (Object.keys(draft).every((k) => isAuto(A[k], k, x))) aAuto++;
+      for (const k of keys) {
+        const lab = e.labels[k];
+        if (lab == null || !e.before[k] || !A[k]) continue;
+        const b = sameLabel(predLabel(e.before[k]), lab), a = sameLabel(predLabel(A[k]), lab);
+        n++; bOk += b; aOk += a;
+        if (b !== a || !sameLabel(predLabel(e.before[k]), predLabel(A[k]))) flips.push({ kind: a && !b ? "fixed" : b && !a ? "broke" : "changed", k, text: e.text, before: topAnswer(e.before[k]), after: topAnswer(A[k]), lab });
+      }
+    });
+    const ok = ex.filter((_, i) => !after[i].__error).length;
+    rpl.running = false;
+    rpl.result = { n, ex: ok, errors: ex.length - ok, bAcc: n ? bOk / n : null, aAcc: n ? aOk / n : null, bAuto: ok ? bAuto / ok : null, aAuto: ok ? aAuto / ok : null,
+      fixed: flips.filter((f) => f.kind === "fixed").length, broke: flips.filter((f) => f.kind === "broke").length, flips: flips.sort((p, q) => ({ broke: 0, fixed: 1, changed: 2 }[p.kind] - { broke: 0, fixed: 1, changed: 2 }[q.kind])) };
+    rpl.key = canon(draft);
+    if (mode === "replay") renderOut();
+  }
+  function renderReplay() {
+    const x = curSet(), draft = playgroundQuestions();
+    const intro = h("div", { class: "pane-intro" }, h("span", { class: "tagline" }, "Zex.Replay"), h("span", {}, "Run an edit on every labeled example before you save it."));
+    if (!x) return h("div", { class: "pane" }, intro, h("div", { class: "empty-hint" }, "Open a saved set first. Replay compares your edit with the saved version."));
+    if (setMatchesPlayground(x)) return h("div", { class: "pane" }, intro, h("div", { class: "empty-hint" }, `Edit the questions of ${x.name} on the left: change a wording, an option or a question. Replay runs your edit on every labeled example and shows what changes before you save.`));
+    if (!validQuestions(draft)) return h("div", { class: "pane" }, intro, h("div", { class: "banner err", style: "margin:0" }, "Fix the questions first."));
+    if (rpl.setId !== x.id || (!rpl.examples && !rpl.loading)) { loadReplayExamples(x); return h("div", { class: "pane" }, intro, h("div", { class: "empty-hint" }, "Gathering labeled examples…")); }
+    if (rpl.loading) return h("div", { class: "pane" }, intro, h("div", { class: "empty-hint" }, "Gathering labeled examples…"));
+    const ex = rpl.examples, reviews = ex.filter((e) => e.from === "review").length;
+    const changed = Object.keys(draft).filter((k) => canon(draft[k]) !== canon(x.questions[k] ?? null));
+    const src = h("p", { class: "rp-src" }, `${fmtN(ex.length)} labeled example${ex.length === 1 ? "" : "s"}: ${fmtN(reviews)} from Review, ${fmtN(ex.length - reviews)} from Batch. `,
+      `Changed: ${changed.map((k) => (k in x.questions ? k : `${k} (new)`)).join(", ") || "nothing"}${Object.keys(x.questions).filter((k) => !(k in draft)).map((k) => `, ${k} (removed)`).join("")}.`);
+    if (!ex.length) return h("div", { class: "pane" }, intro, src, h("div", { class: "empty-hint" }, "No labeled examples yet. Review some answers, or run a file with expected answers in Batch, then come back."));
+    const stale = rpl.result && rpl.key !== canon(draft);
+    const run = h("button", { class: "btn solid", type: "button", disabled: rpl.running || undefined, onclick: () => runReplay(x, draft) },
+      rpl.running ? `Replaying ${rpl.done} / ${ex.length}…` : rpl.result && !stale ? "Replay again" : `Replay on ${fmtN(ex.length)} example${ex.length === 1 ? "" : "s"}`);
+    const kids = [intro, src, h("div", { class: "btn-row", style: "margin-top:0" }, run, (x.route || []).length ? h("span", { class: "meta" }, "through the route: " + [...x.route.map(stageLabel), "person"].join(" → ")) : h("span", { class: "meta" }, `with ${model} on ${activeConn().name}`))];
+    const R = rpl.result;
+    if (R && !stale) {
+      const delta = (a, b) => (a == null || b == null ? "" : `${b - a >= 0 ? "+" : "−"}${Math.abs(Math.round((b - a) * 100))}`);
+      const tile = (k, a, b, good) => h("div", { class: "etile rp-t" + (good == null ? "" : good ? " up" : " down") }, h("span", { class: "ek" }, k),
+        h("b", { class: "ev" }, b == null ? "–" : pct(b)), h("span", { class: "es" }, a == null ? "" : `was ${pct(a)} · ${delta(a, b)} points`));
+      kids.push(h("div", { class: "win shadow" }, h("div", { class: "win-title" }, "Zex.Replay", h("span", { class: "grow" }), `${x.name} v${x.version || 1} → v${(x.version || 1) + 1}`),
+        h("div", { class: "win-body rp-body" },
+          h("div", { class: "eval-tiles" },
+            tile("accuracy", R.bAcc, R.aAcc, R.aAcc == null || R.bAcc == null ? null : R.aAcc >= R.bAcc),
+            tile("handled on its own", R.bAuto, R.aAuto, R.aAuto == null || R.bAuto == null ? null : R.aAuto >= R.bAuto),
+            h("div", { class: "etile rp-t up" }, h("span", { class: "ek" }, "fixed"), h("b", { class: "ev" }, fmtN(R.fixed)), h("span", { class: "es" }, "now match the label")),
+            h("div", { class: "etile rp-t" + (R.broke ? " down" : "") }, h("span", { class: "ek" }, "broke"), h("b", { class: "ev" }, fmtN(R.broke)), h("span", { class: "es" }, "were right, now wrong"))),
+          R.errors ? h("div", { class: "banner warn", style: "margin:0" }, `${R.errors} example${R.errors === 1 ? "" : "s"} failed to run and aren't counted.`) : null,
+          R.flips.length ? h("div", { class: "rp-flips" }, R.flips.slice(0, 60).map((f) => h("div", { class: "rp-flip k-" + f.kind },
+            h("span", { class: "rv-tag" }, f.kind.toUpperCase()), h("span", { class: "q" }, f.k),
+            h("span", { class: "tx", dir: "auto", title: f.text }, f.text),
+            h("span", { class: "ch pix" }, `${f.before.label} ${pct(f.before.p)} → ${f.after.label} ${pct(f.after.p)}`),
+            h("span", { class: "lab" }, `label: ${f.lab}`)))) : h("p", { class: "rp-src" }, "No labeled answer changed. Questions without labels can still answer differently; label some in Review or Batch to measure them."),
+          h("div", { class: "btn-row" },
+            h("button", { class: "btn solid", type: "button", onclick: () => { if (saveIntoSet(x)) { toast(`Saved ${x.name} v${x.version}`); rpl.result = null; renderOut(); } } }, `Save as v${(x.version || 1) + 1}`),
+            h("button", { class: "btn", type: "button", onclick: () => { openSet(x); toast("Edit discarded"); } }, "Discard the edit"),
+            R.broke > R.fixed ? h("span", { class: "meta warn" }, "This edit breaks more than it fixes.") : R.fixed > R.broke ? h("span", { class: "meta" }, "This edit fixes more than it breaks.") : null))));
+    }
+    return h("div", { class: "pane" }, kids);
   }
 
   // ---------------------------------------------------------------- compare (race two models, any connections)
@@ -2559,6 +2770,82 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
 
 
+
+  // ---------------------------------------------------------------- routes (cascades)
+  // A set's route sends every question to its first stage, asks the next stage only about what
+  // the previous one wasn't sure of, and leaves the rest for a person.
+  let routeEdit = null;   // { setId, stages: [{ conn, model, cost }] } while a route is being edited
+  const stageConn = (st) => connById(st.conn);
+  const stageLabel = (st) => `${stageConn(st)?.name || "missing connection"} · ${st.model}`;
+  const money = (v) => (v >= 1 ? `$${v.toFixed(2)}` : v > 0 ? `$${v.toFixed(v < 0.01 ? 4 : 3)}` : "$0");
+  async function decideRoute(route, questions, set, state) {
+    const keys = Object.keys(questions), answers = {}, by = {}, stages = [];
+    let remaining = keys, cost = 0, lastErr = null;
+    const t0 = performance.now();
+    for (let i = 0; i < route.length; i++) {
+      const st = route[i], c = stageConn(st);
+      if (!c) continue;
+      const s0 = performance.now();
+      try {
+        const { data } = await decide({ model: st.model, state, questions: Object.fromEntries(remaining.map((k) => [k, questions[k]])) }, c);
+        cost += (Number(st.cost) || 0) / 1000;
+        const next = [];
+        for (const k of remaining) {
+          const a = data.answers?.[k];
+          if (!a) { next.push(k); continue; }
+          answers[k] = a; by[k] = i;
+          if (!isAuto(a, k, set)) next.push(k);
+        }
+        stages.push({ i, label: stageLabel(st), asked: remaining.length, auto: remaining.length - next.length, ms: performance.now() - s0 });
+        remaining = next;
+        if (!remaining.length) return { answers, by, stages, cost, finished: i, ms: performance.now() - t0 };
+      } catch (e) { lastErr = e; stages.push({ i, label: stageLabel(st), asked: remaining.length, auto: 0, error: e.message.split("\n")[0] }); }
+    }
+    if (!Object.keys(answers).length && lastErr) throw lastErr;
+    return { answers, by, stages, cost, finished: -1, ms: performance.now() - t0 };
+  }
+  function routeRow(x) {
+    if (routeEdit?.setId === x.id) return routeEditor(x);
+    const r = x.route || [];
+    return h("div", { class: "route" },
+      h("span", { class: "rk" }, "Route"),
+      h("div", { class: "rchips" }, r.length
+        ? [...r.flatMap((st, i) => [h("span", { class: "rchip" }, h("b", { class: "pix" }, String(i + 1)), stageLabel(st), Number(st.cost) ? h("small", {}, `$${st.cost}/1k`) : h("small", {}, "free")), h("span", { class: "rarr", "aria-hidden": "true" }, "→")]),
+           h("span", { class: "rchip person" }, "person")]
+        : [h("span", { class: "rchip" }, "your active connection"), h("span", { class: "rarr", "aria-hidden": "true" }, "→"), h("span", { class: "rchip person" }, "person")]),
+      h("button", { class: "text-btn xs bordered", type: "button", onclick: () => { routeEdit = { setId: x.id, stages: (r.length ? r : [{ conn: activeId, model, cost: 0 }]).map((st) => ({ ...st })) }; rerender(); } }, r.length ? "Edit route" : "Add a route"));
+  }
+  function routeEditor(x) {
+    const ed = routeEdit;
+    const rows = ed.stages.map((st, i) => {
+      const cSel = h("select", { class: "chip-select", "aria-label": `Stage ${i + 1} connection` }, conns.map((c) => h("option", { value: c.id }, c.name)));
+      cSel.value = st.conn;
+      cSel.addEventListener("change", () => { st.conn = cSel.value; st.model = (cstat[st.conn]?.models || [])[0] || st.model; rerender(); });
+      const ms = cstat[st.conn]?.models || [];
+      const mSel = ms.length
+        ? h("select", { class: "chip-select", "aria-label": `Stage ${i + 1} model` }, [...new Set([...ms, st.model])].filter(Boolean).map((m) => h("option", { value: m }, m)))
+        : h("input", { class: "fld mono", value: st.model || "", placeholder: "model", "aria-label": `Stage ${i + 1} model` });
+      if (ms.length) mSel.value = st.model || ms[0];
+      mSel.addEventListener("change", () => { st.model = mSel.value; });
+      mSel.addEventListener("input", () => { st.model = mSel.value; });
+      const cost = h("input", { class: "fld mono cost", type: "number", min: "0", step: "0.01", value: String(st.cost ?? 0), "aria-label": `Stage ${i + 1} cost per 1,000 requests` });
+      cost.addEventListener("input", () => { st.cost = Number(cost.value) || 0; });
+      const mv = (d) => { const j = i + d; if (j < 0 || j >= ed.stages.length) return; [ed.stages[i], ed.stages[j]] = [ed.stages[j], ed.stages[i]]; rerender(); };
+      return h("div", { class: "re-row" }, h("b", { class: "pix" }, String(i + 1)), cSel, mSel, h("label", { class: "re-cost" }, "$", cost, h("span", {}, "/ 1k")),
+        h("button", { class: "icon-btn", type: "button", title: "Earlier", "aria-label": "Move earlier", onclick: () => mv(-1) }, "↑"),
+        h("button", { class: "icon-btn", type: "button", title: "Later", "aria-label": "Move later", onclick: () => mv(1) }, "↓"),
+        h("button", { class: "icon-btn", type: "button", title: "Remove", "aria-label": "Remove stage", onclick: () => { ed.stages.splice(i, 1); rerender(); } }, icon("i-x")));
+    });
+    return h("div", { class: "route editing" },
+      h("span", { class: "rk" }, "Route"),
+      h("p", { class: "re-note" }, "Every question goes to stage 1. Only the questions a stage isn't sure about go on to the next. Whatever is still unsure at the end waits for a person. Put cheap or local models first."),
+      rows, h("div", { class: "re-row person" }, h("b", { class: "pix" }, "→"), h("span", {}, "person: the review queue")),
+      h("div", { class: "btn-row" },
+        h("button", { class: "btn", type: "button", onclick: () => { ed.stages.push({ conn: activeId, model, cost: 0 }); rerender(); } }, "+ Add a stage"),
+        h("button", { class: "btn solid", type: "button", onclick: () => { x.route = ed.stages.filter((st) => st.conn && st.model); x.updatedAt = Date.now(); routeEdit = null; saveSets(); rerender(); toast(x.route.length ? `${x.name} routes through ${x.route.length} stage${x.route.length === 1 ? "" : "s"}` : "Route removed"); } }, "Save route"),
+        h("button", { class: "btn", type: "button", onclick: () => { routeEdit = null; rerender(); } }, "Cancel"),
+        (x.route || []).length ? h("button", { class: "text-btn xs", type: "button", onclick: () => { x.route = []; routeEdit = null; saveSets(); rerender(); } }, "Remove route") : null));
+  }
 
   // ---------------------------------------------------------------- question sets
   function setById(id) { return sets.find((x) => x.id === id); }
@@ -2687,7 +2974,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
             h("span", { class: "n" }, y.name), h("span", { class: "m" }, `${qCount(y.questions)} q · v${y.version || 1}`)))
         : h("div", { class: "sp-empty" }, "No saved sets yet.")),
       h("div", { class: "btn-row sp-acts" },
-        x && dirty ? h("button", { class: "btn solid", type: "button", onclick: () => { if (saveIntoSet(x)) { toast(`Saved ${x.name} v${x.version}`); close(); } } }, "Save changes") : null,
+        x && dirty ? h("button", { class: "btn solid", type: "button", onclick: () => { close(); mode = "replay"; renderOut(); } }, "Replay, then save") : null,
+        x && dirty ? h("button", { class: "btn", type: "button", onclick: () => { if (saveIntoSet(x)) { toast(`Saved ${x.name} v${x.version}`); close(); } } }, "Save now") : null,
         h("button", { class: "btn" + (x ? "" : " solid"), type: "button", onclick: () => openSetPop("saveas") }, x ? "Save as new…" : "Save as a set…"),
         x ? h("button", { class: "btn", type: "button", onclick: () => openSetPop("rename") }, "Rename…") : null,
         x ? h("button", { class: "btn", type: "button", onclick: () => { exportSet(x); close(); } }, "Export") : null,
@@ -2704,7 +2992,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       const qs_ = Object.entries(x.questions || {});
       const del = h("button", { class: "btn", type: "button" }, "Delete");
       del.addEventListener("click", () => {
-        if (del.dataset.sure) { deleteSet(x); applyRoute(); toast(`Deleted ${x.name}`); }
+        if (del.dataset.sure) { deleteSet(x); rerender(); toast(`Deleted ${x.name}`); }
         else { del.dataset.sure = "1"; del.textContent = "Delete for good?"; del.classList.add("danger"); }
       });
       const openIn = (m) => { openSet(x, false); renderQuestions(); mode = m; go("playground"); };
@@ -2713,16 +3001,17 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         h("div", { class: "qlist" }, qs_.map(([k, q]) => h("div", { class: "qrow" },
           h("span", { class: "qt" }, String(q.type).toUpperCase()), h("span", { class: "k" }, k),
           x.thresholds?.[k] != null ? h("span", { class: "th", title: "This question's own AUTO threshold" }, `≥ ${Math.round(x.thresholds[k] * 100)}%`) : null))),
+        routeRow(x),
         h("div", { class: "meta" }, `${qs_.length} question${qs_.length === 1 ? "" : "s"} · saved ${ago(x.updatedAt)}`,
           apiCfg.enabled ? h("span", { class: "mono" }, ` · POST /api/sets/${x.slug}`) : null),
         h("div", { class: "btn-row" },
           h("button", { class: "btn solid", type: "button", onclick: () => openIn("response") }, "Open"),
           h("button", { class: "btn", type: "button", onclick: () => openIn("batch") }, "Batch"),
-          h("button", { class: "btn", type: "button", onclick: () => { duplicateSet(x); applyRoute(); } }, "Duplicate"),
+          h("button", { class: "btn", type: "button", onclick: () => { duplicateSet(x); rerender(); } }, "Duplicate"),
           h("button", { class: "btn", type: "button", onclick: () => exportSet(x) }, "Export"),
           del)), "set-win" + (x.id === curSetId ? " current" : ""));
     };
-    const onImport = async (f) => { try { const a = await importSets(f); applyRoute(); toast(importedMsg(a)); } catch (err) { toast(err.message); } };
+    const onImport = async (f) => { try { const a = await importSets(f); rerender(); toast(importedMsg(a)); } catch (err) { toast(err.message); } };
     return dropTarget(h("div", { class: "conns sets" },
       h("section", { class: "c-head" },
         h("span", { class: "tagline" }, "Zex.Sets 0.1"),
@@ -2744,7 +3033,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     return m ? m[1] : "home";
   }
   let route = routeFromHash();
-  function go(r) { if (location.hash === "#/" + r) { route = r; applyRoute(); } else location.hash = "#/" + r; }
+  function go(r) { if (location.hash === "#/" + r) { route = r; rerender(); } else location.hash = "#/" + r; }
   window.addEventListener("hashchange", () => { route = routeFromHash(); withTransition(applyRoute); });
   // 3D dot shapes on the desk: point clouds on spinning globes and a tumbling torus.
   // A dot is drawn when its shade (from a fixed light) beats its own random threshold,
@@ -2854,21 +3143,26 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     io.observe(band);
   }
 
-  function applyRoute() {
+  // Navigation renders a page with its entrance animations. Re-rendering the same page after
+  // a click (rerender) is quiet: nothing replays, and the scroll position stays put.
+  function applyRoute(opts = {}) {
+    const top = page.scrollTop;
     app.dataset.route = route;
     document.querySelectorAll("[data-route-link]").forEach((a) => {
       const on = a.dataset.routeLink === route;
       a.classList.toggle("active", on);
       if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
-    if (route === "home") { page.replaceChildren(renderHome()); animateHome(page.firstChild); }
+    if (route === "home") { page.replaceChildren(renderHome()); animateHome(page.firstChild); refreshLive(); }
     else if (route === "connections") page.replaceChildren(renderConnections());
     else if (route === "sets") page.replaceChildren(renderSets());
     else if (route === "api") page.replaceChildren(renderApi());
     else if (route === "review") page.replaceChildren(renderReview());
     else { page.replaceChildren(); renderOut(); }
-    page.scrollTop = 0;
+    if (opts.quiet) { page.firstElementChild?.classList.add("quiet"); page.scrollTop = top; }
+    else page.scrollTop = 0;
   }
+  function rerender() { applyRoute({ quiet: true }); }
   const openMode = (m) => { mode = m; go("playground"); };
 
   // ---------------------------------------------------------------- clock
@@ -2956,7 +3250,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("section", { class: "hm-sky" },
         h("div", { class: "hm-b64", "aria-hidden": "true" }, STRIP),
         h("div", { class: "hm-top" },
-          h("span", { class: "tagline cursor" }, "Zex.OS 0.2"), h("h1", {}, "Home"), h("span", { class: "grow" }),
+          h("span", { class: "tagline cursor" }, "Zex.OS 0.3"), h("h1", {}, "Home"), h("span", { class: "grow" }),
           h("span", { class: "zclock pix" }, `${fmtDate()} · ${fmtTime()}`)),
         (hmBriefEl = briefEl()),
         h("div", { class: "hm-mark" }, h("div", { class: "halftone" }), heroCanvas())),
@@ -2976,6 +3270,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
           h("div", { class: "btn-row" },
             hist.length ? h("button", { class: "btn", type: "button", onclick: () => openMode("history") }, "All history") : null,
             h("button", { class: "btn", type: "button", onclick: sampleBatch }, "Try a sample batch"))), "hm-hist-win"))))),
+      renderAtlas(),
       h("div", { class: "hm-below" },
       h("div", { class: "hm-label" }, h("span", { class: "tagline" }, "Zex.Tools")),
       h("div", { class: "opt-grid" },
@@ -3060,8 +3355,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   async function refreshLive() {
     if (!apiCfg.available) return;
     try {
-      const [st, lg] = await Promise.all([zexGet("/zex/stats?days=14"), zexGet("/zex/log?limit=0")]);
-      live = { stats: st, counts: lg.counts };
+      const [st, lg, pt] = await Promise.all([zexGet("/zex/stats?days=14"), zexGet("/zex/log?limit=0"), route === "home" ? zexGet("/zex/points?days=7") : Promise.resolve(live.points)]);
+      live = { stats: st, counts: lg.counts, points: pt };
     } catch { return; }
     paintReviewBadge();
     if (route === "home") paintLive();
@@ -3102,7 +3397,14 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         h("p", {}, "Answers the model wasn't sure about wait here for a person, with a few sure ones as spot checks. Each answer you give is a label: Zex uses them to measure accuracy and tune thresholds.")),
       rvBody);
   }
-  function paintReview() { if (rvBody) rvBody.replaceChildren(...reviewBody().filter(Boolean)); }
+  function paintReview() {
+    if (!rvBody) return;
+    const rows = rvBody.querySelector(".rv-rows")?.scrollTop || 0, top = page.scrollTop;
+    rvBody.replaceChildren(...reviewBody().filter(Boolean));
+    const nr = rvBody.querySelector(".rv-rows");
+    if (nr) nr.scrollTop = rows;
+    page.scrollTop = top;
+  }
   function reviewBody() {
     if (!apiCfg.available) return [h("div", { class: "banner warn", style: "margin:20px 0 0" }, "The review queue comes with the Zex app, and with server.py when you run Zex from source.")];
     const c = rv.counts || {};
@@ -3262,6 +3564,260 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     } catch (e) { toast(e.message); }
   }
 
+  // ---------------------------------------------------------------- the atlas: the week on Home, in dots
+  // Every request of the last 7 days is a dot on a slowly turning globe: around it by time, up
+  // it by how sure the model was. Next to it, the route as flowing particles, the spread of
+  // confidence, the money a route saved and the accuracy trend.
+  const AT = { pink: "#f38aa2", teal: "#2dd4bf", white: "#f4f1ee", red: "#ff5a52", amber: "#ffb02e" };
+  let atlas = null;
+  const fibSphere = (n) => Array.from({ length: n }, (_, i) => { const y = 1 - (2 * (i + 0.5)) / n, r = Math.sqrt(1 - y * y), th = i * 2.399963; return [Math.cos(th) * r, y, Math.sin(th) * r]; });
+  function fitCanvas(cv) {
+    const dpr = Math.min(2, devicePixelRatio || 1), w = cv.clientWidth, hh = cv.clientHeight;
+    if (!w || !hh) return null;
+    if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(hh * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(hh * dpr); }
+    const ctx = cv.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, w, hh);
+    return { ctx, w, h: hh };
+  }
+  const hashUnit = (n) => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
+  const quantile = (xs, q) => { if (!xs.length) return null; const a = [...xs].sort((p, r) => p - r); return a[Math.min(a.length - 1, Math.floor(q * a.length))]; };
+
+  function atlasData() {
+    const raw = live.points?.points || [], names = live.points?.sets || [], now = Date.now(), week = 7 * 864e5;
+    // up the globe: how sure the model was; around it: an even golden-angle spread; brightness: how recent
+    const pts = raw.map(([at, si, c, code, by, ms], i) => ({ at, set: names[si], c, code, by, ms, age: Math.min(1, Math.max(0, (now - at) / week)),
+      lon: i * 2.399963 + hashUnit(i + 1) * 0.3, lat: (Math.max(0, Math.min(1, c)) - 0.5) * Math.PI * 0.94 + (hashUnit(i + 7) - 0.5) * 0.06 }));
+    // the route to draw: the busiest decision that has one, else the active connection
+    const routes = live.stats?.routes || {}, sum = (o) => Object.values(o || {}).reduce((m, x) => m + x, 0);
+    const slug = Object.keys(routes).sort((a, b) => sum(routes[b]) - sum(routes[a]))[0];
+    const set = sets.find((x) => x.slug === slug);
+    let stages, flowName;
+    if (set && (set.route || []).length) {
+      const counts = routes[slug], total = sum(counts) || 1;
+      stages = [...set.route.map((st) => ({ label: st.model, sub: stageConn(st)?.name || "", cost: Number(st.cost) || 0, share: (counts[stageLabel(st)] || 0) / total })), { label: "person", sub: "review queue", person: true, share: (counts.person || 0) / total }];
+      flowName = set.name;
+    } else {
+      const ok = pts.filter((p) => p.code !== 5), auto = ok.filter((p) => p.code === 0 || p.code === 2 || (p.code >= 3 && p.by >= 0)).length;
+      stages = [{ label: model, sub: activeConn().name, cost: 0, share: ok.length ? auto / ok.length : 0 }, { label: "person", sub: "review queue", person: true, share: ok.length ? 1 - auto / ok.length : 0 }];
+      flowName = "all decisions";
+    }
+    const bins = Array.from({ length: 20 }, () => ({ auto: 0, other: 0 }));
+    for (const p of pts) if (p.code !== 5) bins[Math.min(19, Math.floor(p.c * 20))][p.code === 0 || p.code === 2 || (p.code >= 3 && p.by >= 0) ? "auto" : "other"]++;
+    const D = live.stats?.days?.length || 0, ser = Object.values(live.stats?.sets || {});
+    const add = (key, from = 0) => ser.reduce((m, x) => m + (x[key] || []).slice(from).reduce((a, b) => a + b, 0), 0);
+    const spent = add("spent", D - 7), base = add("baseline", D - 7);
+    const trend = (live.stats?.days || []).map((day, i) => {
+      const at = (k) => ser.reduce((m, x) => m + ((x[k] || [])[i] || 0), 0);
+      return { day, req: at("requests"), ac: at("audit_checked"), ag: at("audit_agreed"), rc: at("review_checked"), ra: at("review_agreed") };
+    });
+    const ms = pts.map((p) => p.ms).filter((x) => x > 0);
+    return { pts, stages, flowName, bins, spent, base, trend, p50: quantile(ms, 0.5), p95: quantile(ms, 0.95) };
+  }
+
+  function renderAtlas() {
+    const cv = (cls, label) => h("canvas", { class: cls, role: "img", "aria-label": label });
+    const el = h("section", { class: "hm-atlas", "aria-label": "The last 7 days, drawn in dots" },
+      h("div", { class: "at-head" },
+        h("span", { class: "tagline" }, "Zex.Atlas"),
+        h("h2", { class: "at-title" }, words("The Week In Dots.")),
+        h("p", { class: "at-lede" }, "Every request from the last 7 days is a dot. Higher on the globe means the model was surer, and brighter means newer. The bright ring is the AUTO line."),
+        h("div", { class: "at-legend" }, [["auto", "on its own"], ["wait", "waiting"], ["spot", "spot check"], ["ok", "reviewed"], ["fix", "corrected"]].map(([k, t]) => h("span", { class: "lg-" + k }, h("i"), t)))),
+      h("div", { class: "at-grid" },
+        h("div", { class: "at-cell at-globe" }, h("div", { class: "at-t pix" }, "ATLAS.GLOBE", h("span", { class: "grow" }), h("span", { "data-at": "count" })),
+          cv("cv-globe", "A globe of dots, one per request"), h("div", { class: "at-tip", hidden: true }),
+          h("div", { class: "at-poles pix" }, h("span", {}, "100% SURE"), h("span", {}, "50%"), h("span", {}, "0%")),
+          h("div", { class: "at-empty pix", "data-at": "empty", hidden: true }, "NO REQUESTS YET", h("small", {}, "Turn on the local API and every request lands here as a dot."))),
+        h("div", { class: "at-cell at-flow" }, h("div", { class: "at-t pix" }, "ATLAS.ROUTE", h("span", { class: "grow" }), h("span", { "data-at": "flowname" })),
+          cv("cv-flow", "Requests flowing through the route"), h("div", { class: "at-nodes", "data-at": "nodes" }),
+          h("p", { class: "at-note", "data-at": "latency" })),
+        h("div", { class: "at-cell at-hist" }, h("div", { class: "at-t pix" }, "ATLAS.CONFIDENCE", h("span", { class: "grow" }), h("span", { class: "at-sub" }, "● on its own ○ to a person")), cv("cv-hist", "How sure the model was, as columns of dots"),
+          h("div", { class: "at-axis pix" }, h("span", {}, "0%"), h("span", {}, "50%"), h("span", {}, "100%"))),
+        h("div", { class: "at-cell at-saved" }, h("div", { class: "at-t pix" }, "ATLAS.SAVED"), cv("cv-saved", "A sphere of dots filled to the share of money saved"),
+          h("div", { class: "at-big" }, h("b", { class: "pix", "data-at": "saved" }, "$0"), h("span", { "data-at": "savedsub" }, ""))),
+        h("div", { class: "at-cell at-trend" }, h("div", { class: "at-t pix" }, "ATLAS.TREND", h("span", { class: "grow" }), "14 DAYS"), h("div", { class: "at-svg", "data-at": "trend" }))));
+    const S = atlas = { el, d: null, last: 0, visible: true, ry: 0, rx: -0.38, drag: null, vel: 0.18, parts: [], spawn: 0, t0: performance.now(), hover: null, proj: [],
+      globe: el.querySelector(".cv-globe"), flow: el.querySelector(".cv-flow"), hist: el.querySelector(".cv-hist"), saved: el.querySelector(".cv-saved"), tip: el.querySelector(".at-tip"), sat: fibSphere(700) };
+    S.globe.addEventListener("pointerdown", (e) => { S.drag = { x: e.clientX, ry: S.ry, t: performance.now() }; S.globe.setPointerCapture(e.pointerId); });
+    S.globe.addEventListener("pointerup", () => { S.drag = null; });
+    S.globe.addEventListener("pointermove", (e) => {
+      const r = S.globe.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+      if (S.drag) { const nry = S.drag.ry + (e.clientX - S.drag.x) / 120; S.vel = (nry - S.ry) * 10; S.ry = nry; }
+      let best = null, bd = 64;
+      for (const p of S.proj) { const dd = (p.x - mx) ** 2 + (p.y - my) ** 2; if (dd < bd) { bd = dd; best = p; } }
+      S.hover = best ? best.p : null;
+      if (best) {
+        const p = best.p, what = ["answered on its own", "waiting for a person", "a spot check", "reviewed: the model was right", "reviewed: a person corrected it", "failed"][p.code];
+        S.tip.hidden = false; S.tip.style.left = `${Math.min(r.width - 190, best.x + 12)}px`; S.tip.style.top = `${best.y + 12}px`;
+        S.tip.replaceChildren(h("b", {}, setName(p.set)), h("span", {}, `${ago(p.at)} · ${pct(p.c)} sure`), h("span", {}, what));
+      } else S.tip.hidden = true;
+    });
+    S.globe.addEventListener("pointerleave", () => { S.hover = null; S.tip.hidden = true; });
+    new IntersectionObserver(([en]) => { S.visible = en.isIntersecting; }, { rootMargin: "120px" }).observe(el);
+    fillAtlas();
+    requestAnimationFrame(atlasLoop);
+    return el;
+  }
+  function fillAtlas() {
+    const S = atlas;
+    if (!S) return;
+    const d = S.d = atlasData(), q = (k) => S.el.querySelector(`[data-at="${k}"]`);
+    q("count").textContent = `${fmtN(d.pts.length)} REQUESTS`;
+    q("empty").hidden = d.pts.length > 0;
+    q("flowname").textContent = d.flowName.toUpperCase();
+    const n = d.stages.length;
+    q("nodes").replaceChildren(...d.stages.map((st, i) => h("div", { class: "at-node" + (st.person ? " person" : ""), style: `left:${atNodeX(i, n) * 100}%` },
+      h("b", { class: "pix" }, d.pts.length ? pct(st.share) : "–"), h("span", { class: "m" }, st.label), h("small", {}, st.person ? st.sub : `${st.sub}${st.cost ? ` · $${st.cost}/1k` : " · free"}`))));
+    q("latency").textContent = d.p50 != null ? `Latency per request: ${fmtMs(d.p50)} typical, ${fmtMs(d.p95)} for the slowest 5%.` : "Latency shows up here once requests arrive.";
+    const saved = Math.max(0, d.base - d.spent), share = d.base > 0 ? saved / d.base : 0;
+    S.savedShare = share;
+    q("saved").textContent = d.base > 0 ? money(saved) : d.pts.length ? "$0" : "–";
+    q("savedsub").textContent = d.base > 0 ? `saved this week, ${Math.round(share * 100)}% less than sending everything to the last stage` : d.pts.length ? "Add a route with a cost per stage to see what it saves." : "Savings from routes show up here.";
+    q("trend").replaceChildren(trendSvg(d.trend));
+    if (reduceMotion) atlasDraw(0, performance.now() / 1000);
+  }
+  const atNodeX = (i, n) => 0.16 + (i / Math.max(1, n - 1)) * 0.74;
+  function trendSvg(days) {
+    const W = 560, H = 150, L = 6, R = 6, T = 14, B = 22, n = Math.max(1, days.length);
+    const x = (i) => L + (i / Math.max(1, n - 1)) * (W - L - R), y = (v) => T + (1 - v) * (H - T - B);
+    const ns = "http://www.w3.org/2000/svg", el = (tag, a, txt) => { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(a)) e.setAttribute(k, v); if (txt != null) e.textContent = txt; return e; };
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, class: "at-trend-svg", role: "img", "aria-label": "Requests, accuracy and agreement per day" });
+    const max = Math.max(1, ...days.map((d) => d.req));
+    days.forEach((d, i) => { const k = Math.round((d.req / max) * 9); for (let j = 0; j < k; j++) svg.append(el("circle", { cx: x(i), cy: H - B - 4 - j * 8, r: 2, class: "vol" })); });
+    const line = (key, cls) => {
+      const pts = days.map((d, i) => [i, d[key[0]] ? d[key[1]] / d[key[0]] : null]).filter(([, v]) => v != null);
+      if (pts.length > 1) svg.append(el("path", { d: pts.map(([i, v], j) => `${j ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(""), class: cls }));
+      for (const [i, v] of pts) svg.append(el("rect", { x: x(i) - 3, y: y(v) - 3, width: 6, height: 6, class: cls + " pt" }));
+    };
+    line(["ac", "ag"], "acc"); line(["rc", "ra"], "agr");
+    if (days.length) { svg.append(el("text", { x: L, y: H - 4, class: "lab" }, days[0].day.slice(5)), el("text", { x: W - R, y: H - 4, class: "lab", "text-anchor": "end" }, "today")); }
+    const wrap = h("div", {}, svg, h("div", { class: "at-key" }, h("span", { class: "acc" }, "right when on its own"), h("span", { class: "agr" }, "agreed with reviewers"), h("span", { class: "vol" }, "requests")));
+    return wrap;
+  }
+  function atlasLoop(now) {
+    const S = atlas;
+    if (!S || !S.el.isConnected) { if (S && !S.el.isConnected) atlas = null; return; }
+    if (!reduceMotion) requestAnimationFrame(atlasLoop);
+    if (!S.visible || document.hidden || now - S.last < 33) return;
+    const dt = S.last ? Math.min(0.1, (now - S.last) / 1000) : 0;
+    S.last = now;
+    atlasDraw(dt, now / 1000);
+  }
+  function atlasDraw(dt, t) {
+    const S = atlas, d = S?.d;
+    if (!d) return;
+    // ---- globe
+    const g = fitCanvas(S.globe);
+    if (g) {
+      const { ctx, w, h: hh } = g, R = Math.min(w * 0.43, hh * 0.42), cx = w / 2, cy = hh / 2 + 4;
+      if (!S.drag) { S.vel += (0.16 - S.vel) * Math.min(1, dt * 0.8); S.ry += S.vel * dt; }
+      const cY = Math.cos(S.ry), sY = Math.sin(S.ry), cX = Math.cos(S.rx), sX = Math.sin(S.rx);
+      const proj = (lat, lon) => {
+        const x = Math.cos(lat) * Math.sin(lon), y = Math.sin(lat), z = Math.cos(lat) * Math.cos(lon);
+        const x1 = x * cY + z * sY, z1 = -x * sY + z * cY, y2 = y * cX - z1 * sX, z2 = y * sX + z1 * cX;
+        return [cx + x1 * R, cy - y2 * R, z2];
+      };
+      const glow = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.35, R * 0.1, cx, cy, R * 1.15);
+      glow.addColorStop(0, "rgba(243,138,162,.16)"); glow.addColorStop(1, "rgba(243,138,162,0)");
+      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(cx, cy, R * 1.15, 0, Math.PI * 2); ctx.fill();
+      const dot = (x, y, r, color, a) => { ctx.globalAlpha = a; ctx.fillStyle = color; ctx.fillRect(x - r, y - r, r * 2, r * 2); };
+      for (let la = -60; la <= 60; la += 30) for (let k = 0; k < 96; k++) { const [x, y, z] = proj((la * Math.PI) / 180, (k / 96) * Math.PI * 2); dot(x, y, 0.8, AT.pink, z > 0 ? 0.28 : 0.08); }
+      for (let lo = 0; lo < 12; lo++) for (let k = 1; k < 40; k++) { const [x, y, z] = proj(-Math.PI / 2 + (k / 40) * Math.PI, (lo / 12) * Math.PI * 2); dot(x, y, 0.7, AT.pink, z > 0 ? 0.2 : 0.06); }
+      const ring = (thr - 0.5) * Math.PI * 0.94;
+      for (let k = 0; k < 140; k++) { const [x, y, z] = proj(ring, (k / 140) * Math.PI * 2 + t * 0.05); dot(x, y, z > 0 ? 1.4 : 0.9, AT.teal, z > 0 ? 0.95 : 0.25); }
+      const colors = [AT.pink, AT.white, AT.teal, AT.white, AT.amber, AT.red];
+      const front = [];
+      ctx.globalAlpha = 1;
+      for (const p of d.pts) {
+        const [x, y, z] = proj(p.lat, p.lon);
+        if (z < 0) { dot(x, y, 1.1, colors[p.code], 0.18); continue; }
+        front.push({ x, y, z, p });
+      }
+      front.sort((a, b) => a.z - b.z);
+      for (const f of front) {
+        const r = 1.6 + f.z * 1.9 + (S.hover === f.p ? 2.5 : 0);
+        ctx.globalAlpha = (0.55 + f.z * 0.45) * (1 - f.p.age * 0.55);
+        if (f.p.code === 1) { ctx.strokeStyle = AT.white; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(f.x, f.y, r + 0.6, 0, Math.PI * 2); ctx.stroke(); }
+        else { ctx.fillStyle = colors[f.p.code]; ctx.beginPath(); ctx.arc(f.x, f.y, r, 0, Math.PI * 2); ctx.fill(); }
+      }
+      ctx.globalAlpha = 1;
+      S.proj = front;
+    }
+    // ---- route flow: morphing dotted shapes and particles in real proportions
+    const fl = fitCanvas(S.flow);
+    if (fl) {
+      const { ctx, w, h: hh } = fl, n = d.stages.length, y0 = hh * 0.42, srcX = w * 0.04;
+      const xs = d.stages.map((_, i) => atNodeX(i, n) * w), r = Math.min(hh * 0.27, (w * 0.74) / Math.max(1, n - 1) * 0.3);
+      ctx.fillStyle = AT.pink;
+      for (let x = srcX; x < xs[n - 1]; x += 7) { ctx.globalAlpha = 0.3; ctx.fillRect(x - 1, y0 - 1, 2, 2); }
+      d.stages.forEach((st, i) => {
+        const sides = 3 + (i % 4), m = (Math.sin(t * 0.7 + i * 1.3) + 1) / 2, spin = t * 0.25 * (i % 2 ? -1 : 1), dots = 54;
+        const poly = (k, s) => { const seg = Math.floor(s * k), f = s * k - seg, a1 = spin + (seg / k) * Math.PI * 2, a2 = spin + ((seg + 1) / k) * Math.PI * 2;
+          return [Math.cos(a1) * (1 - f) + Math.cos(a2) * f, Math.sin(a1) * (1 - f) + Math.sin(a2) * f]; };
+        const rr = r * (0.75 + 0.25 * Math.sqrt(st.share || 0.05));
+        ctx.fillStyle = st.person ? AT.white : AT.pink;
+        for (let k = 0; k < dots; k++) {
+          const sP = k / dots, [ax, ay] = poly(sides, sP), [bx, by] = poly(sides + 1, sP);
+          ctx.globalAlpha = 0.85; ctx.fillRect(xs[i] + (ax * (1 - m) + bx * m) * rr - 1.2, y0 + (ay * (1 - m) + by * m) * rr - 1.2, 2.4, 2.4);
+        }
+        ctx.globalAlpha = 0.18; ctx.beginPath(); ctx.arc(xs[i], y0, rr * 0.55, 0, Math.PI * 2); ctx.fill();
+      });
+      if (!reduceMotion && d.pts.length) {
+        S.spawn += dt;
+        while (S.spawn > 0.07) {
+          S.spawn -= 0.07;
+          let u = Math.random(), target = n - 1;
+          for (let i = 0; i < n; i++) { u -= d.stages[i].share; if (u <= 0) { target = i; break; } }
+          S.parts.push({ x: srcX, target, v: 90 + Math.random() * 60, dy: (Math.random() - 0.5) * 10, life: 1 });
+        }
+      }
+      S.parts = S.parts.filter((p) => p.life > 0);
+      for (const p of S.parts) {
+        const tx = xs[p.target];
+        if (p.x < tx) p.x = Math.min(tx, p.x + p.v * dt); else p.life -= dt * 2.2;
+        const near = Math.max(0, 1 - Math.abs(p.x - tx) / 40);
+        ctx.globalAlpha = Math.max(0, p.life) * 0.95;
+        ctx.fillStyle = d.stages[p.target].person ? AT.white : AT.pink;
+        ctx.beginPath(); ctx.arc(p.x, y0 + p.dy * (1 - near), 2.2, 0, Math.PI * 2); ctx.fill();
+        ctx.globalAlpha *= 0.35; ctx.fillRect(p.x - 9, y0 + p.dy * (1 - near) - 1, 6, 2);
+      }
+      ctx.globalAlpha = 1;
+    }
+    // ---- confidence: columns of dots
+    const hi = fitCanvas(S.hist);
+    if (hi) {
+      // each column stacks the requests whose weakest answer had that confidence:
+      // filled pink were handled on their own, hollow went to a person
+      const { ctx, w, h: hh } = hi, max = Math.max(1, ...d.bins.map((b) => b.auto + b.other)), cols = d.bins.length, cw = w / cols, grow = reduceMotion ? 1 : Math.min(1, (performance.now() - S.t0) / 1400);
+      const step = (hh - 16) / 11;
+      d.bins.forEach((b, i) => {
+        const ka = Math.round((b.auto / max) * 11 * grow), ko = Math.round((b.other / max) * 11 * grow), x = i * cw + cw / 2;
+        for (let j = 0; j < ka + ko; j++) {
+          const y = hh - 8 - j * step;
+          ctx.globalAlpha = 0.92;
+          if (j < ka) { ctx.fillStyle = AT.pink; ctx.beginPath(); ctx.arc(x, y, Math.min(4, cw * 0.28), 0, Math.PI * 2); ctx.fill(); }
+          else { ctx.strokeStyle = AT.white; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y, Math.min(3.4, cw * 0.24), 0, Math.PI * 2); ctx.stroke(); }
+        }
+        if (!ka && !ko) { ctx.globalAlpha = 0.25; ctx.fillStyle = AT.pink; ctx.fillRect(x - 1, hh - 9, 2, 2); }
+      });
+      ctx.globalAlpha = 1;
+    }
+    // ---- saved: a turning sphere of dots, filled to the share saved
+    const sv = fitCanvas(S.saved);
+    if (sv) {
+      const { ctx, w, h: hh } = sv, R = Math.min(w, hh) * 0.36, cx = w / 2, cy = hh / 2, a = t * 0.4, level = 1 - 2 * (S.savedShare || 0);
+      const cA = Math.cos(a), sA = Math.sin(a);
+      for (const [x, y, z] of S.sat) {
+        const x1 = x * cA + z * sA, z1 = -x * sA + z * cA;
+        if (z1 < -0.2) continue;
+        const wet = y > level;
+        ctx.globalAlpha = (wet ? 0.95 : 0.28) * (0.5 + z1 * 0.5);
+        ctx.fillStyle = wet ? AT.pink : AT.white;
+        ctx.fillRect(cx + x1 * R - 1.3, cy + y * R - 1.3, 2.6, 2.6);
+      }
+      ctx.globalAlpha = 1;
+    }
+  }
+
   // ---------------------------------------------------------------- live numbers on Home
   function liveSummary() {
     const st = live.stats;
@@ -3313,64 +3869,67 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("div", { class: "lbars-x pix" }, h("span", {}, L.daily[0].day.slice(5)), h("span", {}, "today"))));
   }
 
-  // The head of Home: the single most important thing right now, what to do about it, and
-  // the week's numbers. Problems come first, then work waiting, then how things are going.
+  // The head of Home: a short report under a plain title. One line for each thing that needs
+  // you, or how the week went when nothing does, then the week's numbers.
   let hmBriefEl = null;
-  function briefing() {
-    const c = activeConn(), st = cstat[activeId], L = liveSummary();
+  function reportItems() {
+    const c = activeConn(), st = cstat[activeId], L = liveSummary(), host = c.url.replace(/^https?:\/\//, "");
     const toReview = (tab) => () => { rv.tab = tab; go("review"); };
-    if (!st || st.state === "checking") return { tone: "wait", tag: "CONNECTING", h: "Connecting…", s: `Looking for ${c.name} at ${c.url.replace(/^https?:\/\//, "")}.`, acts: [] };
-    if (st.state === "bad") return { tone: "bad", tag: "OFFLINE", h: "No Model Server.", s: `${c.name} isn't answering at ${c.url.replace(/^https?:\/\//, "")}. Start it, or switch to another connection.`, acts: [["Connections", () => go("connections"), true]] };
+    const accuracy = ["See accuracy", () => { rv.tab = "accuracy"; rv.evalItems = null; go("review"); }];
+    if (!st || st.state === "checking") return [{ tone: "wait", tag: "CONNECTING", text: `Looking for ${c.name} at ${host}.`, acts: [] }];
+    const items = [];
+    if (st.state === "bad") items.push({ tone: "bad", tag: "OFFLINE", text: `${c.name} isn't answering at ${host}. Start it, or switch to another connection.`, acts: [["Connections", () => go("connections"), true]] });
     if (L) {
-      const alerts = liveAlerts(L), wait = L.waiting + L.spot;
-      const top = alerts.find((a) => a.kind === "bad") || alerts.find((a) => a.kind === "warn");
-      const rest = alerts.filter((a) => a !== top && a.kind !== "info");
-      if (top) return { tone: top.kind, tag: "ATTENTION", h: top.head, s: top.text, more: rest, acts: [[top.act[0], top.act[1], true], ...(wait ? [[`Review ${fmtN(wait)}`, toReview(L.waiting ? "waiting" : "spot")]] : [])] };
+      for (const a of liveAlerts(L)) if (a.kind !== "info") items.push({ tone: a.kind, tag: a.kind === "bad" ? "ALERT" : "WATCH", text: a.text, acts: [[a.act[0], a.act[1]]] });
+      const wait = L.waiting + L.spot;
       if (wait) {
-        const per = Object.entries(live.stats.waiting || {}).filter(([, n]) => n).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([slug, n]) => `${setName(slug)} has ${fmtN(n)} waiting`);
-        const spot = L.spot ? `plus ${fmtN(L.spot)} spot check${L.spot === 1 ? "" : "s"}` : "";
-        return { tone: "info", tag: "FOR YOU", h: `${fmtN(wait)} Answer${wait === 1 ? " Needs" : "s Need"} You.`, s: [...per, spot].filter(Boolean).join(", ") + ". Review them so Zex learns where to trust the model.", more: rest,
-          acts: [["Review now", toReview(L.waiting ? "waiting" : "spot"), true], ["See accuracy", () => { rv.tab = "accuracy"; rv.evalItems = null; go("review"); }]] };
+        const per = Object.entries(live.stats.waiting || {}).filter(([, n]) => n).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([slug, n]) => `${fmtN(n)} in ${setName(slug)}`);
+        if (L.spot) per.push(`plus ${fmtN(L.spot)} spot check${L.spot === 1 ? "" : "s"}`);
+        items.push({ tone: "info", tag: "WAITING", text: `${fmtN(wait)} answer${wait === 1 ? " is" : "s are"} waiting for review (${per.join(", ")}).`, acts: [["Review", toReview(L.waiting ? "waiting" : "spot"), true]] });
       }
-      const t = L.tot, ok = t.req - t.err;
-      return { tone: "ok", tag: "ALL CLEAR", h: ok ? `${pct(t.auto / ok)} Handled On Its Own.` : "All Clear.",
-        s: `${fmtN(t.req)} request${t.req === 1 ? "" : "s"} this week, nothing waiting. ` + (t.ac ? `Spot checks found the model right ${pct(t.ag / t.ac)} of the time.` : "Spot checks will show how often the model is right."), more: rest,
-        acts: [["See accuracy", () => { rv.tab = "accuracy"; rv.evalItems = null; go("review"); }, true]] };
+      if (!items.length) {
+        const t = L.tot, ok = t.req - t.err;
+        items.push({ tone: "ok", tag: "ALL CLEAR", text: `Nothing needs you. ${ok ? pct(t.auto / ok) : "None"} of this week's ${fmtN(t.req)} request${t.req === 1 ? " was" : "s were"} handled on ${t.req === 1 ? "its" : "their"} own` + (t.ac ? `, and spot checks found them right ${pct(t.ag / t.ac)} of the time.` : "."), acts: [accuracy] });
+      }
+    } else if (st.state !== "bad") {
+      const n = st.models.length;
+      items.push({ tone: "ok", tag: "READY", text: `${c.name} is online with ${n} model${n === 1 ? "" : "s"}. No requests yet: try a set below, or turn on the local API to start.`,
+        acts: [["Open Playground", () => openMode("response"), true], [apiCfg.enabled ? "Local API" : "Turn on the local API", () => go("api")]] });
     }
-    const n = st.models.length;
-    return { tone: "ok", tag: "READY", h: "Ready To Decide.",
-      s: `${c.name} is online with ${n} model${n === 1 ? "" : "s"}. Try a set on a message below, or turn on the local API to put one to work.`,
-      acts: [["Open Playground", () => openMode("response"), true], [apiCfg.enabled ? "Local API" : "Turn on the local API", () => go("api")]] };
+    return items;
   }
-  function briefEl() {
-    const b = briefing(), L = liveSummary(), c = activeConn(), sl = statusLine(c.id);
-    const key = [b.tone, b.h, b.s, b.acts.map((a) => a[0]).join(), (b.more || []).length, L ? [L.tot.req, L.tot.auto, L.tot.ac, L.waiting + L.spot].join() : ""].join("|");
+  function reportEl() {
+    const items = reportItems(), L = liveSummary(), t = L?.tot, ok = t ? t.req - t.err : 0;
+    const key = JSON.stringify([items.map((x) => [x.tone, x.text]), L ? [t.req, t.auto, t.ac, t.ag, L.waiting + L.spot] : 0]);
     const cell = (label, value, onclick) => h("button", { type: "button", class: "hm-kpi", onclick }, h("b", {}, value), h("span", {}, label));
-    const t = L?.tot, ok = t ? t.req - t.err : 0;
-    return h("div", { class: "hm-brief tone-" + b.tone, "data-key": key },
-      h("p", { class: "hm-leader" }, h("span", { class: sl.cls, "data-cdot": c.id }), h("b", {}, c.name), h("span", { class: "dl", "aria-hidden": "true" }),
-        h("span", { class: "u" }, `${model} · `, h("span", { "data-ctext": c.id }, sl.short))),
-      h("span", { class: "hm-tone pix" }, b.tag),
-      h("h2", { class: "giant hm-status", role: "status" }, words(b.h)),
-      h("p", { class: "hm-sub" }, b.s),
-      b.more?.length ? h("ul", { class: "hm-more" }, b.more.slice(0, 2).map((a) => h("li", {}, h("span", {}, a.text), " ", h("button", { class: "text-btn xs bordered", type: "button", onclick: a.act[1] }, a.act[0])))) : null,
-      b.acts.length ? h("div", { class: "hm-acts" }, b.acts.map(([label, fn, primary]) => h("button", { class: "btn" + (primary ? " solid" : ""), type: "button", onclick: fn }, label))) : null,
+    return h("div", { class: "hm-report", "data-key": key },
+      h("ul", { class: "hm-items" }, items.map((x) => h("li", { class: "tone-" + x.tone },
+        h("span", { class: "hm-tone pix" }, x.tag), h("span", { class: "tx" }, x.text),
+        x.acts.length ? h("span", { class: "acts" }, x.acts.map(([label, fn, primary]) => h("button", { class: "btn" + (primary ? " solid" : ""), type: "button", onclick: fn }, label))) : null))),
       L ? h("div", { class: "hm-kpis", "aria-label": "The last 7 days" },
         cell("requests this week", fmtN(t.req), () => { rv.tab = "all"; go("review"); }),
-        cell("handled on its own", ok ? pct(t.auto / ok) : "–", () => { rv.tab = "all"; go("review"); }),
-        cell("right when on its own", t.ac ? pct(t.ag / t.ac) : "–", () => { rv.tab = t.ac ? "accuracy" : "spot"; rv.evalItems = null; go("review"); }),
-        cell("waiting for you", fmtN(L.waiting + L.spot), () => { rv.tab = L.waiting ? "waiting" : "spot"; go("review"); })) : null);
+        cell("handled on their own", ok ? pct(t.auto / ok) : "–", () => { rv.tab = "all"; go("review"); }),
+        cell("right when on their own", t.ac ? pct(t.ag / t.ac) : "–", () => { rv.tab = t.ac ? "accuracy" : "spot"; rv.evalItems = null; go("review"); }),
+        cell("waiting for review", fmtN(L.waiting + L.spot), () => { rv.tab = L.waiting ? "waiting" : "spot"; go("review"); })) : null);
+  }
+  function briefEl() {
+    const c = activeConn(), sl = statusLine(c.id);
+    return h("div", { class: "hm-brief" },
+      h("p", { class: "hm-leader" }, h("span", { class: sl.cls, "data-cdot": c.id }), h("b", {}, c.name), h("span", { class: "dl", "aria-hidden": "true" }),
+        h("span", { class: "u" }, `${model} · `, h("span", { "data-ctext": c.id }, sl.short))),
+      h("h2", { class: "giant hm-status" }, words("Overview")),
+      reportEl());
   }
   function paintBrief() {
-    if (!hmBriefEl?.isConnected) return;
-    const n = briefEl();
-    if (n.dataset.key === hmBriefEl.dataset.key) return;
-    hmBriefEl.replaceWith(n); hmBriefEl = n;
+    const old = hmBriefEl?.querySelector(".hm-report");
+    if (!old) return;
+    const n = reportEl();
+    if (n.dataset.key !== old.dataset.key) old.replaceWith(n);
   }
 
   function paintLive() {
-    if (hmStatsEl?.isConnected) { const n = statsCard(); hmStatsEl.replaceWith(n); hmStatsEl = n; }
-    paintBrief();
+    if (hmStatsEl?.isConnected) { const n = statsCard(); n.classList.add("quiet"); hmStatsEl.replaceWith(n); hmStatsEl = n; }
+    paintBrief(); fillAtlas();
   }
 
   // ---------------------------------------------------------------- local API
@@ -3388,12 +3947,13 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       if (apiCfg.enabled) syncApi(true);
       refreshLive();
     } catch { apiCfg = { available: false, enabled: false, token: "" }; }
-    if (route === "api" || route === "sets" || route === "review") applyRoute();
+    if (route === "api" || route === "sets" || route === "review") rerender();
   }
   function apiPayload() {
     const c = activeConn();
     return { enabled: apiCfg.enabled, model, thr, log: apiCfg.log !== false, audit: apiCfg.audit ?? 0.05, connection: { kind: c.kind, name: c.name, url: c.url, key: c.key || "" },
-      sets: sets.map((x) => ({ slug: x.slug, name: x.name, questions: x.questions, thresholds: x.thresholds || {} })) };
+      sets: sets.map((x) => ({ slug: x.slug, name: x.name, questions: x.questions, thresholds: x.thresholds || {},
+        route: (x.route || []).map((st) => { const sc = stageConn(st); return sc ? { connection: { kind: sc.kind, name: sc.name, url: sc.url, key: sc.key || "" }, model: st.model, cost: Number(st.cost) || 0 } : null; }).filter(Boolean) })) };
   }
   function syncApi(now = false, extra = {}) {
     if (!apiCfg.available || (!apiCfg.enabled && !extra.force)) return Promise.resolve();
@@ -3412,7 +3972,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
   function reviewControls() {
     const logSw = h("button", { class: "switch sm" + (apiCfg.log !== false ? " on" : ""), type: "button", role: "switch", "aria-checked": String(apiCfg.log !== false), "aria-label": "Keep requests for review",
-      onclick: async () => { apiCfg.log = apiCfg.log === false; await syncApi(true); applyRoute(); } }, h("i"), h("span", { class: "pix" }, apiCfg.log !== false ? "ON" : "OFF"));
+      onclick: async () => { apiCfg.log = apiCfg.log === false; await syncApi(true); rerender(); } }, h("i"), h("span", { class: "pix" }, apiCfg.log !== false ? "ON" : "OFF"));
     const spot = h("select", { class: "chip-select", "aria-label": "Share of sure answers to spot-check", disabled: apiCfg.log === false || undefined },
       [[0, "no spot checks"], [0.02, "spot-check 2%"], [0.05, "spot-check 5%"], [0.1, "spot-check 10%"], [0.2, "spot-check 20%"]].map(([v, l]) => h("option", { value: String(v) }, l)));
     spot.value = String(apiCfg.audit ?? 0.05);
@@ -3425,8 +3985,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     });
     return [logSw, h("span", { class: "muted" }, "keep requests for review"), spot, clear];
   }
-  async function setApiEnabled(on) { apiCfg.enabled = on; await syncApi(true, { force: true }); applyRoute(); toast(on ? "The local API is on" : "The local API is off"); }
-  async function newApiToken() { await syncApi(true, { force: true, regenerate: true }); apiShowToken = true; applyRoute(); toast("New token made. Update your scripts."); }
+  async function setApiEnabled(on) { apiCfg.enabled = on; await syncApi(true, { force: true }); rerender(); toast(on ? "The local API is on" : "The local API is off"); }
+  async function newApiToken() { await syncApi(true, { force: true, regenerate: true }); apiShowToken = true; rerender(); toast("New token made. Update your scripts."); }
 
   function renderApi() {
     const base = `${location.origin}/api`;
@@ -3460,7 +4020,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const slug = apiTry.slug || "your-set", url = `${base}/sets/${slug}`;
     const trySel = h("select", { class: "chip-select", "aria-label": "Set to call" }, sets.map((x) => h("option", { value: x.slug }, x.name)));
     trySel.value = apiTry.slug || "";
-    trySel.addEventListener("change", () => { apiTry.slug = trySel.value; apiTry.out = ""; applyRoute(); });
+    trySel.addEventListener("change", () => { apiTry.slug = trySel.value; apiTry.out = ""; rerender(); });
     const tryTa = h("textarea", { class: "api-try-in", dir: "auto", "aria-label": "Text to send" });
     tryTa.value = apiTry.text;
     tryTa.addEventListener("input", () => { apiTry.text = tryTa.value; });
