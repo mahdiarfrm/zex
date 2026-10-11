@@ -1,6 +1,7 @@
 name: release
 
-# Push a tag like v0.1.0 to build the macOS and Windows apps and attach them to a GitHub release.
+# Builds the macOS, Windows and Linux apps on every run. Pushing a tag like v0.1.0 also
+# attaches them to a GitHub release.
 on:
   push:
     tags: ["v*"]
@@ -10,20 +11,50 @@ permissions:
   contents: write
 
 jobs:
-  build:
-    runs-on: macos-14
+  mac-windows:
+    runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
       - run: go test ./desktop/
-      - run: desktop/build.sh
+      - run: desktop/build.sh mac && desktop/build.sh windows
       - uses: actions/upload-artifact@v4
         with:
-          name: zex
+          name: mac-windows
           path: dist/*.zip
-      - if: startsWith(github.ref, 'refs/tags/')
-        uses: softprops/action-gh-release@v2
+
+  linux:
+    strategy:
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
         with:
-          files: dist/*.zip
+          go-version-file: go.mod
+      - run: sudo apt-get update && sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
+      - run: desktop/build.sh linux
+      # the binary must load WebKitGTK and start; --version exits before opening a window
+      - run: dist/linux-*/zex/zex --version
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-${{ matrix.runner }}
+          path: |
+            dist/*.tar.gz
+            dist/*.deb
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [mac-windows, linux]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*

@@ -1,5 +1,5 @@
 #!/bin/sh
-# Build the app icons from assets/icon.svg: PNGs, icon.icns (macOS) and icon.ico (Windows).
+# Build the app icons from assets/icon.svg: PNGs, icon.icns (macOS), icon.ico (Windows) and a Linux PNG.
 # Needs rsvg-convert (librsvg) and, for the .ico, ImageMagick. iconutil ships with macOS.
 set -e
 cd "$(dirname "$0")"
@@ -29,4 +29,7 @@ if command -v magick >/dev/null; then
   magick "$tmp/w16.png" "$tmp/w24.png" "$tmp/w32.png" "$tmp/w48.png" "$tmp/w64.png" "$tmp/w128.png" "$tmp/w256.png" icon.ico
 fi
 cp "$tmp/w256.png" icon-win-256.png
+
+# Linux: the same cropped tile at 512px, for icon themes
+rsvg-convert -w 512 -h 512 "$tmp/win.svg" -o icon-linux-512.png
 ls -l icon.icns icon.ico icon-512.png 2>/dev/null

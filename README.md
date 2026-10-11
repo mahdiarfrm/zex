@@ -3,9 +3,10 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/mahdiarfrm/zex/releases/latest"><img alt="Download for macOS" src="https://img.shields.io/badge/download-macOS-0a0a0a?style=for-the-badge"></a>
-  <a href="https://github.com/mahdiarfrm/zex/releases/latest"><img alt="Download for Windows" src="https://img.shields.io/badge/download-Windows-0a0a0a?style=for-the-badge"></a>
-  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-f38aa2?style=for-the-badge"></a>
+  <a href="https://github.com/mahdiarfrm/zex/releases/latest"><img alt="Download for macOS" src="docs/badges/macos.svg" height="40"></a>
+  <a href="https://github.com/mahdiarfrm/zex/releases/latest"><img alt="Download for Windows" src="docs/badges/windows.svg" height="40"></a>
+  <a href="https://github.com/mahdiarfrm/zex/releases/latest"><img alt="Download for Linux" src="docs/badges/linux.svg" height="40"></a>
+  <a href="LICENSE"><img alt="MIT License" src="docs/badges/license.svg" height="40"></a>
 </p>
 
 <p align="center"><b>Write a few typed questions, give Zex a message, and read every answer with its probability.</b><br>
@@ -66,6 +67,8 @@ Chat models answer in sentences you have to parse. Typed-decision models answer 
 | **macOS** | macOS 11 or newer, Apple silicon and Intel | `Zex-<version>-macOS.zip` |
 | **Windows** | Windows 10 or 11, x64 | `Zex-<version>-Windows-x64.zip` |
 | **Windows on ARM** | Windows 11 on ARM | `Zex-<version>-Windows-arm64.zip` |
+| **Debian, Ubuntu** | x64 and ARM64 | `zex_<version>_amd64.deb`, `zex_<version>_arm64.deb` |
+| **Other Linux** | x64 and ARM64, with WebKitGTK 4.1 | `Zex-<version>-Linux-x64.tar.gz`, `Zex-<version>-Linux-arm64.tar.gz` |
 
 Get them from the [latest release](https://github.com/mahdiarfrm/zex/releases/latest).
 
@@ -75,6 +78,8 @@ Get them from the [latest release](https://github.com/mahdiarfrm/zex/releases/la
 
 - **macOS:** unzip and move **Zex** to Applications. The app isn't notarized yet, so the first time, right-click it and choose **Open**.
 - **Windows:** unzip and run **Zex.exe**. If SmartScreen warns you, choose **More info**, then **Run anyway**. Zex uses the Microsoft Edge WebView2 Runtime, which comes with Windows 10 and 11. Without it, Zex opens in your browser instead.
+- **Debian and Ubuntu:** `sudo apt install ./zex_<version>_amd64.deb`, then open Zex from your app menu.
+- **Other Linux:** unpack the `.tar.gz` and run `./zex/install.sh`, which installs Zex for your user with its menu entry and icon. Zex needs WebKitGTK 4.1: `webkit2gtk4.1` on Fedora, `webkit2gtk-4.1` on Arch.
 
 </details>
 
@@ -111,18 +116,18 @@ flowchart LR
   R --> C["Hosted APIs<br/>TypeSafe Jev · Vercel · OpenJev"]
 ```
 
-The interface is a single page (`web/index.html`) with no build step. Many hosted model APIs send no CORS headers, so a page can't call them directly, and a small local relay forwards those requests. The desktop app (`desktop/`, Go) embeds the page and the relay in one binary and shows them in a native window: WebKit on macOS, WebView2 on Windows. `server.py` is the same server in Python, for running from source.
+The interface is a single page (`web/index.html`) with no build step. Many hosted model APIs send no CORS headers, so a page can't call them directly, and a small local relay forwards those requests. The desktop app (`desktop/`, Go) embeds the page and the relay in one binary and shows them in a native window: WebKit on macOS, WebView2 on Windows, WebKitGTK on Linux. `server.py` is the same server in Python, for running from source.
 
 ## Build from source
 
 ```sh
 ./start.sh                  # Python 3.9+, no packages: opens Zex in your browser
 go run ./desktop            # Go 1.26+: opens the desktop window
-desktop/build.sh            # builds the macOS app (on a Mac) and the Windows apps into dist/
+desktop/build.sh            # builds the macOS app (on a Mac), the Windows apps, and Linux (on Linux) into dist/
 sh assets/build_icons.sh    # regenerates the icons (needs librsvg and ImageMagick)
 ```
 
-Pushing a tag such as `v0.1.0` runs [the release workflow](.github/workflows/release.yml), which builds both apps and attaches them to a GitHub release.
+Pushing a tag such as `v0.1.0` runs [the release workflow](.github/workflows/release.yml), which builds the apps for all three systems and attaches them to a GitHub release.
 
 <details>
 <summary><b>Tests</b></summary>
@@ -144,11 +149,11 @@ python3 server.py --port 8766    # then, with Ollaya running, the browser click-
 
 ```
 web/        the app: one HTML file, its font, and the embed for the desktop build
-desktop/    the desktop app: local server, relay and native window (Go)
+desktop/    the desktop app: local server, relay, native window and packaging (Go)
 server.py   the same server for running from source (Python)
 assets/     icon source and generated icons
 tests/      browser click-through tests and a screenshot driver
-docs/       README images
+docs/       README images and badges
 ```
 
 </details>

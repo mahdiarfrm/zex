@@ -1,5 +1,5 @@
 // Command zex is the Zex desktop app: the web UI and its relay in one binary, shown in a
-// native window (WebKit on macOS, WebView2 on Windows).
+// native window (WebKit on macOS, WebView2 on Windows, WebKitGTK on Linux).
 package main
 
 import (
@@ -134,5 +134,7 @@ func reveal(path string) {
 		exec.Command("open", "-R", path).Start()
 	case "windows":
 		exec.Command("explorer", "/select,", path).Start()
+	default:
+		exec.Command("xdg-open", filepath.Dir(path)).Start()
 	}
 }

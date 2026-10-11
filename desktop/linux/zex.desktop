@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Zex
+Comment=Desktop workbench for typed-decision models
+Exec=zex
+Icon=zex
+Terminal=false
+Categories=Development;Utility;
+Keywords=classification;decision;model;
+StartupWMClass=zex
