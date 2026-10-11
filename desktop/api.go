@@ -17,6 +17,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 )
 
 // The local API: while Zex runs, each saved question set is an endpoint on 127.0.0.1.
@@ -44,6 +45,17 @@ type apiConfig struct {
 	Thr        float64  `json:"thr,omitempty"`
 	Connection *apiConn `json:"connection,omitempty"`
 	Sets       []apiSet `json:"sets,omitempty"`
+	Log        *bool    `json:"log,omitempty"`   // keep requests for review; on unless turned off
+	Audit      *float64 `json:"audit,omitempty"` // share of AUTO answers set aside as spot checks
+}
+
+func logOn(c apiConfig) bool { return c.Log == nil || *c.Log }
+
+func auditRate(c apiConfig) float64 {
+	if c.Audit == nil {
+		return 0.05
+	}
+	return math.Max(0, math.Min(1, *c.Audit))
 }
 
 var (
@@ -99,13 +111,21 @@ func newToken() string {
 // handleAPIConfig is how the page turns the API on or off and keeps it current. It has the
 // same guards as the relay: a custom header (so other sites can't send it without a CORS
 // preflight, which this server never grants) and, when present, this page's origin.
-func handleAPIConfig(w http.ResponseWriter, r *http.Request, origins map[string]bool) {
+// fromPage lets a request through only when it comes from the Zex page itself.
+func fromPage(w http.ResponseWriter, r *http.Request, origins map[string]bool) bool {
 	if r.Header.Get("X-Zex") != "1" {
 		writeJSON(w, 403, map[string]any{"error": "Zex: missing X-Zex header"})
-		return
+		return false
 	}
 	if o := r.Header.Get("Origin"); o != "" && !origins[o] {
 		writeJSON(w, 403, map[string]any{"error": "Zex: origin " + o + " not allowed"})
+		return false
+	}
+	return true
+}
+
+func handleAPIConfig(w http.ResponseWriter, r *http.Request, origins map[string]bool) {
+	if !fromPage(w, r, origins) {
 		return
 	}
 	apiMu.Lock()
@@ -126,6 +146,7 @@ func handleAPIConfig(w http.ResponseWriter, r *http.Request, origins map[string]
 		}
 		if in.Enabled {
 			apiCfg.Model, apiCfg.Thr, apiCfg.Connection, apiCfg.Sets = in.Model, in.Thr, in.Connection, in.Sets
+			apiCfg.Log, apiCfg.Audit = in.Log, in.Audit
 		} else {
 			apiCfg.Model, apiCfg.Thr, apiCfg.Connection, apiCfg.Sets = "", 0, nil, nil
 		}
@@ -134,7 +155,7 @@ func handleAPIConfig(w http.ResponseWriter, r *http.Request, origins map[string]
 			return
 		}
 	}
-	writeJSON(w, 200, map[string]any{"enabled": apiCfg.Enabled, "token": apiCfg.Token})
+	writeJSON(w, 200, map[string]any{"enabled": apiCfg.Enabled, "token": apiCfg.Token, "log": logOn(apiCfg), "audit": auditRate(apiCfg)})
 }
 
 func handleAPI(w http.ResponseWriter, r *http.Request) {
@@ -214,18 +235,33 @@ func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) 
 	if model == "" {
 		model = cfg.Model
 	}
+	// one answers a single state and records it for the review queue
 	one := func(state json.RawMessage) map[string]any {
+		it := &logItem{ID: newID(), At: time.Now().UnixMilli(), Set: set.Slug, Model: model, State: state, AuditRate: auditRate(cfg)}
+		var res map[string]any
 		data, err := callModel(*cfg.Connection, model, state, set.Questions)
 		if err != nil {
-			return map[string]any{"error": err.Error()}
+			it.Error = err.Error()
+			res = map[string]any{"id": it.ID, "error": it.Error}
+		} else {
+			answers, _ := data["answers"].(map[string]any)
+			dec, allAuto := decide(answers, set.Thresholds, cfg.Thr)
+			m := data["model"]
+			if m == nil {
+				m = model
+			}
+			it.Model, it.Decisions, it.Answers, it.AllAuto = fmt.Sprint(m), dec, answers, allAuto
+			status := "review"
+			if allAuto {
+				status = "auto"
+				it.Audit = logOn(cfg) && chance(it.AuditRate)
+			}
+			res = map[string]any{"id": it.ID, "set": set.Slug, "model": m, "status": status, "decisions": dec, "all_auto": allAuto, "answers": answers}
 		}
-		answers, _ := data["answers"].(map[string]any)
-		dec, allAuto := decide(answers, set.Thresholds, cfg.Thr)
-		m := data["model"]
-		if m == nil {
-			m = model
+		if logOn(cfg) {
+			recordItem(it)
 		}
-		return map[string]any{"set": set.Slug, "model": m, "decisions": dec, "all_auto": allAuto, "answers": answers}
+		return res
 	}
 	switch {
 	case len(in.Items) > 0:
@@ -247,7 +283,7 @@ func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) 
 		}
 		res := one(state)
 		if e, ok := res["error"]; ok {
-			writeJSON(w, 502, map[string]any{"error": e})
+			writeJSON(w, 502, map[string]any{"id": res["id"], "error": e})
 			return
 		}
 		writeJSON(w, 200, res)

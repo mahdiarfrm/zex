@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -42,6 +43,9 @@ func setup(t *testing.T) http.Handler {
 	apiMu.Lock()
 	apiPath, apiCfg, apiLoaded = filepath.Join(dir, "api.json"), apiConfig{}, false
 	apiMu.Unlock()
+	logMu.Lock()
+	logItems, logByID, logLoaded = nil, map[string]*logItem{}, false
+	logMu.Unlock()
 	return newHandler(web.FS, 18765)
 }
 
@@ -149,5 +153,102 @@ func TestAPIRunsASet(t *testing.T) {
 	cfg = configure(t, h, `{"enabled":true,"regenerate":true}`)
 	if cfg["token"] == token {
 		t.Fatalf("regenerate should make a new token")
+	}
+}
+
+func TestReviewQueue(t *testing.T) {
+	var path string
+	up := fakeModel(t, &path)
+	defer up.Close()
+	h := setup(t)
+	page := map[string]string{"X-Zex": "1", "Content-Type": "application/json"}
+	conf := func(thr float64, thresholds, extra string) string {
+		cfg := configure(t, h, `{"enabled":true,"model":"laya:latest","thr":`+strconv.FormatFloat(thr, 'f', -1, 64)+`,"audit":1`+extra+`,
+			"connection":{"kind":"custom","url":"`+up.URL+`"},
+			"sets":[{"slug":"triage","name":"Triage","questions":{"team":{"type":"choice"},"refund":{"type":"noul"},"mood":{"type":"score"}},"thresholds":`+thresholds+`}]}`)
+		return cfg["token"].(string)
+	}
+	logOf := func(query string) (items []map[string]any, counts map[string]float64) {
+		r := get(t, h, "GET", "/zex/log?"+query, page, "")
+		var out struct {
+			Items  []map[string]any
+			Counts map[string]float64
+		}
+		json.Unmarshal(r.Body.Bytes(), &out)
+		return out.Items, out.Counts
+	}
+	run := func(token string) map[string]any {
+		r := get(t, h, "POST", "/api/sets/triage", map[string]string{"Authorization": "Bearer " + token, "Content-Type": "application/json"}, `{"text":"refund me"}`)
+		var out map[string]any
+		json.Unmarshal(r.Body.Bytes(), &out)
+		return out
+	}
+
+	if r := get(t, h, "GET", "/zex/log", nil, ""); r.Code != 403 {
+		t.Fatalf("the log is for the page only, got %d", r.Code)
+	}
+	tok := conf(0.8, `{"refund":0.9}`, "")
+	first := run(tok)
+	if first["status"] != "review" || first["id"] == nil {
+		t.Fatalf("an unsure answer should be queued: %v", first)
+	}
+	items, counts := logOf("status=waiting")
+	if len(items) != 1 || items[0]["id"] != first["id"] || counts["waiting"] != 1 {
+		t.Fatalf("waiting: %v %v", items, counts)
+	}
+
+	tok = conf(0.5, `{}`, "")
+	second := run(tok)
+	if second["status"] != "auto" {
+		t.Fatalf("a sure answer should be auto: %v", second)
+	}
+	if items, _ := logOf("status=spot"); len(items) != 1 || items[0]["id"] != second["id"] {
+		t.Fatalf("with audit 1 every auto answer is a spot check: %v", items)
+	}
+
+	r := get(t, h, "POST", "/zex/review", page, `{"id":"`+first["id"].(string)+`","labels":{"team":"billing","refund":"false","mood":"1"},"checked":3,"agreed":2}`)
+	if r.Code != 200 {
+		t.Fatalf("review: %d %s", r.Code, r.Body)
+	}
+	if _, counts := logOf("status=reviewed"); counts["reviewed"] != 1 || counts["waiting"] != 0 {
+		t.Fatalf("after review: %v", counts)
+	}
+
+	r = get(t, h, "GET", "/zex/stats?days=7", page, "")
+	var st struct {
+		Days []string
+		Sets map[string]map[string][]int
+		Spot map[string]int
+	}
+	json.Unmarshal(r.Body.Bytes(), &st)
+	sum := func(xs []int) (n int) {
+		for _, x := range xs {
+			n += x
+		}
+		return
+	}
+	tri := st.Sets["triage"]
+	if len(st.Days) != 7 || sum(tri["requests"]) != 2 || sum(tri["auto"]) != 1 || sum(tri["review_checked"]) != 3 || sum(tri["review_agreed"]) != 2 || st.Spot["triage"] != 1 {
+		t.Fatalf("stats: %s", r.Body)
+	}
+
+	// a restart reads everything back, reviews included
+	logMu.Lock()
+	logLoaded = false
+	logMu.Unlock()
+	if items, counts := logOf("status=reviewed"); len(items) != 1 || counts["all"] != 2 {
+		t.Fatalf("after reload: %v %v", items, counts)
+	} else if rv, _ := items[0]["review"].(map[string]any); rv == nil || rv["agreed"] != float64(2) {
+		t.Fatalf("review not reloaded: %v", items[0])
+	}
+
+	tok = conf(0.5, `{}`, `,"log":false`)
+	run(tok)
+	if _, counts := logOf(""); counts["all"] != 2 {
+		t.Fatalf("with the log off nothing is kept: %v", counts)
+	}
+	get(t, h, "POST", "/zex/log/clear", page, `{}`)
+	if _, counts := logOf(""); counts["all"] != 0 {
+		t.Fatalf("clear: %v", counts)
 	}
 }

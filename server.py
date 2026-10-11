@@ -18,6 +18,7 @@ Standard library only. Python 3.9 or newer.
 from __future__ import annotations
 
 import argparse
+import datetime
 import hmac
 import http.server
 import json
@@ -26,6 +27,7 @@ import re
 import secrets
 import sys
 import threading
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -116,6 +118,97 @@ class UpstreamError(Exception):
     pass
 
 
+# ---------------------------------------------------------------- request log and review queue
+# Every API answer is recorded on this computer. Answers the model wasn't sure about wait for
+# a person, and a share of the sure ones are set aside as spot checks; reviews become labels.
+LOG_FILE = os.path.join(os.path.dirname(API_FILE), "requests.jsonl")
+REVIEW_FILE = os.path.join(os.path.dirname(API_FILE), "reviews.jsonl")
+LOG_KEEP = 10000
+LOG_LOCK = threading.Lock()
+_log: list | None = None
+_log_by_id: dict = {}
+
+
+def log_on(cfg: dict) -> bool:
+    return cfg.get("log") is not False
+
+
+def audit_rate(cfg: dict) -> float:
+    a = cfg.get("audit")
+    return 0.05 if a is None else max(0.0, min(1.0, float(a)))
+
+
+def item_status(it: dict) -> str:
+    if it.get("review"):
+        return "reviewed"
+    if it.get("error"):
+        return "error"
+    if not it.get("all_auto"):
+        return "waiting"
+    return "spot" if it.get("audit") else "auto"
+
+
+def _append(path: str, obj) -> None:
+    os.makedirs(os.path.dirname(path), mode=0o700, exist_ok=True)
+    fd = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_APPEND, 0o600)
+    with os.fdopen(fd, "a", encoding="utf-8") as f:
+        f.write(json.dumps(obj) + "\n")
+
+
+def _compact() -> None:
+    global _log
+    if len(_log) > LOG_KEEP:
+        for it in _log[:-LOG_KEEP]:
+            _log_by_id.pop(it["id"], None)
+        _log = _log[-LOG_KEEP:]
+    for path, rows in ((LOG_FILE, [{k: v for k, v in it.items() if k != "review"} for it in _log]),
+                       (REVIEW_FILE, [{"id": it["id"], "review": it["review"]} for it in _log if it.get("review")])):
+        os.makedirs(os.path.dirname(path), mode=0o700, exist_ok=True)
+        fd = os.open(path + ".tmp", os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            f.writelines(json.dumps(r) + "\n" for r in rows)
+        os.replace(path + ".tmp", path)
+
+
+def log_items() -> list:
+    """The log, loaded once. Call with LOG_LOCK held."""
+    global _log
+    if _log is None:
+        _log = []
+        for path, is_review in ((LOG_FILE, False), (REVIEW_FILE, True)):
+            try:
+                with open(path, encoding="utf-8") as f:
+                    for line in f:
+                        try:
+                            row = json.loads(line)
+                        except ValueError:
+                            continue
+                        if is_review:
+                            if row.get("id") in _log_by_id:
+                                _log_by_id[row["id"]]["review"] = row.get("review")
+                        elif row.get("id"):
+                            _log.append(row)
+                            _log_by_id[row["id"]] = row
+            except OSError:
+                pass
+        if len(_log) > LOG_KEEP:
+            _compact()
+    return _log
+
+
+def record(item: dict) -> None:
+    with LOG_LOCK:
+        log_items().append(item)
+        _log_by_id[item["id"]] = item
+        _append(LOG_FILE, item)
+        if len(_log) > LOG_KEEP + LOG_KEEP // 5:
+            _compact()
+
+
+def new_id() -> str:
+    return "r_" + format(int(time.time() * 1000), "x") + secrets.token_hex(6)
+
+
 def call_model(conn: dict, model: str, state, questions) -> dict:
     """One request to the connection: Ollaya first tries /api/decide, then /v1/systemone."""
     body = json.dumps({"model": model, "state": state, "questions": questions}).encode()
@@ -126,7 +219,7 @@ def call_model(conn: dict, model: str, state, questions) -> dict:
         req = urllib.request.Request(base + path, data=body, method="POST")
         req.add_header("Content-Type", "application/json")
         req.add_header("Accept", "application/json")
-        req.add_header("User-Agent", "Zex/0.1")
+        req.add_header("User-Agent", "Zex/0.2")
         if conn.get("key"):
             req.add_header("Authorization", "Bearer " + conn["key"])
         opener = DIRECT if urllib.parse.urlparse(base).hostname in LOOPBACK else DEFAULT
@@ -151,7 +244,7 @@ def call_model(conn: dict, model: str, state, questions) -> dict:
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
-    server_version = "Zex/0.1"
+    server_version = "Zex/0.2"
     allowed_origins: set[str] = set()
 
     def log_message(self, fmt, *args):
@@ -191,7 +284,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         req = urllib.request.Request(target, data=body, method=self.command)
         req.add_header("Content-Type", self.headers.get("Content-Type", "application/json"))
         req.add_header("Accept", "application/json")
-        req.add_header("User-Agent", "Zex/0.1")
+        req.add_header("User-Agent", "Zex/0.2")
         key = self.headers.get("X-Zex-Key")
         if key:
             req.add_header("Authorization", "Bearer " + key)
@@ -232,8 +325,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 cfg["enabled"] = bool(body.get("enabled"))
                 if not cfg.get("token") or body.get("regenerate"):
                     cfg["token"] = "zex_" + secrets.token_hex(16)
-                for k in ("model", "thr", "connection", "sets"):
-                    if cfg["enabled"]:
+                for k in ("model", "thr", "connection", "sets", "log", "audit"):
+                    if cfg["enabled"] and body.get(k) is not None:
                         cfg[k] = body.get(k)
                     else:
                         cfg.pop(k, None)
@@ -241,7 +334,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     api_save(cfg)
                 except OSError as e:
                     return self._json(500, {"error": f"Zex could not save its API settings: {e}"})
-            return self._json(200, {"enabled": bool(cfg.get("enabled")), "token": cfg.get("token", "")})
+            return self._json(200, {"enabled": bool(cfg.get("enabled")), "token": cfg.get("token", ""),
+                                    "log": log_on(cfg), "audit": audit_rate(cfg)})
 
     def _api(self) -> None:
         with API_LOCK:
@@ -255,7 +349,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         path = urllib.parse.urlparse(self.path).path.rstrip("/")
         sets = cfg.get("sets") or []
         if path == "/api" and self.command == "GET":
-            return self._json(200, {"ok": True, "app": "zex", "version": "0.1.0", "sets": len(sets)})
+            return self._json(200, {"ok": True, "app": "zex", "version": "0.2.0", "sets": len(sets)})
         if path == "/api/sets" and self.command == "GET":
             return self._json(200, {"sets": [{"slug": s["slug"], "name": s["name"], "endpoint": "/api/sets/" + s["slug"],
                                               "questions": {k: (v or {}).get("type") for k, v in (s.get("questions") or {}).items()}} for s in sets]})
@@ -280,13 +374,24 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         model = body.get("model") or cfg.get("model") or ""
 
         def one(state):
+            item = {"id": new_id(), "at": int(time.time() * 1000), "set": slug, "model": model, "state": state,
+                    "all_auto": False, "audit_rate": audit_rate(cfg)}
             try:
                 data = call_model(conn, model, state, s.get("questions") or {})
             except UpstreamError as e:
-                return {"error": str(e)}
-            answers = data.get("answers") or {}
-            dec, all_auto = decide(answers, s.get("thresholds") or {}, cfg.get("thr") or 0.8)
-            return {"set": slug, "model": data.get("model") or model, "decisions": dec, "all_auto": all_auto, "answers": answers}
+                item["error"] = str(e)
+                res = {"id": item["id"], "error": str(e)}
+            else:
+                answers = data.get("answers") or {}
+                dec, all_auto = decide(answers, s.get("thresholds") or {}, cfg.get("thr") or 0.8)
+                item.update(model=data.get("model") or model, decisions=dec, answers=answers, all_auto=all_auto)
+                if all_auto and log_on(cfg) and secrets.randbelow(1_000_000) < item["audit_rate"] * 1_000_000:
+                    item["audit"] = True
+                res = {"id": item["id"], "set": slug, "model": item["model"], "status": "auto" if all_auto else "review",
+                       "decisions": dec, "all_auto": all_auto, "answers": answers}
+            if log_on(cfg):
+                record(item)
+            return res
 
         if body.get("items"):
             if len(body["items"]) > 100:
@@ -294,10 +399,105 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._json(200, {"set": slug, "results": [{**one(it), "state": it} for it in body["items"]]})
         if "text" in body or "state" in body:
             res = one(body["text"] if "text" in body else body["state"])
-            return self._json(502 if "error" in res else 200, {"error": res["error"]} if "error" in res else res)
+            return self._json(502 if "error" in res else 200, {"id": res["id"], "error": res["error"]} if "error" in res else res)
         return self._json(400, {"error": 'Send {"text": "..."}, {"state": ...} or {"items": [...]}.'})
 
     _raw = b""
+
+    def _log(self) -> None:
+        if not self._from_page():
+            return
+        q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        get = lambda k, d: (q.get(k) or [d])[0]
+        want_set, status = get("set", ""), get("status", "")
+        offset = int(get("offset", "0") or 0)
+        limit = int(get("limit", "50") or 0)
+        counts = {"waiting": 0, "spot": 0, "reviewed": 0, "error": 0, "auto": 0, "all": 0}
+        match = []
+        with LOG_LOCK:
+            for it in reversed(log_items()):
+                if want_set and it.get("set") != want_set:
+                    continue
+                st = item_status(it)
+                counts[st] += 1
+                counts["all"] += 1
+                if status in ("", "all", st):
+                    match.append(it)
+            page = match[offset:] if limit < 0 else match[offset:offset + limit]
+            return self._json(200, {"items": json.loads(json.dumps(page)), "total": len(match), "counts": counts})
+
+    def _review(self) -> None:
+        if not self._from_page():
+            return
+        try:
+            body = json.loads(self._raw or b"{}")
+        except ValueError:
+            body = {}
+        if not body.get("id") or not body.get("labels"):
+            return self._json(400, {"error": "Zex: send an id and labels"})
+        with LOG_LOCK:
+            log_items()
+            it = _log_by_id.get(body["id"])
+            if not it:
+                return self._json(404, {"error": "Zex: no request with that id"})
+            it["review"] = {"at": int(time.time() * 1000), "labels": body["labels"],
+                            "checked": int(body.get("checked") or 0), "agreed": int(body.get("agreed") or 0)}
+            _append(REVIEW_FILE, {"id": it["id"], "review": it["review"]})
+            return self._json(200, {"ok": True, "item": it})
+
+    def _stats(self) -> None:
+        if not self._from_page():
+            return
+        q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        days = int((q.get("days") or ["14"])[0] or 14)
+        days = days if 0 < days <= 90 else 14
+        start = datetime.datetime.combine(datetime.date.today(), datetime.time()) - datetime.timedelta(days=days - 1)
+        labels = [(start + datetime.timedelta(days=i)).strftime("%Y-%m-%d") for i in range(days)]
+        keys = ("requests", "auto", "errors", "audit_checked", "audit_agreed", "review_checked", "review_agreed")
+        sets: dict = {}
+        waiting: dict = {}
+        spot: dict = {}
+        with LOG_LOCK:
+            for it in log_items():
+                st, name = item_status(it), it.get("set")
+                if st == "waiting":
+                    waiting[name] = waiting.get(name, 0) + 1
+                elif st == "spot":
+                    spot[name] = spot.get(name, 0) + 1
+                d = (datetime.datetime.fromtimestamp(it.get("at", 0) / 1000) - start).days
+                if not 0 <= d < days:
+                    continue
+                s = sets.setdefault(name, {k: [0] * days for k in keys})
+                s["requests"][d] += 1
+                if it.get("error"):
+                    s["errors"][d] += 1
+                    continue
+                if it.get("all_auto"):
+                    s["auto"][d] += 1
+                rv = it.get("review")
+                if rv:
+                    side = "audit" if it.get("all_auto") else "review"
+                    s[side + "_checked"][d] += int(rv.get("checked") or 0)
+                    s[side + "_agreed"][d] += int(rv.get("agreed") or 0)
+        return self._json(200, {"days": labels, "sets": sets, "waiting": waiting, "spot": spot})
+
+    def _log_clear(self) -> None:
+        global _log
+        if not self._from_page():
+            return
+        try:
+            want = (json.loads(self._raw or b"{}") or {}).get("set") or ""
+        except ValueError:
+            want = ""
+        with LOG_LOCK:
+            items = log_items()
+            keep = [it for it in items if want and it.get("set") != want]
+            for it in items:
+                if not (want and it.get("set") != want):
+                    _log_by_id.pop(it["id"], None)
+            _log = keep
+            _compact()
+            return self._json(200, {"ok": True, "left": len(_log)})
 
     def do_GET(self):
         if self.path.startswith("/zex/health"):
@@ -306,6 +506,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._relay()
         if self.path.startswith("/zex/api-config"):
             return self._api_config()
+        if self.path.startswith("/zex/log"):
+            return self._log()
+        if self.path.startswith("/zex/stats"):
+            return self._stats()
         if self.path == "/api" or self.path.startswith("/api/") or self.path.startswith("/api?"):
             return self._api()
         return super().do_GET()
@@ -318,6 +522,10 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._relay()
         if self.path.startswith("/zex/api-config"):
             return self._api_config()
+        if self.path.startswith("/zex/log/clear"):
+            return self._log_clear()
+        if self.path.startswith("/zex/review"):
+            return self._review()
         if self.path == "/api" or self.path.startswith("/api/"):
             return self._api()
         return self._json(405, {"error": "method not allowed"})

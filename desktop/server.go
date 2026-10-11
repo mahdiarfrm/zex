@@ -38,6 +38,14 @@ func newHandler(site fs.FS, port int) http.Handler {
 			relay(w, r, origins)
 		case strings.HasPrefix(r.URL.Path, "/zex/api-config"):
 			handleAPIConfig(w, r, origins)
+		case r.URL.Path == "/zex/log/clear" && r.Method == http.MethodPost:
+			handleLogClear(w, r, origins)
+		case r.URL.Path == "/zex/log":
+			handleLog(w, r, origins)
+		case r.URL.Path == "/zex/review" && r.Method == http.MethodPost:
+			handleReview(w, r, origins)
+		case r.URL.Path == "/zex/stats":
+			handleStats(w, r, origins)
 		case r.URL.Path == "/api" || strings.HasPrefix(r.URL.Path, "/api/"):
 			handleAPI(w, r)
 		case r.Method == http.MethodGet || r.Method == http.MethodHead:

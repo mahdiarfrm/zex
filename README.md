@@ -69,7 +69,9 @@ curl -s http://127.0.0.1:18765/api/sets/support-triage \
 
 ```json
 {
+  "id": "r_mgl2x4k1c9e0a7f3b2d1",
   "set": "support-triage",
+  "status": "auto",
   "decisions": {
     "team": { "answer": "billing", "confidence": 0.952, "verdict": "auto", "threshold": 0.8 },
     "refund_requested": { "answer": "true", "confidence": 0.836, "verdict": "auto", "threshold": 0.8 }
@@ -79,6 +81,20 @@ curl -s http://127.0.0.1:18765/api/sets/support-triage \
 ```
 
 Requests use your active connection and the thresholds saved in the set, so `all_auto` tells your workflow when to act on its own and when to hand the item to a person. Send `{"items": [...]}` for up to 100 texts at once. `GET /api/sets` lists your sets.
+
+### Review what the model isn't sure about
+
+<img alt="The review queue: an unsure answer, every option with its probability, and one-key review" src="docs/screenshots/review.png">
+
+Every answer the local API gives is kept on your computer. Answers below their threshold wait in **Review** for a person, and a small share of the sure ones (5% by default) come as **spot checks**. Review from the keyboard: a number picks an option, **Enter** confirms, **S** skips.
+
+Each review is a label. Zex uses the labels to show how often the model is right on your real traffic and to suggest better thresholds. Spot checks count for all the AUTO answers they were drawn from, so the numbers aren't tilted toward the hard cases. **Export labels** gives you every reviewed answer as JSONL, ready to fine-tune a model elsewhere.
+
+### Know how it's doing
+
+<img alt="Home: requests this week, the share answered on its own, accuracy from spot checks, and what is waiting" src="docs/screenshots/home-live.png">
+
+Home shows the last 7 days: requests, the share answered on its own, how often those answers were right, and what is waiting for a person. It warns you when accuracy falls below your aim, when it slips from the week before, and when requests start failing.
 
 ## More
 
@@ -147,6 +163,7 @@ Get them from the [latest release](https://github.com/mahdiarfrm/zex/releases/la
 - A key is only ever sent to the server you added it for.
 - The local relay listens on `127.0.0.1` only, and it forwards decision-model API paths only.
 - The local API is off until you turn it on, answers on `127.0.0.1` only, and needs a token that you can replace at any time. Turning it off removes your sets and connection from its settings file.
+- Requests to the local API are logged on your computer only, so you can review them. Turn the log off or clear it on the Local API page.
 
 ## How it works
 

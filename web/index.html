@@ -381,11 +381,12 @@ textarea.batch-input:focus { border-color: var(--accent); }
 
 /* ---------- pages: home and connections ---------- */
 .page { display: none; grid-column: 2 / -1; overflow: auto; min-width: 0; min-height: 0; background: var(--bg); }
-.app[data-route="home"] .page, .app[data-route="connections"] .page, .app[data-route="sets"] .page, .app[data-route="api"] .page { display: block; }
+.app[data-route="home"] .page, .app[data-route="connections"] .page, .app[data-route="sets"] .page, .app[data-route="api"] .page, .app[data-route="review"] .page { display: block; }
 .app[data-route="home"] .editor-col, .app[data-route="home"] .out-col,
 .app[data-route="connections"] .editor-col, .app[data-route="connections"] .out-col,
 .app[data-route="sets"] .editor-col, .app[data-route="sets"] .out-col,
-.app[data-route="api"] .editor-col, .app[data-route="api"] .out-col { display: none; }
+.app[data-route="api"] .editor-col, .app[data-route="api"] .out-col,
+.app[data-route="review"] .editor-col, .app[data-route="review"] .out-col { display: none; }
 a.server-card { color: inherit; text-decoration: none; display: block; }
 a.server-card:hover .win-title { background: var(--accent); color: var(--on-accent); }
 .conn-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
@@ -670,6 +671,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .etile .ev { font-family: var(--pix); font-size: 44px; font-weight: 400; line-height: .95; }
 .etile .es { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .eval-main { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr); gap: 18px; align-items: start; }
+.curve-wrap { max-width: 620px; }
 .curve { width: 100%; height: auto; display: block; }
 .curve .grid { stroke: var(--border-strong); stroke-dasharray: 1 3; }
 .curve .lab { font-family: var(--pix); font-size: 18px; fill: var(--text-muted); }
@@ -741,6 +743,75 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .end .verb.post { background: var(--text); color: var(--bg); }
 @media (max-width: 1100px) { .api-grid { grid-template-columns: minmax(0, 1fr); } .end { grid-template-columns: 52px minmax(0, 1fr) auto; } .end .muted { display: none; } }
 
+/* ---------- review queue and live numbers ---------- */
+.nav-badge { margin-left: auto; background: var(--text); color: var(--bg); font-size: 15px; font-weight: 400; line-height: 16px; padding: 0 5px; min-width: 18px; text-align: center; }
+.nav-item.active .nav-badge { background: var(--accent); color: var(--on-accent); }
+.app.sb-collapsed .nav-badge { position: absolute; margin: -16px 0 0 18px; }
+.rv-body { margin-top: 26px; display: flex; flex-direction: column; gap: 18px; }
+.rv-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rv-bar .grow { flex: 1; }
+.rv-tabs { display: flex; flex-wrap: wrap; border-bottom: 1.5px solid var(--text); }
+.rv-tabs button { display: inline-flex; align-items: center; gap: 7px; padding: 7px 12px; font-size: 13px; border: 1.5px solid transparent; border-bottom: 0; margin-bottom: -1.5px; color: var(--text-muted); }
+.rv-tabs button b { font-size: 16px; font-weight: 400; background: var(--surface-2); color: var(--text); padding: 0 5px; line-height: 16px; }
+.rv-tabs button[aria-selected="true"] { border-color: var(--text); background: var(--bg); color: var(--text); }
+.rv-tabs button[aria-selected="true"] b { background: var(--text); color: var(--bg); }
+.rv-grid { display: grid; grid-template-columns: minmax(260px, 0.8fr) minmax(0, 1.7fr); gap: 22px; align-items: start; }
+.rv-list .win-body, .rv-rows { padding: 0; }
+.rv-rows { display: flex; flex-direction: column; max-height: 640px; overflow: auto; }
+.rv-row { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-areas: "tag when" "txt txt" "set set"; gap: 3px 8px; text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+.rv-row:hover { background: var(--surface-2); }
+.rv-row.on { background: var(--surface-2); box-shadow: inset 3px 0 0 var(--accent); }
+.rv-row .rv-tag { grid-area: tag; } .rv-row .when { grid-area: when; justify-self: end; font-size: 16px; color: var(--text-muted); }
+.rv-row .txt { grid-area: txt; font-size: 13px; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.rv-row .set { grid-area: set; font-size: 11.5px; color: var(--text-muted); }
+.rv-tag { display: inline-block; font-family: var(--pix); font-size: 15px; line-height: 16px; padding: 0 5px; border: 1px solid currentColor; white-space: nowrap; }
+.rv-tag.t-waiting { color: var(--warn); } .rv-tag.t-spot { color: var(--accent); } .rv-tag.t-reviewed { background: var(--text); color: var(--bg); border-color: var(--text); }
+.rv-tag.t-auto { color: var(--text-muted); } .rv-tag.t-error { color: var(--danger); }
+.rv-item .win-body { display: flex; flex-direction: column; gap: 14px; }
+.rv-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; color: var(--text-muted); }
+.rv-meta .mono { font: 11.5px var(--mono); }
+.rv-text { margin: 0; padding: 14px 16px; border-left: 4px solid var(--text); background: var(--surface); font-size: 16px; line-height: 1.5; white-space: pre-wrap; }
+.rv-qs { display: flex; flex-direction: column; gap: 10px; }
+.rv-q { padding: 10px 12px; border: 1px solid var(--border-strong); cursor: default; transition: border-color .2s, box-shadow .2s; }
+.rv-q.focus { border-color: var(--text); box-shadow: 4px 4px 0 var(--text); }
+.rv-qh { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+.rv-qh .k { font: 600 13px var(--mono); } .rv-qh .ins { font-size: 12.5px; color: var(--text-muted); font-style: italic; }
+.rv-qh .grow { flex: 1; } .rv-qh .dchip { margin-top: 0; }
+.rv-opts { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px; }
+.rv-opt { position: relative; display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; grid-template-areas: "n l p" "bar bar bar"; gap: 4px 8px; align-items: center; text-align: left; padding: 7px 10px 8px; border: 1.5px solid var(--border-strong); background: var(--bg); }
+.rv-opt:hover { border-color: var(--text); }
+.rv-opt .n { grid-area: n; font-size: 15px; color: var(--text-muted); } .rv-opt .l { grid-area: l; font: 13px var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rv-opt .p { grid-area: p; font-size: 16px; color: var(--text-muted); }
+.rv-opt .bar { grid-area: bar; height: 4px; background: var(--surface-2); } .rv-opt .bar i { display: block; height: 100%; background: var(--text-muted); }
+.rv-opt.model::after { content: "model"; position: absolute; top: -9px; right: 8px; font-family: var(--pix); font-size: 13px; line-height: 14px; padding: 0 4px; background: var(--bg); color: var(--text-muted); border: 1px solid var(--border-strong); }
+.rv-opt.sel { border-color: var(--text); background: var(--text); color: var(--bg); }
+.rv-opt.sel .n, .rv-opt.sel .p { color: var(--bg); } .rv-opt.sel .bar { background: color-mix(in srgb, var(--bg) 25%, transparent); } .rv-opt.sel .bar i { background: var(--bg); }
+.rv-acts { margin-top: 0; }
+.rv-keys { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); border-top: 1px dotted var(--border-strong); padding-top: 10px; }
+.rv-keys kbd { font-size: 15px; border: 1px solid var(--border-strong); padding: 0 5px; margin-right: 5px; color: var(--text); }
+.rv-empty { max-width: 640px; } .rv-empty b { font-size: 28px; font-weight: 400; } .rv-empty p { margin: 6px 0 0; color: var(--text-muted); font-size: 13.5px; }
+.rv-acc { display: flex; flex-direction: column; gap: 12px; }
+.rv-acc-note { margin: 0; font-size: 13px; color: var(--text-muted); }
+.switch.sm { height: 24px; } .switch.sm .pix { font-size: 16px; }
+.hm-alerts { position: relative; z-index: 1; display: flex; flex-direction: column; gap: 10px; margin-bottom: 18px; max-width: 64%; }
+.hm-alerts:empty { display: none; }
+.hm-alert { display: flex; align-items: center; gap: 12px; padding: 8px 10px 8px 8px; background: var(--winbody); border: 1.5px solid var(--desk-ink); box-shadow: 5px 5px 0 var(--desk-ink); font-size: 13.5px; }
+.hm-alert .ic { width: 26px; height: 26px; display: grid; place-items: center; font-size: 22px; background: var(--desk-ink); color: var(--desk); flex: none; }
+.hm-alert.a-bad .ic { background: var(--danger); color: #fff; } .hm-alert.a-warn .ic { background: var(--warn); color: #fff; }
+.hm-alert .tx { flex: 1; }
+.hm-live { display: flex; flex-direction: column; gap: 10px; }
+.hm-cell { text-align: left; padding: 8px 4px 10px; border-bottom: 1px dotted var(--border-strong); display: flex; flex-direction: column; }
+.hm-stats > .hm-cell:nth-child(odd) { border-right: 1px dotted var(--border-strong); padding-right: 10px; }
+.hm-stats > .hm-cell:nth-child(even) { padding-left: 12px; }
+.hm-cell b { font-family: var(--pix); font-size: 34px; font-weight: 400; line-height: 1; }
+.hm-cell span { font-size: 12px; color: var(--text-muted); } .hm-cell small { font-size: 11px; color: var(--text-faint); }
+.hm-cell.link:hover b { color: var(--accent); }
+.lbars { display: flex; align-items: flex-end; gap: 3px; height: 54px; border-bottom: 1.5px solid var(--text); }
+.lb { flex: 1; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; }
+.lb i { display: block; } .lb i.aut { background: var(--text); } .lb i.rev { background: repeating-linear-gradient(135deg, var(--text-muted) 0 1.5px, transparent 1.5px 4px); }
+.lbars-x { display: flex; justify-content: space-between; font-size: 14px; color: var(--text-muted); }
+@media (max-width: 1100px) { .rv-grid { grid-template-columns: minmax(0, 1fr); } .hm-alerts { max-width: none; } }
+
 /* ---------- boot splash ---------- */
 #splash { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; overflow: hidden; background: var(--bg); color: var(--text);
   clip-path: circle(150% at 50% 42%); transition: clip-path .75s cubic-bezier(.7, 0, .25, 1); }
@@ -782,7 +853,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     <div class="sp-mark"><div class="halftone"></div></div>
     <div class="sp-name"><span style="--i:0">Z</span><span style="--i:1">e</span><span style="--i:2">x</span></div>
     <div class="win sp-log">
-      <div class="win-title">Zex.OS 0.1<span class="grow"></span>boot</div>
+      <div class="win-title">Zex.OS 0.2<span class="grow"></span>boot</div>
       <div class="win-body">
         <div class="sp-line" style="--d:0"><span>loading workbench</span><i></i><b class="ok">ok</b></div>
         <div class="sp-line" style="--d:1"><span>starting relay</span><i></i><b id="spRelay"></b></div>
@@ -831,6 +902,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     <a class="nav-item" data-route-link="home" href="#/home"><svg class="i"><use href="#i-home"/></svg><span>Home</span></a>
     <a class="nav-item" data-route-link="playground" href="#/playground"><svg class="i"><use href="#i-flask"/></svg><span>Playground</span></a>
     <a class="nav-item" data-route-link="sets" href="#/sets"><svg class="i"><use href="#i-layers"/></svg><span>Sets</span></a>
+    <a class="nav-item" data-route-link="review" href="#/review"><svg class="i"><use href="#i-eye"/></svg><span>Review</span><b class="nav-badge pix" id="reviewBadge" hidden></b></a>
     <a class="nav-item" data-route-link="api" href="#/api"><svg class="i"><use href="#i-code"/></svg><span>Local API</span></a>
     <a class="nav-item" data-route-link="connections" href="#/connections"><svg class="i"><use href="#i-plug"/></svg><span>Connections</span></a>
     <a class="nav-item ext-link" href="https://docs.typesafe.ai/introduction/quickstart" target="_blank" rel="noopener"><svg class="i"><use href="#i-book"/></svg><span>API format</span><svg class="i ext"><use href="#i-ext"/></svg></a>
@@ -1651,7 +1723,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("div", { class: "vstrip", "aria-hidden": "true" }, STRIP),
       h("div", { class: "ex-hero" },
         h("div", {},
-          h("span", { class: "tagline" }, "Zex.OS 0.1"),
+          h("span", { class: "tagline" }, "Zex.OS 0.2"),
           h("div", { class: "eyebrow" }, "Start here"),
           h("div", { class: "corners", style: "display:inline-block;margin-top:14px" }, h("i", { class: "tl" }), h("i", { class: "tr" }), h("i", { class: "bl" }), h("i", { class: "br" }),
             h("h2", {}, "Ask a model something"))),
@@ -2026,20 +2098,23 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     return null;
   }
   const sameLabel = (a, b) => a != null && b != null && String(a).toLowerCase() === String(b).toLowerCase();
-  function evalStats(key, q) {
+  // Accuracy for one question from points { a: answer, exp: expected (raw), w: weight }.
+  // Weights let spot checks stand in for all the AUTO answers they were drawn from.
+  function evalStatsFrom(raw, q) {
     const pts = [];
-    batch.items.forEach((it, i) => {
-      const r = batch.results[i], a = r?.answers?.[key], exp = canonExpected(q, it.expected[key]);
-      if (!r || r.error || !a || exp == null) return;
-      const pred = predLabel(a);
-      pts.push({ p: topAnswer(a).p, pred, exp, ok: sameLabel(pred, exp), near: q.type === "score" && /^\d+$/.test(exp) ? Math.abs(Number(pred) - Number(exp)) <= 1 : null });
-    });
+    for (const x of raw) {
+      const exp = canonExpected(q, x.exp);
+      if (!x.a || exp == null) continue;
+      const pred = predLabel(x.a);
+      pts.push({ p: topAnswer(x.a).p, pred, exp, w: x.w ?? 1, ok: sameLabel(pred, exp), near: q.type === "score" && /^\d+$/.test(exp) ? Math.abs(Number(pred) - Number(exp)) <= 1 : null });
+    }
     const n = pts.length;
     if (!n) return null;
+    const W = pts.reduce((m, x) => m + x.w, 0), wOf = (arr, f) => arr.reduce((m, x) => m + (f(x) ? x.w : 0), 0);
     const curve = [];
     for (let t = 50; t <= 99; t++) {
-      const cov = pts.filter((x) => x.p >= t / 100);
-      curve.push({ t: t / 100, cov: cov.length / n, acc: cov.length ? cov.filter((x) => x.ok).length / cov.length : null, n: cov.length });
+      const cov = pts.filter((x) => x.p >= t / 100), cw = wOf(cov, () => true);
+      curve.push({ t: t / 100, cov: cw / W, acc: cov.length ? wOf(cov, (x) => x.ok) / cw : null, n: cov.length });
     }
     const labels = (q.type === "noul" ? ["true", "false"] : q.type === "choice" ? (Array.isArray(q.criteria) ? q.criteria : Object.keys(q.criteria || {})) : (Array.isArray(q.criteria) ? q.criteria : []).map((_, i) => i)).map(String);
     for (const x of pts) for (const v of [x.exp, x.pred]) if (v != null && !labels.some((l) => sameLabel(l, v))) labels.push(String(v));
@@ -2047,10 +2122,13 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const cm = labels.map(() => labels.map(() => 0));
     for (const x of pts) cm[at(x.exp)][at(x.pred)]++;
     const bins = [[0, 0.5], [0.5, 0.6], [0.6, 0.7], [0.7, 0.8], [0.8, 0.9], [0.9, 1.01]].map(([lo, hi]) => {
-      const b = pts.filter((x) => x.p >= lo && x.p < hi);
-      return { lo, hi, n: b.length, conf: b.length ? b.reduce((m, x) => m + x.p, 0) / b.length : null, acc: b.length ? b.filter((x) => x.ok).length / b.length : null };
+      const b = pts.filter((x) => x.p >= lo && x.p < hi), bw = wOf(b, () => true);
+      return { lo, hi, n: b.length, conf: b.length ? b.reduce((m, x) => m + x.p * x.w, 0) / bw : null, acc: b.length ? wOf(b, (x) => x.ok) / bw : null };
     }).filter((b) => b.lo >= 0.5 || b.n);
-    return { n, acc: pts.filter((x) => x.ok).length / n, curve, labels, cm, bins, near: q.type === "score" ? pts.filter((x) => x.near).length / n : null };
+    return { n, acc: wOf(pts, (x) => x.ok) / W, curve, labels, cm, bins, near: q.type === "score" ? wOf(pts, (x) => x.near) / W : null, weighted: pts.some((x) => x.w !== 1) };
+  }
+  function evalStats(key, q) {
+    return evalStatsFrom(batch.items.map((it, i) => { const r = batch.results[i]; return r && !r.error ? { a: r.answers?.[key], exp: it.expected[key] } : null; }).filter(Boolean), q);
   }
   // the lowest threshold that keeps accuracy at the target automates the most
   function recommend(curve, target, n) {
@@ -2222,60 +2300,64 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         }))));
   }
   const etile = (k, v, sub) => h("div", { class: "etile" }, h("span", { class: "ek" }, k), h("b", { class: "ev" }, v), h("span", { class: "es" }, sub));
+  const evalShell = (right, ...body) => h("div", { class: "win shadow eval" }, h("div", { class: "win-title" }, "Zex.Eval", h("span", { class: "grow" }), right), h("div", { class: "win-body" }, ...body));
   function evalWin(keys, set) {
-    const qs_ = batch.questions;
     const labeled = keys.filter((k) => batch.items.some((it) => hasValue(it.expected[k])));
-    const shell = (right, ...body) => h("div", { class: "win shadow eval" }, h("div", { class: "win-title" }, "Zex.Eval", h("span", { class: "grow" }), right), h("div", { class: "win-body" }, ...body));
     if (!labeled.length) {
-      return shell("accuracy", h("div", { class: "eval-empty" }, h("b", {}, "How often is the model right?"),
+      return evalShell("accuracy", h("div", { class: "eval-empty" }, h("b", {}, "How often is the model right?"),
         h("p", {}, "Run a file that has a column with the answer you expect, and pick that column under Expected answers. Zex measures accuracy for each question and suggests the threshold that keeps it above your aim.")));
     }
-    if (!labeled.includes(evalKey)) evalKey = labeled[0];
-    const stats = Object.fromEntries(labeled.map((k) => [k, evalStats(k, qs_[k])]));
-    const tabs = h("div", { class: "eval-tabs", role: "tablist" }, labeled.map((k) => h("button", { role: "tab", type: "button", "aria-selected": String(k === evalKey), onclick: () => { evalKey = k; fillBatch(); } },
-      h("span", { class: "k" }, k), h("span", { class: "v pix" }, stats[k] ? pct(stats[k].acc) : "–"))));
-    const k = evalKey, q = qs_[k], st = stats[k];
-    if (!st) return shell(set ? set.name : "accuracy", tabs, h("div", { class: "eval-empty" }, "Waiting for answers that have an expected value."));
-    let t = batch.evalThr[k] ?? thrFor(k, set);
+    return evalPanel({ keys: labeled, qs: batch.questions, set, stats: Object.fromEntries(labeled.map((k) => [k, evalStats(k, batch.questions[k])])),
+      key: evalKey, onKey: (k) => { evalKey = k; fillBatch(); }, preview: batch.evalThr, after: fillBatch });
+  }
+  // the accuracy panel, for a batch with expected answers or for answers people reviewed
+  function evalPanel(c) {
+    const k = c.keys.includes(c.key) ? c.key : c.keys[0];
+    const tabs = h("div", { class: "eval-tabs", role: "tablist" }, c.keys.map((x) => h("button", { role: "tab", type: "button", "aria-selected": String(x === k), onclick: () => c.onKey(x) },
+      h("span", { class: "k" }, x), h("span", { class: "v pix" }, c.stats[x] ? pct(c.stats[x].acc) : "–"))));
+    const q = c.qs[k] || {}, st = c.stats[k], set = c.set;
+    if (!st) return evalShell(set ? set.name : "accuracy", tabs, h("div", { class: "eval-empty" }, "Waiting for answers that have an expected value."));
+    let t = c.preview[k] ?? thrFor(k, set);
     const tiles = h("div", { class: "eval-tiles" }), chart = h("div", { class: "eval-chart" }), sugg = h("div", { class: "eval-sugg" });
     const range = h("input", { type: "range", min: "50", max: "99", value: String(Math.round(t * 100)), "aria-label": `AUTO threshold for ${k}` });
     const tLab = h("b", { class: "pix" }), useBtn = h("button", { class: "btn solid", type: "button" });
     const aimSel = h("select", { class: "chip-select", "aria-label": "Accuracy to aim for" }, [0.9, 0.95, 0.97, 0.99].map((v) => h("option", { value: String(v) }, `${Math.round(v * 100)}% right`)));
     aimSel.value = String(evalTarget);
     const paint = () => {
-      const c = st.curve[Math.round(t * 100) - 50], saved = thrFor(k, set);
+      const cv = st.curve[Math.round(t * 100) - 50], saved = thrFor(k, set);
       tLab.textContent = `${Math.round(t * 100)}%`;
       tiles.replaceChildren(
-        etile("accuracy", pct(st.acc), `all ${fmtN(st.n)} answers` + (st.near != null ? ` · ${pct(st.near)} within a level` : "")),
-        etile("auto", pct(c.cov), `at ≥ ${Math.round(t * 100)}%`),
-        etile("right when auto", c.acc != null ? pct(c.acc) : "–", `${fmtN(c.n)} answers`),
-        etile("for review", fmtN(st.n - c.n), "a person checks these"));
+        etile("accuracy", pct(st.acc), `${fmtN(st.n)} checked answers` + (st.near != null ? ` · ${pct(st.near)} within a level` : "")),
+        etile("auto", pct(cv.cov), `at ≥ ${Math.round(t * 100)}%`),
+        etile("right when auto", cv.acc != null ? pct(cv.acc) : "–", `${fmtN(cv.n)} checked`),
+        etile("for a person", pct(1 - cv.cov), "below the threshold"));
       chart.replaceChildren(curveSvg(st.curve, t, evalTarget));
       const rec = recommend(st.curve, evalTarget, st.n);
       sugg.replaceChildren(rec
         ? h("span", {}, "Suggested ", h("b", { class: "pix" }, `≥ ${Math.round(rec.t * 100)}%`), ` automates ${pct(rec.cov)} and is right ${pct(rec.acc)} of the time. `,
-            h("button", { class: "text-btn xs bordered", type: "button", onclick: () => { t = rec.t; range.value = String(Math.round(t * 100)); batch.evalThr[k] = t; paint(); } }, "Try it"))
+            h("button", { class: "text-btn xs bordered", type: "button", onclick: () => { t = rec.t; range.value = String(Math.round(t * 100)); c.preview[k] = t; paint(); } }, "Try it"))
         : h("span", {}, `No threshold reaches ${pct(evalTarget)} right on this data. Lower the aim, or send these answers to a person.`));
       const same = Math.abs(saved - t) < 0.001, own = set?.thresholds?.[k] != null;
       useBtn.textContent = same ? (own ? `Saved: ${k} is AUTO at ≥ ${Math.round(t * 100)}%` : `${k} uses the global ≥ ${Math.round(t * 100)}%`)
         : set ? `Use ≥ ${Math.round(t * 100)}% for ${k}` : `Use ≥ ${Math.round(t * 100)}% everywhere`;
       useBtn.disabled = same;
     };
-    range.addEventListener("input", () => { t = Number(range.value) / 100; batch.evalThr[k] = t; paint(); });
+    range.addEventListener("input", () => { t = Number(range.value) / 100; c.preview[k] = t; paint(); });
     aimSel.addEventListener("change", () => { evalTarget = Number(aimSel.value); store.set("zex.evalTarget", evalTarget); paint(); });
     useBtn.addEventListener("click", () => {
       if (set) { set.thresholds = { ...(set.thresholds || {}), [k]: t }; set.updatedAt = Date.now(); saveSets(); toast(`${k} is AUTO at ≥ ${Math.round(t * 100)}% in ${set.name}`); }
       else { thr = t; store.set("zex.thr", thr); syncApi(); thrLabel(); toast(`Every question is AUTO at ≥ ${Math.round(t * 100)}% now`); }
-      delete batch.evalThr[k]; fillBatch();
+      delete c.preview[k]; c.after();
     });
     paint();
-    return shell(set ? set.name : "accuracy", tabs, tiles,
+    return evalShell(set ? set.name : "accuracy", tabs, tiles,
       h("div", { class: "eval-main" }, chart,
         h("div", { class: "eval-side" },
           h("div", { class: "eval-ctl" }, h("span", {}, "AUTO at"), tLab), range,
           h("div", { class: "eval-ctl" }, h("span", {}, "Aim for"), aimSel),
           sugg, h("div", { class: "btn-row" }, useBtn),
-          set ? null : h("p", { class: "eval-note" }, "Save these questions as a set to keep a threshold for each question."))),
+          set ? null : h("p", { class: "eval-note" }, "Save these questions as a set to keep a threshold for each question."),
+          st.weighted ? h("p", { class: "eval-note" }, "Each spot check stands in for all the AUTO answers it was drawn from, so these numbers aren't tilted toward the hard cases.") : null)),
       h("div", { class: "eval-grid" }, confusion(st, q), calibration(st)));
   }
   function curveSvg(curve, t, aim) {
@@ -2644,7 +2726,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   const page = $("#page");
   function routeFromHash() {
     if (location.hash.startsWith("#share/")) return "playground";
-    const m = location.hash.match(/^#\/(home|playground|connections|sets|api)\b/);
+    const m = location.hash.match(/^#\/(home|playground|connections|sets|api|review)\b/);
     return m ? m[1] : "home";
   }
   let route = routeFromHash();
@@ -2769,6 +2851,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     else if (route === "connections") page.replaceChildren(renderConnections());
     else if (route === "sets") page.replaceChildren(renderSets());
     else if (route === "api") page.replaceChildren(renderApi());
+    else if (route === "review") page.replaceChildren(renderReview());
     else { page.replaceChildren(); renderOut(); }
     page.scrollTop = 0;
   }
@@ -2860,13 +2943,14 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("section", { class: "hm-sky" },
         h("div", { class: "hm-b64", "aria-hidden": "true" }, STRIP),
         h("div", { class: "hm-top" },
-          h("span", { class: "tagline cursor" }, "Zex.OS 0.1"), h("h1", {}, "Home"), h("span", { class: "grow" }),
+          h("span", { class: "tagline cursor" }, "Zex.OS 0.2"), h("h1", {}, "Home"), h("span", { class: "grow" }),
           h("span", { class: "zclock pix" }, `${fmtDate()} · ${fmtTime()}`)),
         h("p", { class: "hm-leader" }, h("b", {}, ac.name), h("span", { class: "dl", "aria-hidden": "true" }), h("span", { class: "u" }, ac.url.replace(/^https?:\/\//, ""))),
         h("div", { class: "giant hm-status", "data-hmstatus": "", "data-t": status, role: "status" }, words(status)),
         h("div", { class: "hm-mark" }, h("div", { class: "halftone" }), heroCanvas())),
       h("div", { class: "hm-desk-wrap" }, withDeskDots(h("section", { class: "hm-desk", "aria-label": "Workspace" },
         h("span", { class: "tagline" }, "Zex.OS1"),
+        (hmAlertsEl = alertsEl()),
         h("div", { class: "hm-grid" },
         win("Zex.Run", h("span", { "data-model": "" }, model), h("div", { class: "qr" }, ta, h("div", { class: "qr-row" }, sel, keys, runQ)), "qr-win"),
         win("Zex.Link", `${conns.length} saved`, h("div", { class: "hm-conn" },
@@ -2874,11 +2958,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
           h("div", { class: "btn-row" },
             h("button", { class: "btn", type: "button", onclick: () => checkConn(ac) }, "Test"),
             h("button", { class: "btn", type: "button", onclick: () => go("connections") }, "Manage")))),
-        win("Zex.Stats", "", h("div", { class: "hm-stats" },
-          stat("runs", String(st.n), st.n),
-          stat("median model time", st.med != null ? fmtMs(st.med) : "–", st.med != null && st.med < 1000 ? Math.round(st.med) : null, " ms"),
-          stat(`answers at ≥ ${Math.round(thr * 100)}%`, st.autoRate != null ? pct(st.autoRate) : "–", st.autoRate != null ? Math.round(st.autoRate * 100) : null, "%"),
-          stat("last run", st.lastAt ? ago(st.lastAt) : "–"))),
+        (hmStatsEl = statsCard()),
         win("Zex.History", hist.length ? `${hist.length} saved` : "", h("div", { class: "hm-recent" },
           hist.length ? h("div", { class: "hist" }, hist.slice(0, 5).map(histItem))
             : h("div", { class: "hm-empty" }, "No runs yet. Everything you run shows up here, kept in this browser."),
@@ -2953,6 +3033,283 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
 
 
+  // ---------------------------------------------------------------- review queue
+  // Answers the model wasn't sure about wait here for a person; a share of the sure ones come
+  // as spot checks. Every review is a label, and labels feed the accuracy view and Home.
+  const rv = { tab: "waiting", set: "", items: [], counts: {}, total: 0, sel: null, picks: {}, q: 0, evalKey: null, evalThr: {}, evalItems: null, loading: false, error: "" };
+  let live = { stats: null, counts: null };
+  let rvBody = null, hmStatsEl = null, hmAlertsEl = null;
+  async function zexGet(path) { const r = await fetch(path, { headers: { "X-Zex": "1" } }); const d = await r.json(); if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`); return d; }
+  async function zexPost(path, body) { const r = await fetch(path, { method: "POST", headers: { "X-Zex": "1", "Content-Type": "application/json" }, body: JSON.stringify(body) }); const d = await r.json(); if (!r.ok) throw new Error(d.error || `HTTP ${r.status}`); return d; }
+  const itemStatus = (it) => (it.review ? "reviewed" : it.error ? "error" : !it.all_auto ? "waiting" : it.audit ? "spot" : "auto");
+  const STATUS_TAG = { waiting: "WAITING", spot: "SPOT CHECK", reviewed: "REVIEWED", auto: "AUTO", error: "ERROR" };
+  const stateText_ = (v) => (typeof v === "string" ? v : JSON.stringify(v));
+  const setName = (slug) => sets.find((x) => x.slug === slug)?.name || slug;
+
+  async function refreshLive() {
+    if (!apiCfg.available) return;
+    try {
+      const [st, lg] = await Promise.all([zexGet("/zex/stats?days=14"), zexGet("/zex/log?limit=0")]);
+      live = { stats: st, counts: lg.counts };
+    } catch { return; }
+    paintReviewBadge();
+    if (route === "home") paintLive();
+  }
+  setInterval(() => { if (!document.hidden) refreshLive(); }, 15000);
+  function paintReviewBadge() {
+    const el = $("#reviewBadge");
+    if (!el) return;
+    const n = (live.counts?.waiting || 0) + (live.counts?.spot || 0);
+    el.textContent = n > 99 ? "99+" : String(n); el.hidden = !n;
+  }
+
+  async function loadReview() {
+    if (!apiCfg.available) { paintReview(); return; }
+    rv.loading = true; rv.error = "";
+    const setQ = rv.set ? `&set=${encodeURIComponent(rv.set)}` : "";
+    try {
+      if (rv.tab === "accuracy") {
+        if (!rv.set) rv.set = (curSet() || sets[0])?.slug || "";
+        const d = await zexGet(`/zex/log?status=reviewed&limit=-1&set=${encodeURIComponent(rv.set)}`);
+        rv.evalItems = d.items; rv.counts = d.counts;
+      } else {
+        const d = await zexGet(`/zex/log?status=${rv.tab}&limit=200${setQ}`);
+        rv.items = d.items; rv.counts = d.counts; rv.total = d.total;
+        if (!rv.items.some((x) => x.id === rv.sel)) { rv.sel = rv.items[0]?.id || null; rv.picks = {}; rv.q = 0; }
+      }
+    } catch (e) { rv.error = e.message; }
+    rv.loading = false;
+    paintReview();
+  }
+  function renderReview() {
+    rvBody = h("div", { class: "rv-body" });
+    paintReview(); loadReview();
+    return h("div", { class: "conns review" },
+      h("section", { class: "c-head" },
+        h("span", { class: "tagline" }, "Zex.Review 0.1"),
+        h("h1", { class: "giant sm" }, words("Review")),
+        h("p", {}, "Answers the model wasn't sure about wait here for a person, with a few sure ones as spot checks. Each answer you give is a label: Zex uses them to measure accuracy and tune thresholds.")),
+      rvBody);
+  }
+  function paintReview() { if (rvBody) rvBody.replaceChildren(...reviewBody().filter(Boolean)); }
+  function reviewBody() {
+    if (!apiCfg.available) return [h("div", { class: "banner warn", style: "margin:20px 0 0" }, "The review queue comes with the Zex app, and with server.py when you run Zex from source.")];
+    const c = rv.counts || {};
+    const tab = (id, label, n) => h("button", { role: "tab", type: "button", "aria-selected": String(rv.tab === id), onclick: () => { rv.tab = id; rv.sel = null; rv.items = []; rv.evalItems = null; paintReview(); loadReview(); } },
+      label, n ? h("b", { class: "pix" }, fmtN(n)) : null);
+    const setSel = h("select", { class: "chip-select", "aria-label": "Decision" },
+      rv.tab === "accuracy" ? null : h("option", { value: "" }, "All decisions"), sets.map((x) => h("option", { value: x.slug }, x.name)));
+    setSel.value = rv.set;
+    setSel.addEventListener("change", () => { rv.set = setSel.value; rv.sel = null; rv.evalItems = null; loadReview(); });
+    const bar = h("div", { class: "rv-bar" },
+      h("div", { class: "rv-tabs", role: "tablist" }, tab("waiting", "Waiting", c.waiting), tab("spot", "Spot checks", c.spot), tab("reviewed", "Reviewed", c.reviewed), tab("all", "All requests", c.all), tab("accuracy", "Accuracy")),
+      h("span", { class: "grow" }), setSel,
+      c.reviewed ? h("button", { class: "btn", type: "button", title: "Your reviewed answers as JSONL, ready for training or fine-tuning elsewhere", onclick: exportLabels }, "Export labels") : null);
+    if (rv.error) return [bar, h("div", { class: "banner err", style: "margin:16px 0 0" }, rv.error)];
+    if (rv.tab === "accuracy") return [bar, accuracyView()];
+    if (!rv.items.length) return [bar, rv.loading ? h("div", { class: "empty-hint" }, "Loading…") : emptyQueue()];
+    return [bar, h("div", { class: "rv-grid" }, queueWin(), itemWin())];
+  }
+  function emptyQueue() {
+    const msg = { waiting: "Nothing is waiting. When the model isn't sure about an answer, it shows up here.", spot: "No spot checks waiting. Zex sets aside a share of the sure answers so you can check them.", reviewed: "No reviewed answers yet.", all: "No requests yet." }[rv.tab];
+    const target = rv.set || sets[0]?.slug;
+    return h("div", { class: "win shadow rv-empty" }, h("div", { class: "win-title" }, "Zex.Queue", h("span", { class: "grow" }), "empty"),
+      h("div", { class: "win-body" }, h("b", { class: "pix" }, "ALL CLEAR"), h("p", {}, msg),
+        !apiCfg.enabled ? h("p", {}, "Requests arrive through the local API. ", h("a", { href: "#/api" }, "Turn it on"), " to start.")
+          : target ? h("div", { class: "btn-row" }, h("button", { class: "btn", type: "button", onclick: (e) => sendSamples(target, e.currentTarget) }, `Send ${SAMPLE_BATCH.length} sample requests to ${setName(target)}`)) : null));
+  }
+  async function sendSamples(slug, btn) {
+    btn.disabled = true; btn.textContent = "Sending…";
+    try {
+      const r = await fetch(`/api/sets/${encodeURIComponent(slug)}`, { method: "POST", headers: { Authorization: `Bearer ${apiCfg.token}`, "Content-Type": "application/json" }, body: JSON.stringify({ items: SAMPLE_BATCH }) });
+      if (!r.ok) throw new Error((await r.json()).error || `HTTP ${r.status}`);
+      toast(`Sent ${SAMPLE_BATCH.length} requests`);
+    } catch (e) { toast(e.message); }
+    await loadReview(); refreshLive();
+  }
+  function queueWin() {
+    return h("div", { class: "win shadow rv-list" }, h("div", { class: "win-title" }, "Zex.Queue", h("span", { class: "grow" }), `${fmtN(rv.total)}${rv.total > rv.items.length ? ` · newest ${rv.items.length}` : ""}`),
+      h("div", { class: "rv-rows" }, rv.items.map((it) => {
+        const st = itemStatus(it);
+        return h("button", { type: "button", class: "rv-row" + (it.id === rv.sel ? " on" : ""), onclick: () => { rv.sel = it.id; rv.picks = {}; rv.q = 0; paintReview(); } },
+          h("span", { class: "rv-tag t-" + st }, STATUS_TAG[st]), h("span", { class: "when pix" }, ago(it.at)),
+          h("span", { class: "txt", dir: "auto" }, stateText_(it.state)), h("span", { class: "set" }, setName(it.set)));
+      })));
+  }
+  function optionsFor(q, a) {
+    if (!a) return [];
+    if (a.type === "noul") return [{ v: "true", label: "true", p: a.noul }, { v: "false", label: "false", p: 1 - a.noul }];
+    if (a.type === "choice") {
+      const pr = a.probabilities || {}, order = Array.isArray(q.criteria) ? q.criteria : Object.keys(q.criteria || {});
+      const keys = [...order.filter((x) => x in pr), ...Object.keys(pr).filter((x) => !order.includes(x))];
+      return keys.map((x) => ({ v: x, label: x, p: pr[x] ?? 0 }));
+    }
+    if (a.type === "score") {
+      const pr = a.probabilities || {}, legend = a.legend || {};
+      return Object.keys(pr).sort((x, y) => Number(x) - Number(y)).map((x) => ({ v: x, label: `${x} ${legend[x] ?? (Array.isArray(q.criteria) ? q.criteria[Number(x)] : "") ?? ""}`.trim(), p: pr[x] ?? 0 }));
+    }
+    return [];
+  }
+  const curItem = () => rv.items.find((x) => x.id === rv.sel) || null;
+  function itemKeys(it) { const qs_ = sets.find((x) => x.slug === it.set)?.questions || {}; const ks = Object.keys(it.answers || {}); return [...Object.keys(qs_).filter((k) => ks.includes(k)), ...ks.filter((k) => !(k in qs_))]; }
+  function itemWin() {
+    const it = curItem();
+    if (!it) return null;
+    const st = itemStatus(it), set = sets.find((x) => x.slug === it.set), qs_ = set?.questions || {}, keys = itemKeys(it);
+    for (const k of keys) if (rv.picks[k] == null) rv.picks[k] = it.review?.labels?.[k] ?? predLabel(it.answers?.[k]);
+    const changed = keys.filter((k) => !sameLabel(rv.picks[k], predLabel(it.answers?.[k]))).length;
+    const qRows = keys.map((k, qi) => {
+      const a = it.answers?.[k], d = it.decisions?.[k], q = qs_[k] || {};
+      return h("div", { class: "rv-q" + (qi === rv.q ? " focus" : ""), onclick: () => { rv.q = qi; paintReview(); } },
+        h("div", { class: "rv-qh" }, h("span", { class: "k" }, k), q.instructions ? h("span", { class: "ins", dir: "auto" }, q.instructions) : null, h("span", { class: "grow" }),
+          d ? h("span", { class: "dchip " + (d.verdict === "auto" ? "auto" : "review"), title: `${pct(d.confidence)} against a threshold of ${pct(d.threshold)}` }, d.verdict.toUpperCase()) : null),
+        h("div", { class: "rv-opts" }, optionsFor(q, a).map((o, oi) => h("button", { type: "button", class: "rv-opt" + (sameLabel(rv.picks[k], o.v) ? " sel" : "") + (sameLabel(predLabel(a), o.v) ? " model" : ""),
+          onclick: (e) => { e.stopPropagation(); rv.picks[k] = o.v; rv.q = qi; paintReview(); } },
+          h("span", { class: "n pix" }, oi < 9 ? String(oi + 1) : ""), h("span", { class: "l", dir: "auto" }, o.label),
+          h("span", { class: "bar" }, h("i", { style: `width:${(o.p * 100).toFixed(1)}%` })), h("span", { class: "p pix" }, pct(o.p))))));
+    });
+    const done = it.review;
+    return h("div", { class: "win shadow rv-item" },
+      h("div", { class: "win-title" }, `Zex.Review · ${setName(it.set)}`, h("span", { class: "grow" }), STATUS_TAG[st]),
+      h("div", { class: "win-body" },
+        h("div", { class: "rv-meta" }, h("span", { class: "rv-tag t-" + st }, STATUS_TAG[st]), h("span", { class: "mono" }, it.id), h("span", {}, `${it.model || ""} · ${ago(it.at)}`),
+          st === "spot" ? h("span", { class: "muted" }, "The model was sure. Check that it was right.") : null),
+        h("blockquote", { class: "rv-text", dir: "auto" }, stateText_(it.state)),
+        it.error ? h("div", { class: "banner err", style: "margin:0" }, it.error) : h("div", { class: "rv-qs" }, qRows),
+        it.error ? null : h("div", { class: "btn-row rv-acts" },
+          h("button", { class: "btn solid", type: "button", onclick: confirmReview }, done ? "Save review" : changed ? `Save with ${changed} correction${changed === 1 ? "" : "s"}` : "Confirm"),
+          h("button", { class: "btn", type: "button", onclick: () => stepItem(1) }, "Skip"),
+          done ? h("span", { class: "meta" }, `Reviewed ${ago(done.at)}${done.checked - done.agreed ? ` · ${done.checked - done.agreed} corrected` : " · the model was right"}`) : null),
+        h("div", { class: "rv-keys" }, [["1–9", "pick"], ["↑ ↓", "question"], ["Enter", "confirm"], ["S", "skip"]].map(([k, v]) => h("span", {}, h("kbd", { class: "pix" }, k), v)))));
+  }
+  function stepItem(d) {
+    const i = rv.items.findIndex((x) => x.id === rv.sel), n = rv.items[i + d];
+    if (n) { rv.sel = n.id; rv.picks = {}; rv.q = 0; paintReview(); }
+  }
+  async function confirmReview() {
+    const it = curItem();
+    if (!it || it.error) return;
+    const keys = itemKeys(it), labels = Object.fromEntries(keys.map((k) => [k, String(rv.picks[k])]));
+    const agreed = keys.filter((k) => sameLabel(labels[k], predLabel(it.answers?.[k]))).length;
+    try {
+      await zexPost("/zex/review", { id: it.id, labels, checked: keys.length, agreed });
+    } catch (e) { toast(e.message); return; }
+    const wasOpen = !it.review, before = itemStatus(it);
+    it.review = { at: Date.now(), labels, checked: keys.length, agreed };
+    toast(agreed === keys.length ? "Confirmed" : `Saved ${keys.length - agreed} correction${keys.length - agreed === 1 ? "" : "s"}`);
+    if (wasOpen) { rv.counts[before] = Math.max(0, (rv.counts[before] || 0) - 1); rv.counts.reviewed = (rv.counts.reviewed || 0) + 1; }
+    if (rv.tab === "waiting" || rv.tab === "spot") {
+      const i = rv.items.indexOf(it);
+      rv.items.splice(i, 1); rv.total = Math.max(0, rv.total - 1);
+      rv.sel = rv.items[Math.min(i, rv.items.length - 1)]?.id || null;
+    }
+    rv.picks = {}; rv.q = 0;
+    paintReview(); refreshLive();
+  }
+  document.addEventListener("keydown", (e) => {
+    if (route !== "review" || rv.tab === "accuracy" || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.target.closest && e.target.closest("input, textarea, select, [contenteditable]")) return;
+    const it = curItem();
+    if (!it) return;
+    const keys = itemKeys(it);
+    if (/^[1-9]$/.test(e.key)) {
+      const k = keys[rv.q], o = optionsFor(sets.find((x) => x.slug === it.set)?.questions?.[k] || {}, it.answers?.[k])[Number(e.key) - 1];
+      if (o) { rv.picks[k] = o.v; if (rv.q < keys.length - 1) rv.q++; paintReview(); e.preventDefault(); }
+    } else if (e.key === "ArrowDown") { rv.q = Math.min(keys.length - 1, rv.q + 1); paintReview(); e.preventDefault(); }
+    else if (e.key === "ArrowUp") { rv.q = Math.max(0, rv.q - 1); paintReview(); e.preventDefault(); }
+    else if (e.key === "Enter") { e.preventDefault(); confirmReview(); }
+    else if (e.key === "s" || e.key === "S" || e.key === "ArrowRight") { e.preventDefault(); stepItem(1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); stepItem(-1); }
+  });
+  function accuracyView() {
+    const set = sets.find((x) => x.slug === rv.set);
+    if (!set) return h("div", { class: "empty-hint" }, "Pick a decision to see how often the model is right on it.");
+    if (!rv.evalItems) return h("div", { class: "empty-hint" }, "Loading…");
+    const items = rv.evalItems, spotN = items.filter((x) => x.all_auto).length;
+    if (!items.length) {
+      return evalShell(set.name, h("div", { class: "eval-empty" }, h("b", {}, "No reviewed answers for this decision yet."),
+        h("p", {}, "Review a few answers under Waiting and Spot checks. Every one becomes a label, and this view shows how often the model was right, and the threshold that keeps it above your aim.")));
+    }
+    const keys = Object.keys(set.questions).filter((k) => items.some((it) => it.review?.labels?.[k] != null));
+    const stats = Object.fromEntries(keys.map((k) => [k, evalStatsFrom(items.map((it) => ({ a: it.answers?.[k], exp: it.review?.labels?.[k], w: it.all_auto ? 1 / (it.audit_rate || 0.05) : 1 })), set.questions[k])]));
+    return h("div", { class: "rv-acc" },
+      h("p", { class: "rv-acc-note" }, `From ${fmtN(items.length)} reviewed answer${items.length === 1 ? "" : "s"}: ${fmtN(items.length - spotN)} the model wasn't sure about and ${fmtN(spotN)} spot check${spotN === 1 ? "" : "s"}.`,
+        rv.counts.waiting ? ` ${fmtN(rv.counts.waiting)} more are still waiting.` : ""),
+      evalPanel({ keys, qs: set.questions, set, stats, key: rv.evalKey, onKey: (k) => { rv.evalKey = k; paintReview(); }, preview: rv.evalThr, after: paintReview }));
+  }
+  async function exportLabels() {
+    try {
+      const d = await zexGet(`/zex/log?status=reviewed&limit=-1${rv.set ? `&set=${encodeURIComponent(rv.set)}` : ""}`);
+      const lines = d.items.map((it) => {
+        const set = sets.find((x) => x.slug === it.set);
+        return JSON.stringify({ set: it.set, state: it.state, questions: set?.questions, labels: it.review.labels,
+          model_answers: Object.fromEntries(Object.entries(it.answers || {}).map(([k, a]) => [k, predLabel(a)])),
+          source: it.all_auto ? "spot check" : "review", model: it.model, at: new Date(it.at).toISOString() });
+      });
+      download(`zex-labels${rv.set ? "-" + rv.set : ""}.jsonl`, lines.join("\n") + "\n", "application/x-ndjson");
+      toast(`Exported ${fmtN(lines.length)} labels`);
+    } catch (e) { toast(e.message); }
+  }
+
+  // ---------------------------------------------------------------- live numbers on Home
+  function liveSummary() {
+    const st = live.stats;
+    if (!st || !Object.keys(st.sets || {}).length) return null;
+    const sum = (a, from, to) => a.slice(from, to).reduce((m, x) => m + x, 0), D = st.days.length;
+    const per = Object.entries(st.sets).map(([slug, x]) => ({ slug, name: setName(slug),
+      req: sum(x.requests, D - 7), auto: sum(x.auto, D - 7), err: sum(x.errors, D - 7),
+      ac: sum(x.audit_checked, D - 7), ag: sum(x.audit_agreed, D - 7), pac: sum(x.audit_checked, D - 14, D - 7), pag: sum(x.audit_agreed, D - 14, D - 7), x }));
+    const tot = per.reduce((m, p) => ({ req: m.req + p.req, auto: m.auto + p.auto, err: m.err + p.err, ac: m.ac + p.ac, ag: m.ag + p.ag }), { req: 0, auto: 0, err: 0, ac: 0, ag: 0 });
+    const daily = st.days.map((day, i) => ({ day, req: per.reduce((m, p) => m + p.x.requests[i], 0), auto: per.reduce((m, p) => m + p.x.auto[i], 0) }));
+    const add = (o) => Object.values(o || {}).reduce((m, x) => m + x, 0);
+    return { per, tot, daily, waiting: add(st.waiting), spot: add(st.spot) };
+  }
+  function liveAlerts(L) {
+    const out = [];
+    if (L.waiting + L.spot) out.push({ kind: "info", text: `${fmtN(L.waiting)} answer${L.waiting === 1 ? " is" : "s are"} waiting for a person${L.spot ? `, and ${fmtN(L.spot)} spot check${L.spot === 1 ? "" : "s"}` : ""}.`, act: ["Review now", () => { rv.tab = L.waiting ? "waiting" : "spot"; go("review"); }] });
+    for (const p of L.per) {
+      const see = ["See accuracy", () => { rv.tab = "accuracy"; rv.set = p.slug; rv.evalItems = null; go("review"); }];
+      if (p.ac >= 10 && p.ag / p.ac < evalTarget) out.push({ kind: "bad", text: `${p.name}: AUTO answers were right ${pct(p.ag / p.ac)} of the time this week, below your aim of ${pct(evalTarget)}.`, act: see });
+      else if (p.ac >= 10 && p.pac >= 10 && p.pag / p.pac - p.ag / p.ac >= 0.05) out.push({ kind: "warn", text: `${p.name}: AUTO answers were right ${pct(p.ag / p.ac)} of the time this week, down from ${pct(p.pag / p.pac)} the week before.`, act: see });
+      if (p.req >= 10 && p.err / p.req > 0.1) out.push({ kind: "bad", text: `${p.name}: ${fmtN(p.err)} of ${fmtN(p.req)} requests failed this week. Check the connection.`, act: ["Connections", () => go("connections")] });
+    }
+    return out;
+  }
+  function alertsEl() {
+    const L = liveSummary(), list = L ? liveAlerts(L) : [];
+    return h("div", { class: "hm-alerts" }, list.map((a) => h("div", { class: "hm-alert a-" + a.kind, role: a.kind === "info" ? "status" : "alert" },
+      h("span", { class: "ic pix" }, a.kind === "info" ? "i" : "!"), h("span", { class: "tx" }, a.text),
+      h("button", { class: "btn", type: "button", onclick: a.act[1] }, a.act[0]))));
+  }
+  function statsCard() {
+    const L = liveSummary();
+    if (!L) {
+      const st = statsFromHistory();
+      const stat = (label, value, count, suffix = "") => h("div", {}, h("b", count != null ? { "data-count": String(count), "data-suffix": suffix } : {}, value), h("span", {}, label));
+      return win("Zex.Stats", "", h("div", { class: "hm-stats" },
+        stat("runs", String(st.n), st.n),
+        stat("median model time", st.med != null ? fmtMs(st.med) : "–", st.med != null && st.med < 1000 ? Math.round(st.med) : null, " ms"),
+        stat(`answers at ≥ ${Math.round(thr * 100)}%`, st.autoRate != null ? pct(st.autoRate) : "–", st.autoRate != null ? Math.round(st.autoRate * 100) : null, "%"),
+        stat("last run", st.lastAt ? ago(st.lastAt) : "–")));
+    }
+    const t = L.tot, ok = t.req - t.err, max = Math.max(1, ...L.daily.map((d) => d.req));
+    const cell = (label, value, sub, onclick) => h(onclick ? "button" : "div", onclick ? { type: "button", class: "hm-cell link", onclick } : { class: "hm-cell" }, h("b", {}, value), h("span", {}, label), sub ? h("small", {}, sub) : null);
+    return win("Zex.Live", "7 days", h("div", { class: "hm-live" },
+      h("div", { class: "hm-stats" },
+        cell("requests", fmtN(t.req), t.err ? `${fmtN(t.err)} failed` : null),
+        cell("answered on its own", ok ? pct(t.auto / ok) : "–"),
+        cell("right when on its own", t.ac ? pct(t.ag / t.ac) : "–", t.ac ? `${fmtN(t.ac)} spot-checked` : "no spot checks yet", () => { rv.tab = t.ac ? "accuracy" : "spot"; go("review"); }),
+        cell("waiting for a person", fmtN(L.waiting + L.spot), null, () => { rv.tab = L.waiting ? "waiting" : "spot"; go("review"); })),
+      h("div", { class: "lbars", title: "Requests per day: filled answered on its own, hatched went to a person" },
+        L.daily.map((d) => h("div", { class: "lb", title: `${d.day}: ${d.req} requests, ${d.auto} on its own` },
+          h("i", { class: "rev", style: `height:${((d.req - d.auto) / max) * 100}%` }), h("i", { class: "aut", style: `height:${(d.auto / max) * 100}%` })))),
+      h("div", { class: "lbars-x pix" }, h("span", {}, L.daily[0].day.slice(5)), h("span", {}, "today"))));
+  }
+  function paintLive() {
+    if (hmStatsEl?.isConnected) { const n = statsCard(); hmStatsEl.replaceWith(n); hmStatsEl = n; }
+    if (hmAlertsEl?.isConnected) { const n = alertsEl(); hmAlertsEl.replaceWith(n); hmAlertsEl = n; }
+  }
+
   // ---------------------------------------------------------------- local API
   // While Zex runs, every set is an HTTP endpoint on this computer. The page tells the local
   // server which sets and which connection to answer with; the server keeps them in its
@@ -2964,14 +3321,15 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       const r = await fetch("/zex/api-config", { headers: { "X-Zex": "1" } });
       if (!r.ok) throw new Error(String(r.status));
       const d = await r.json();
-      apiCfg = { available: true, enabled: !!d.enabled, token: d.token || "" };
+      apiCfg = { available: true, enabled: !!d.enabled, token: d.token || "", log: d.log !== false, audit: d.audit ?? 0.05 };
       if (apiCfg.enabled) syncApi(true);
+      refreshLive();
     } catch { apiCfg = { available: false, enabled: false, token: "" }; }
-    if (route === "api" || route === "sets") applyRoute();
+    if (route === "api" || route === "sets" || route === "review") applyRoute();
   }
   function apiPayload() {
     const c = activeConn();
-    return { enabled: apiCfg.enabled, model, thr, connection: { kind: c.kind, name: c.name, url: c.url, key: c.key || "" },
+    return { enabled: apiCfg.enabled, model, thr, log: apiCfg.log !== false, audit: apiCfg.audit ?? 0.05, connection: { kind: c.kind, name: c.name, url: c.url, key: c.key || "" },
       sets: sets.map((x) => ({ slug: x.slug, name: x.name, questions: x.questions, thresholds: x.thresholds || {} })) };
   }
   function syncApi(now = false, extra = {}) {
@@ -2988,6 +3346,21 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         resolve();
       }, now === true ? 0 : 400);
     });
+  }
+  function reviewControls() {
+    const logSw = h("button", { class: "switch sm" + (apiCfg.log !== false ? " on" : ""), type: "button", role: "switch", "aria-checked": String(apiCfg.log !== false), "aria-label": "Keep requests for review",
+      onclick: async () => { apiCfg.log = apiCfg.log === false; await syncApi(true); applyRoute(); } }, h("i"), h("span", { class: "pix" }, apiCfg.log !== false ? "ON" : "OFF"));
+    const spot = h("select", { class: "chip-select", "aria-label": "Share of sure answers to spot-check", disabled: apiCfg.log === false || undefined },
+      [[0, "no spot checks"], [0.02, "spot-check 2%"], [0.05, "spot-check 5%"], [0.1, "spot-check 10%"], [0.2, "spot-check 20%"]].map(([v, l]) => h("option", { value: String(v) }, l)));
+    spot.value = String(apiCfg.audit ?? 0.05);
+    spot.addEventListener("change", () => { apiCfg.audit = Number(spot.value); syncApi(true); });
+    const clear = h("button", { class: "text-btn xs", type: "button" }, "Clear log");
+    clear.addEventListener("click", async () => {
+      if (!clear.dataset.sure) { clear.dataset.sure = "1"; clear.textContent = "Clear every logged request?"; return; }
+      try { await zexPost("/zex/log/clear", {}); toast("Log cleared"); refreshLive(); } catch (e) { toast(e.message); }
+      clear.dataset.sure = ""; clear.textContent = "Clear log";
+    });
+    return [logSw, h("span", { class: "muted" }, "keep requests for review"), spot, clear];
   }
   async function setApiEnabled(on) { apiCfg.enabled = on; await syncApi(true, { force: true }); applyRoute(); toast(on ? "The local API is on" : "The local API is off"); }
   async function newApiToken() { await syncApi(true, { force: true, regenerate: true }); apiShowToken = true; applyRoute(); toast("New token made. Update your scripts."); }
@@ -3016,6 +3389,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("div", { class: "kvr" }, h("span", { class: "kk" }, "Token"), h("div", { class: "kvv" }, tokEl, showBtn, apiCfg.token ? copyBtn(() => apiCfg.token) : null,
         apiCfg.enabled ? h("button", { class: "text-btn xs", type: "button", onclick: newApiToken }, "New token") : null)),
       h("div", { class: "kvr" }, h("span", { class: "kk" }, "Answers with"), h("div", { class: "kvv" }, h("span", {}, `${c.name} · ${model}`), h("span", { class: "muted" }, "your active connection and model"))),
+      apiCfg.enabled ? h("div", { class: "kvr" }, h("span", { class: "kk" }, "Review"), h("div", { class: "kvv" }, reviewControls())) : null,
       h("p", { class: "note" }, "Send the token in an Authorization header. Anyone who has it can use your sets, and the key of your active connection, from this computer. Make a new token to cut off old scripts.")), "api-status");
     if (!apiCfg.enabled) return h("div", { class: "conns api" }, head, h("div", { class: "api-grid" }, status));
 

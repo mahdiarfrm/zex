@@ -242,6 +242,41 @@ async function goRoute(w, d, r) {
     d.querySelector(".switch").click();
     await waitFor(() => !d.querySelector(".switch.on"), 3000);
     ok("API-5 off means off", (await w.fetch("/api/sets/support-triage", { method: "POST", headers: { Authorization: "Bearer " + acfg.token }, body: "x" })).status === 403);
+
+    // review queue: answers the model wasn't sure about wait for a person
+    const page = { "X-Zex": "1", "Content-Type": "application/json" };
+    await goRoute(w, d, "api");
+    await waitFor(() => d.querySelector(".switch"), 3000);
+    if (!d.querySelector(".switch.on")) d.querySelector(".switch").click();
+    await waitFor(() => d.querySelector(".switch.on") && d.querySelector(".api-trywin"), 5000);
+    await w.fetch("/zex/log/clear", { method: "POST", headers: page, body: "{}" });
+    const cfg2 = await (await w.fetch("/zex/api-config", { headers: page })).json();
+    ok("REVIEW-1 the API keeps requests for review, with 5% spot checks", cfg2.log === true && cfg2.audit === 0.05, JSON.stringify(cfg2).slice(0, 90));
+    await w.fetch("/api/sets/support-triage", { method: "POST", headers: { Authorization: "Bearer " + cfg2.token, "Content-Type": "application/json" },
+      body: JSON.stringify({ items: ["Refund the double charge on my card now.", "How do I export my data?", "The app crashes when I open settings."] }) });
+    await goRoute(w, d, "review");
+    await waitFor(() => d.querySelectorAll(".rv-row").length > 0, 8000);
+    const waitingNow = () => Number([...d.querySelectorAll(".rv-tabs button")].find((b) => /Waiting/.test(b.textContent))?.querySelector("b")?.textContent || 0);
+    const before = waitingNow();
+    ok("REVIEW-2 unsure answers wait in the queue", d.querySelectorAll(".rv-row").length >= 1 && before >= 1, before + " waiting");
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "2", bubbles: true })); await sleep(50);
+    ok("REVIEW-3 a number key picks an option and moves on", d.querySelectorAll(".rv-q")[0].querySelectorAll(".rv-opt")[1].classList.contains("sel") && d.querySelectorAll(".rv-q")[1]?.classList.contains("focus"));
+    d.dispatchEvent(new w.KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    await waitFor(() => waitingNow() === before - 1, 5000);
+    const lg = await (await w.fetch("/zex/log?status=reviewed", { headers: page })).json();
+    ok("REVIEW-4 Enter saves the review as a label", lg.counts.reviewed === 1 && !!lg.items[0]?.review?.labels?.refund_requested, JSON.stringify(lg.counts));
+    [...d.querySelectorAll(".rv-tabs button")].find((b) => /Accuracy/.test(b.textContent)).click();
+    await waitFor(() => d.querySelector(".rv-acc .eval-tiles"), 8000);
+    ok("REVIEW-5 reviewed answers feed the accuracy view", !!d.querySelector(".rv-acc .eval-tiles") && /1 reviewed answer/.test(d.querySelector(".rv-acc-note")?.textContent || ""), d.querySelector(".rv-acc-note")?.textContent);
+    await goRoute(w, d, "home");
+    await waitFor(() => d.querySelector(".hm-live"), 20000);
+    ok("REVIEW-6 Home shows the last 7 days of requests", d.querySelector(".hm-live .hm-cell b")?.textContent === "3", d.querySelector(".hm-live")?.textContent.slice(0, 90));
+    ok("REVIEW-7 Home flags answers waiting for a person", /waiting for a person/.test(d.querySelector(".hm-alerts")?.textContent || ""));
+    ok("REVIEW-8 the sidebar counts what is waiting", Number(d.querySelector("#reviewBadge")?.textContent || 0) >= 1 && !d.querySelector("#reviewBadge").hidden);
+    await w.fetch("/zex/log/clear", { method: "POST", headers: page, body: "{}" });
+    await goRoute(w, d, "api");
+    if (d.querySelector(".switch.on")) d.querySelector(".switch").click();
+    await sleep(300);
     w.localStorage.clear();
   } catch (e) {
     results.push("FAIL harness " + e.message);
