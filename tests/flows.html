@@ -7,7 +7,8 @@
 <script>
 // Click-through tests of the main flows (F01-F04) against the real page and a local Ollaya server.
 // Run headless Chrome with --force-prefers-reduced-motion: page changes use View Transitions,
-// which wait for a painted frame that headless virtual time never produces.
+// which wait for a painted frame that headless virtual time never produces. Start the server
+// with ZEX_CONFIG_DIR set to a scratch folder, so the API tests don't touch your settings.
 const out = document.getElementById("out");
 const results = [];
 const ok = (id, cond, note = "") => results.push(`${cond ? "PASS" : "FAIL"} ${id}${note ? "  " + note : ""}`);
@@ -118,7 +119,7 @@ async function goRoute(w, d, r) {
     const bta = d.querySelector(".batch-input");
     type(bta, "Refund me now or I cancel.\nHow do I change my email?\nThe app crashes on the reports page.");
     [...d.querySelectorAll(".btn")].find((b) => b.textContent === "Run batch").click();
-    const btab = await waitFor(() => d.querySelectorAll(".btable tbody tr").length === 3 && /Run batch/.test(d.querySelector(".btn.solid").textContent) && d.querySelector(".btable"), 90000);
+    const btab = await waitFor(() => d.querySelectorAll(".btable tbody tr").length === 3 && /Run again/.test(d.querySelector(".btn.solid").textContent) && d.querySelector(".btable"), 90000);
     ok("NEW-3 batch answers every line", !!btab);
     ok("NEW-4 pass grid has one cell per answer", d.querySelectorAll(".passgrid i").length === 12, d.querySelector(".pane .tagline")?.textContent);
     ok("NEW-5 CSV export is enabled", ![...d.querySelectorAll(".btn")].find((b) => b.textContent === "Export CSV").disabled);
@@ -164,7 +165,7 @@ async function goRoute(w, d, r) {
 
     // home
     await goRoute(w, d, "home");
-    ok("HOME-1 home shows quick run, connections, recent runs, stats and five tools", !!d.querySelector(".qr textarea") && !!d.querySelector(".hm-conn") && !!d.querySelector(".hm-recent") && !!d.querySelector(".hm-stats") && d.querySelectorAll(".opt-tile").length === 5);
+    ok("HOME-1 home shows quick run, connections, recent runs, stats and six tools", !!d.querySelector(".qr textarea") && !!d.querySelector(".hm-conn") && !!d.querySelector(".hm-recent") && !!d.querySelector(".hm-stats") && d.querySelectorAll(".opt-tile").length === 6);
     ok("HOME-2 clock shows the time", /\d\d:\d\d:\d\d/.test(d.querySelector(".hm-top .zclock")?.textContent || ""));
     ok("HOME-6 no landing-page call-to-action links", !d.querySelector(".h-hero, .h-desk, .h-cta, .big-link"));
     ok("HOME-10 giant headline is the live server status", /Models? Ready\./.test(d.querySelector("[data-hmstatus]")?.textContent || ""), d.querySelector("[data-hmstatus]")?.textContent);
@@ -182,6 +183,65 @@ async function goRoute(w, d, r) {
     d.querySelector(".qr .run").click();
     await waitFor(() => w.location.hash === "#/playground" && d.querySelectorAll(".r-row:not(.skeleton)").length > 0, 60000);
     ok("HOME-9 quick run opens the Playground with answers", w.location.hash === "#/playground" && d.querySelectorAll(".r-row:not(.skeleton)").length === 4 && /charged twice/.test(d.querySelector(".state-text")?.value || ""), d.querySelectorAll(".r-row:not(.skeleton)").length + " rows");
+
+    // question sets
+    const drop = (el, file) => { const dt = new w.DataTransfer(); dt.items.add(file); el.dispatchEvent(new w.DragEvent("drop", { bubbles: true, cancelable: true, dataTransfer: dt })); };
+    await goRoute(w, d, "sets");
+    ok("SET-1 starter sets are there", d.querySelectorAll(".set-win").length >= 5, d.querySelectorAll(".set-win").length + " sets");
+    await goRoute(w, d, "playground");
+    ok("SET-2 the chip names the set the questions came from", /Support triage/.test(d.querySelector("#setChip")?.textContent || ""), d.querySelector("#setChip")?.textContent);
+    const qed = d.querySelector("#qBody .ce-input");
+    const qv = JSON.parse(qed.value);
+    qv.urgent = { type: "noul", instructions: "Does the customer need this fixed today?" };
+    type(qed, JSON.stringify(qv, null, 2)); await sleep(50);
+    ok("SET-3 editing marks the set as changed", d.querySelector("#setChip").classList.contains("dirty"));
+    d.querySelector("#setChip").click(); await sleep(50);
+    [...d.querySelectorAll(".set-pop .btn")].find((b) => /Save as new/.test(b.textContent)).click(); await sleep(50);
+    d.querySelector(".set-pop input").value = "Triage plus urgency";
+    [...d.querySelectorAll(".set-pop .btn")].find((b) => b.textContent === "Save").click(); await sleep(50);
+    ok("SET-4 save as a new set", /Triage plus urgency/.test(d.querySelector("#setChip").textContent) && !d.querySelector("#setChip").classList.contains("dirty"));
+    await goRoute(w, d, "sets");
+    drop(d.querySelector(".sets"), new w.File([JSON.stringify({ zex: "question-set", format: 1, name: "Imported spam check", questions: { spam: { type: "noul", instructions: "Is this spam?" } } })], "spam.zex.json", { type: "application/json" }));
+    await waitFor(() => [...d.querySelectorAll(".set-win .win-title")].some((t) => /Imported spam check/.test(t.textContent)), 3000);
+    ok("SET-5 dropping a set file imports it", [...d.querySelectorAll(".set-win .win-title")].some((t) => /Imported spam check/.test(t.textContent)));
+
+    // batch from a file with expected answers, then accuracy
+    [...d.querySelectorAll(".set-win")].find((x) => /^Support triage/.test(x.querySelector(".win-title").textContent)).querySelector(".btn.solid").click();
+    await waitFor(() => w.location.hash === "#/playground" && d.querySelector('[data-mode="response"]'), 3000);
+    d.querySelector('[data-mode="batch"]').click(); await sleep(50);
+    [...d.querySelectorAll(".b-head [role=tab]")].find((b) => b.textContent === "File").click(); await sleep(50);
+    drop(d.querySelector(".b-win"), new w.File(['id,message,team\n1,"You charged my card twice, refund it",billing\n2,The app crashes when I open reports,technical\n3,"I can\'t sign in, the reset link expired",account\n'], "tickets.csv", { type: "text/csv" }));
+    await waitFor(() => d.querySelector(".b-map"), 3000);
+    const msel = [...d.querySelectorAll(".b-map select")];
+    ok("FILE-1 a CSV loads with the text and expected-answer columns guessed", msel[0]?.value === "message" && msel.some((x) => x.value === "team"), msel.map((x) => x.value).join(","));
+    [...d.querySelectorAll(".b-ctl .btn")].find((b) => b.textContent === "Run batch").click();
+    await waitFor(() => /Run again/.test(d.querySelector(".b-ctl .btn.solid")?.textContent || ""), 90000);
+    ok("FILE-2 every row is answered", d.querySelectorAll(".b-results .btable tbody tr").length === 3);
+    ok("EVAL-1 accuracy, the threshold curve and the confusion matrix show", !!d.querySelector(".eval .eval-tiles") && !!d.querySelector(".eval svg.curve") && d.querySelectorAll(".eval .cm td").length > 0, d.querySelector(".eval-tabs")?.textContent);
+    const er = d.querySelector(".eval-side input[type=range]");
+    er.value = "70"; er.dispatchEvent(new Event("input"));
+    [...d.querySelectorAll(".eval .btn.solid")].find((b) => /Use ≥ 70% for team/.test(b.textContent))?.click(); await sleep(50);
+    ok("EVAL-2 the threshold is saved to the set", JSON.parse(w.localStorage.getItem("zex.sets")).find((x) => x.name === "Support triage")?.thresholds?.team === 0.7);
+    [...d.querySelectorAll(".bf-bar .text-btn")].find((b) => b.textContent === "Remove").click(); await sleep(50);
+    drop(d.querySelector(".b-win"), new w.File([await (await fetch("/tests/fixtures/tickets.xlsx")).arrayBuffer()], "tickets.xlsx"));
+    await waitFor(() => /tickets\.xlsx/.test(d.querySelector(".bf-bar")?.textContent || ""), 3000);
+    ok("FILE-3 an Excel file reads", /3 rows/.test(d.querySelector(".bf-bar")?.textContent || "") && d.querySelector(".b-map select")?.value === "message" && /twice, refund it/.test(d.querySelector(".b-prev")?.textContent || ""), d.querySelector(".bf-bar")?.textContent);
+
+    // local API
+    await goRoute(w, d, "api");
+    await waitFor(() => d.querySelector(".switch"), 3000);
+    if (!d.querySelector(".switch.on")) d.querySelector(".switch").click();
+    await waitFor(() => d.querySelector(".switch.on") && d.querySelector(".api-trywin"), 5000);
+    const acfg = await (await w.fetch("/zex/api-config", { headers: { "X-Zex": "1" } })).json();
+    ok("API-1 turning it on makes a token", acfg.enabled && /^zex_[0-9a-f]{32}$/.test(acfg.token));
+    const r1 = await w.fetch("/api/sets/support-triage", { method: "POST", headers: { Authorization: "Bearer " + acfg.token, "Content-Type": "application/json" }, body: JSON.stringify({ text: "Refund my double charge now" }) });
+    const j1 = await r1.json();
+    ok("API-2 a set answers over HTTP", r1.status === 200 && ["auto", "review"].includes(j1.decisions?.team?.verdict), JSON.stringify(j1).slice(0, 140));
+    ok("API-3 the set's saved threshold applies", j1.decisions?.team?.threshold === 0.7);
+    ok("API-4 no token, no answer", (await w.fetch("/api/sets/support-triage", { method: "POST", body: "x" })).status === 401);
+    d.querySelector(".switch").click();
+    await waitFor(() => !d.querySelector(".switch.on"), 3000);
+    ok("API-5 off means off", (await w.fetch("/api/sets/support-triage", { method: "POST", headers: { Authorization: "Bearer " + acfg.token }, body: "x" })).status === 403);
     w.localStorage.clear();
   } catch (e) {
     results.push("FAIL harness " + e.message);

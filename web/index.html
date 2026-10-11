@@ -381,9 +381,11 @@ textarea.batch-input:focus { border-color: var(--accent); }
 
 /* ---------- pages: home and connections ---------- */
 .page { display: none; grid-column: 2 / -1; overflow: auto; min-width: 0; min-height: 0; background: var(--bg); }
-.app[data-route="home"] .page, .app[data-route="connections"] .page { display: block; }
+.app[data-route="home"] .page, .app[data-route="connections"] .page, .app[data-route="sets"] .page, .app[data-route="api"] .page { display: block; }
 .app[data-route="home"] .editor-col, .app[data-route="home"] .out-col,
-.app[data-route="connections"] .editor-col, .app[data-route="connections"] .out-col { display: none; }
+.app[data-route="connections"] .editor-col, .app[data-route="connections"] .out-col,
+.app[data-route="sets"] .editor-col, .app[data-route="sets"] .out-col,
+.app[data-route="api"] .editor-col, .app[data-route="api"] .out-col { display: none; }
 a.server-card { color: inherit; text-decoration: none; display: block; }
 a.server-card:hover .win-title { background: var(--accent); color: var(--on-accent); }
 .conn-name { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
@@ -454,7 +456,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .hm-stats span { font-size: 12px; color: var(--text-muted); }
 .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; } .mchip { font: 12px var(--mono); background: var(--surface-2); padding: 1px 6px; }
 .hm-label { margin: 28px 0 10px; }
-.opt-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); border-top: 1.5px solid var(--text); border-left: 1.5px solid var(--text); }
+.opt-grid { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); border-top: 1.5px solid var(--text); border-left: 1.5px solid var(--text); }
 .opt-tile { position: relative; text-align: left; padding: 16px 16px 14px; border-right: 1.5px solid var(--text); border-bottom: 1.5px solid var(--text); display: flex; flex-direction: column; gap: 4px; background: var(--bg); }
 .opt-tile:hover { background: var(--surface-2); }
 .opt-tile .num { position: absolute; top: 0; right: 0; background: var(--text); color: var(--bg); font-family: var(--pix); font-size: 18px; padding: 0 6px; }
@@ -575,6 +577,170 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .toast.out { animation: toastOut .25s ease-in both; }
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: .3s; }
 
+/* ---------- question sets ---------- */
+.toolbar { position: relative; }
+.toolbar .title { margin-right: 0; }
+.set-chip { display: inline-flex; align-items: center; gap: 7px; height: 28px; margin: 0 auto 0 12px; padding: 0 8px 0 3px; border: 1px solid var(--border-strong); background: var(--bg); color: var(--text); max-width: 46%; min-width: 0; }
+.set-chip:hover { border-color: var(--text); }
+.set-chip .sc-tag { font-family: var(--pix); font-size: 15px; line-height: 17px; padding: 0 4px; background: var(--text); color: var(--bg); }
+.set-chip .sc-name { font-size: 13px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.set-chip .sc-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--warn); flex: none; }
+.set-chip .sc-chev { width: 14px; height: 14px; color: var(--text-muted); flex: none; }
+.set-pop { position: absolute; left: 12px; top: calc(var(--row) - 4px); z-index: 40; width: min(380px, 92vw); }
+.sp-list { max-height: 260px; overflow: auto; border: 1px solid var(--border-strong); }
+.sp-item { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; width: 100%; text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); }
+.sp-item:last-child { border-bottom: 0; }
+.sp-item:hover { background: var(--surface-2); }
+.sp-item.on { box-shadow: inset 3px 0 0 var(--accent); font-weight: 600; }
+.sp-item .m { font-family: var(--pix); font-size: 16px; color: var(--text-muted); white-space: nowrap; }
+.sp-empty { padding: 14px 10px; color: var(--text-muted); font-size: 13px; }
+.sp-form { display: flex; gap: 8px; align-items: center; } .sp-form .fld { height: 30px; }
+.btn.danger { border-color: var(--danger); color: var(--danger); }
+.sets .c-head .btn-row .meta { margin-left: 6px; }
+.sets.over, .dropzone.over { outline: 3px dashed var(--accent); outline-offset: -10px; }
+.set-win.current { outline: 3px solid var(--accent); outline-offset: 4px; }
+.set-card .note { margin: 0 0 10px; color: var(--text-muted); font-size: 13px; }
+.qlist { display: flex; flex-direction: column; border-top: 1px dotted var(--border-strong); }
+.qrow { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px dotted var(--border-strong); min-width: 0; }
+.qrow .qt { font-family: var(--pix); font-size: 15px; line-height: 16px; padding: 0 4px; border: 1px solid var(--text); flex: none; min-width: 52px; text-align: center; }
+.qrow .k { font: 12.5px var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qrow .th { margin-left: auto; font-family: var(--pix); font-size: 16px; line-height: 17px; padding: 0 5px; background: var(--accent); color: var(--on-accent); flex: none; }
+.set-card .meta { margin-top: 10px; color: var(--text-muted); font-size: 12.5px; }
+.set-card .meta .mono { font: 12px var(--mono); }
+
+/* ---------- batch: files, progress, results, accuracy ---------- */
+.b-results { display: flex; flex-direction: column; gap: 16px; }
+.b-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+.b-head .grow { flex: 1; }
+.b-set { display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-muted); }
+.b-win.over { outline: 3px dashed var(--accent); outline-offset: 4px; }
+.dropzone { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 168px; padding: 22px; border: 2px dashed var(--border-input); text-align: center; color: var(--text-muted); font-size: 13px; cursor: pointer; background-color: var(--surface); transition: border-color .2s, background-color .2s, transform .2s var(--ease-out); }
+.dropzone:hover, .dropzone:focus-visible { border-color: var(--text); outline: none; }
+.dropzone.over { border-color: var(--accent); background-color: color-mix(in srgb, var(--accent) 8%, var(--surface)); transform: scale(1.01); }
+.dropzone svg.i { width: 30px; height: 30px; color: var(--text); stroke-width: 1.3; margin-bottom: 4px; }
+.dropzone b { font-size: 26px; font-weight: 400; color: var(--text); letter-spacing: .02em; }
+.dropzone .dz-or { font-size: 12px; text-decoration: underline; text-underline-offset: 3px; }
+.b-file { display: flex; flex-direction: column; gap: 12px; }
+.bf-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.bf-bar .tagline { max-width: 60%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bf-bar .muted { color: var(--text-muted); font-size: 12.5px; }
+.bf-bar .grow { flex: 1; }
+.b-map { display: grid; grid-template-columns: minmax(120px, max-content) minmax(0, 1fr); gap: 6px 14px; align-items: center; padding: 10px 12px; background: var(--surface); border: 1px solid var(--border); }
+.b-map .mrow { display: contents; }
+.b-map .ml { font-size: 13px; } .b-map .ml.mono { font: 12.5px var(--mono); }
+.b-map .chip-select { max-width: 320px; }
+.b-map .mhead { grid-column: 1 / -1; margin-top: 6px; font-weight: 600; font-size: 12.5px; display: flex; gap: 8px; align-items: baseline; }
+.b-map .mhead span { font-weight: 400; color: var(--text-muted); }
+.b-prev-wrap { overflow: auto; max-height: 150px; }
+.b-prev td.st { max-width: 420px; }
+.b-ctl { margin-top: 12px; }
+.b-progw { display: flex; align-items: center; gap: 10px; margin-left: auto; min-width: 0; }
+.b-progw .pix { font-size: 17px; white-space: nowrap; }
+.b-prog { display: flex; gap: 2px; height: 14px; width: 168px; flex: none; }
+.b-prog i { flex: 1; background: var(--surface-2); border: 1px solid var(--border-strong); }
+.b-prog i.on { background: var(--text); border-color: var(--text); }
+.passgrid i.todo { background: transparent; }
+.qbars { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+.qbar-row { display: grid; grid-template-columns: minmax(90px, 180px) minmax(0, 1fr) 76px 40px; align-items: center; gap: 10px; }
+.qbar-row .k { font: 12.5px var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qbar { display: flex; height: 14px; border: 1px solid var(--text); background: var(--surface); }
+.qbar i { display: block; height: 100%; }
+.qbar i.auto { background: var(--text); }
+.qbar i.review { background: repeating-linear-gradient(135deg, var(--text-muted) 0 1.5px, transparent 1.5px 4px); }
+.qbar i.err { background: var(--danger); }
+.qbar-row .v { font-size: 17px; text-align: right; } .qbar-row .t { font-size: 16px; color: var(--text-muted); }
+.fchips { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.fchip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border: 1px solid var(--border-strong); font-size: 12.5px; }
+.fchip b { font-size: 16px; font-weight: 400; }
+.fchip[aria-pressed="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.btable td.wrong { box-shadow: inset 3px 0 0 var(--danger); }
+.btable td .ok { color: var(--success); }
+.btable td .exp { margin-top: 2px; font-size: 11.5px; color: var(--danger); }
+.eval .win-body { display: flex; flex-direction: column; gap: 14px; }
+.eval-empty b { display: block; font-size: 15px; margin-bottom: 4px; }
+.eval-empty p { margin: 0; color: var(--text-muted); max-width: 640px; font-size: 13px; }
+.eval-tabs { display: flex; gap: 0; flex-wrap: wrap; border-bottom: 1.5px solid var(--text); }
+.eval-tabs button { display: inline-flex; align-items: baseline; gap: 8px; padding: 6px 12px; border: 1.5px solid transparent; border-bottom: 0; margin-bottom: -1.5px; }
+.eval-tabs button .k { font: 12.5px var(--mono); } .eval-tabs button .v { font-size: 18px; color: var(--text-muted); }
+.eval-tabs button[aria-selected="true"] { border-color: var(--text); background: var(--bg); }
+.eval-tabs button[aria-selected="true"] .v { color: var(--text); }
+.eval-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--text); border-left: 1px solid var(--text); }
+.etile { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-right: 1px solid var(--text); border-bottom: 1px solid var(--text); min-width: 0; }
+.etile .ek { font-family: var(--pix); font-size: 15px; text-transform: uppercase; color: var(--text-muted); letter-spacing: .03em; }
+.etile .ev { font-family: var(--pix); font-size: 44px; font-weight: 400; line-height: .95; }
+.etile .es { font-size: 12px; color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eval-main { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(220px, 1fr); gap: 18px; align-items: start; }
+.curve { width: 100%; height: auto; display: block; }
+.curve .grid { stroke: var(--border-strong); stroke-dasharray: 1 3; }
+.curve .lab { font-family: var(--pix); font-size: 18px; fill: var(--text-muted); }
+.curve .aimt { fill: var(--warn); }
+.curve .aim { stroke: var(--warn); stroke-dasharray: 5 4; stroke-width: 1.5; }
+.curve path { fill: none; stroke-width: 2.5; stroke-linejoin: round; }
+.curve path.acc { stroke: var(--text); }
+.curve path.cov { stroke: var(--accent); stroke-dasharray: 6 4; }
+.curve .mark { stroke: var(--text); stroke-width: 1; stroke-dasharray: 2 2; }
+.curve .dot.acc { fill: var(--text); } .curve .dot.cov { fill: var(--accent); }
+.curve-key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+.curve-key span::before { content: ""; display: inline-block; width: 16px; height: 0; border-top: 2.5px solid var(--text); margin-right: 6px; vertical-align: middle; }
+.curve-key .cov::before { border-top: 2.5px dashed var(--accent); } .curve-key .aim::before { border-top: 1.5px dashed var(--warn); }
+.eval-side { display: flex; flex-direction: column; gap: 10px; }
+.eval-ctl { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--text-muted); }
+.eval-ctl b { font-size: 34px; font-weight: 400; color: var(--text); line-height: 1; }
+.eval-side input[type=range] { width: 100%; accent-color: var(--accent); }
+.eval-sugg { font-size: 13px; line-height: 1.5; padding: 8px 10px; background: var(--surface); border: 1px solid var(--border); }
+.eval-sugg b { font-size: 18px; font-weight: 400; }
+.eval-note { margin: 0; font-size: 12px; color: var(--text-muted); }
+.eval-side .btn { height: auto; min-height: 30px; padding: 6px 12px; text-align: left; line-height: 1.3; }
+.eval-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 18px; align-items: start; }
+.eh { font-family: var(--pix); font-size: 16px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; letter-spacing: .03em; }
+.cm { border-collapse: collapse; font-size: 12px; }
+.cm th { font: 11.5px var(--mono); color: var(--text-muted); padding: 4px 6px; text-align: center; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 400; }
+.cm tbody th { text-align: right; }
+.cm th.corner { font: 15px/1 var(--pix); text-align: left; white-space: nowrap; max-width: none; }
+.cm td { min-width: 38px; height: 32px; text-align: center; font-family: var(--pix); font-size: 18px; border: 1px solid var(--border-strong); }
+.cm td.hit { background: color-mix(in srgb, var(--text) calc(var(--a) * 85%), transparent); color: var(--bg); }
+.cm td.miss { background: color-mix(in srgb, var(--danger) calc(var(--a) * 70%), transparent); color: var(--text); }
+.cm td.hit.zero, .cm td.miss.zero { background: transparent; color: var(--text-faint); }
+.cm td.hit:not(.zero) { color: var(--bg); }
+.cal { display: flex; flex-direction: column; gap: 6px; }
+.cal-row { display: grid; grid-template-columns: 62px minmax(0, 1fr) 82px; gap: 8px; align-items: center; }
+.cal-row.empty { opacity: .45; }
+.cal-row .r { font-size: 16px; } .cal-row .v { font-size: 16px; text-align: right; }
+.cal-bar { position: relative; height: 12px; border: 1px solid var(--text); background: var(--surface); }
+.cal-bar i { display: block; height: 100%; background: var(--text); }
+.cal-bar b { position: absolute; top: -4px; bottom: -4px; width: 2px; margin-left: -1px; background: var(--warn); }
+@media (max-width: 1180px) { .eval-main, .eval-grid { grid-template-columns: minmax(0, 1fr); } .eval-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* ---------- local API ---------- */
+.api-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 26px; margin-top: 28px; align-items: start; }
+.api .api-code { margin-top: 26px; display: flex; flex-direction: column; gap: 10px; }
+.api .api-code pre.code { margin: 0; border: 0; }
+.api > .win { margin-top: 26px; }
+.kv { display: flex; flex-direction: column; }
+.kvr { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; align-items: center; padding: 9px 0; border-bottom: 1px dotted var(--border-strong); }
+.kk { font-family: var(--pix); font-size: 17px; color: var(--text-muted); text-transform: uppercase; }
+.kvv { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; min-width: 0; font-size: 13px; }
+.kvv .muted, .api .muted { color: var(--text-muted); font-size: 12.5px; }
+.tok { font: 12px var(--mono); background: var(--surface-2); padding: 3px 7px; word-break: break-all; }
+.api .note { margin: 12px 0 0; font-size: 12px; color: var(--text-muted); }
+.switch { display: inline-flex; align-items: center; gap: 8px; height: 28px; padding: 0 10px 0 4px; border: 1.5px solid var(--text); background: var(--bg); }
+.switch i { width: 34px; height: 18px; border: 1.5px solid var(--text); position: relative; background: var(--surface-2); transition: background .2s; }
+.switch i::after { content: ""; position: absolute; top: 1.5px; left: 2px; width: 12px; height: 12px; background: var(--text); transition: transform .25s var(--ease-spring); }
+.switch.on i { background: var(--accent); border-color: var(--text); }
+.switch.on i::after { transform: translateX(15px); background: var(--bg); }
+.switch .pix { font-size: 18px; }
+.api-try { display: flex; flex-direction: column; gap: 10px; }
+.api-try-head { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.api-try-in { width: 100%; min-height: 68px; resize: vertical; border: 1px solid var(--border-strong); background: var(--surface); padding: 8px 10px; font: 13.5px/1.45 var(--sans); color: var(--text); outline: none; }
+.api-try-in:focus { border-color: var(--text); }
+.api-out { max-height: 230px; margin: 0; }
+.api-ends { display: flex; flex-direction: column; }
+.end { display: grid; grid-template-columns: 52px minmax(0, max-content) minmax(0, 1fr) auto; gap: 10px; align-items: center; padding: 8px 0; border-bottom: 1px dotted var(--border-strong); }
+.end code { font: 12.5px var(--mono); }
+.end .verb { font-size: 16px; line-height: 18px; text-align: center; border: 1px solid var(--text); padding: 0 4px; }
+.end .verb.post { background: var(--text); color: var(--bg); }
+@media (max-width: 1100px) { .api-grid { grid-template-columns: minmax(0, 1fr); } .end { grid-template-columns: 52px minmax(0, 1fr) auto; } .end .muted { display: none; } }
+
 /* ---------- boot splash ---------- */
 #splash { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; overflow: hidden; background: var(--bg); color: var(--text);
   clip-path: circle(150% at 50% 42%); transition: clip-path .75s cubic-bezier(.7, 0, .25, 1); }
@@ -664,6 +830,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     </div>
     <a class="nav-item" data-route-link="home" href="#/home"><svg class="i"><use href="#i-home"/></svg><span>Home</span></a>
     <a class="nav-item" data-route-link="playground" href="#/playground"><svg class="i"><use href="#i-flask"/></svg><span>Playground</span></a>
+    <a class="nav-item" data-route-link="sets" href="#/sets"><svg class="i"><use href="#i-layers"/></svg><span>Sets</span></a>
+    <a class="nav-item" data-route-link="api" href="#/api"><svg class="i"><use href="#i-code"/></svg><span>Local API</span></a>
     <a class="nav-item" data-route-link="connections" href="#/connections"><svg class="i"><use href="#i-plug"/></svg><span>Connections</span></a>
     <a class="nav-item ext-link" href="https://docs.typesafe.ai/introduction/quickstart" target="_blank" rel="noopener"><svg class="i"><use href="#i-book"/></svg><span>API format</span><svg class="i ext"><use href="#i-ext"/></svg></a>
     <div class="sb-spacer"></div>
@@ -874,11 +1042,25 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     "Is there a discount for annual billing?",
   ];
   let batchText = store.get("zex.batch", SAMPLE_BATCH.join("\n"));
-  let batch = { running: false, cancel: false, done: 0, total: 0, rows: [], questions: null, error: null };
+  let batch = { running: false, paused: false, done: 0, total: 0, cursor: 0, items: [], results: [], questions: null, setId: null, error: null, evalThr: {} };
   let cmp = { a: null, b: null, running: false, res: {} };   // a, b = "connId::model"
   let last = null;          // { body, data, rtt, at }
   let running = false;
   let lastError = null;
+
+  // question sets: named groups of questions, with optional per-question thresholds
+  function slugify(str) { return String(str).toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "set"; }
+  function canon(v) { return Array.isArray(v) ? `[${v.map(canon).join(",")}]` : v && typeof v === "object" ? `{${Object.keys(v).sort().map((k) => JSON.stringify(k) + ":" + canon(v[k])).join(",")}}` : JSON.stringify(v); }
+  let sets = store.get("zex.sets", null);
+  if (!Array.isArray(sets)) {
+    const now = Date.now();
+    sets = CASES.map((c, i) => ({ id: "s-" + slugify(c.t), name: c.t, slug: slugify(c.t), note: c.d, questions: c.questions, thresholds: {}, version: 1, updatedAt: now - i * 1000 }));
+    store.set("zex.sets", sets);
+  }
+  let curSetId = store.get("zex.curSet", null);
+  let setChipEl = null;
+  let apiCfg = { available: false, enabled: false, token: "" };
+  let apiTimer = 0;
 
   // shared link wins over saved work
   if (location.hash.startsWith("#share/")) {
@@ -892,6 +1074,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   function saveAll() {
     store.set("zex.state", stateText); store.set("zex.stateMode", stateMode);
     store.set("zex.questions", questionsText); store.set("zex.model", model);
+    paintSetChip(); syncApi();
   }
 
   // ---------------------------------------------------------------- code editor
@@ -1136,7 +1319,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   // connections: status, models, relay
   const modelSel = $("#model");
   modelSel.addEventListener("change", () => { model = modelSel.value; saveAll(); });
-  const saveConns = () => { store.set("zex.conns", conns); store.set("zex.active", activeId); };
+  const saveConns = () => { store.set("zex.conns", conns); store.set("zex.active", activeId); syncApi(); };
   const activeConn = () => conns.find((c) => c.id === activeId) || conns[0];
   const connById = (id) => conns.find((c) => c.id === id);
   const errMsg = (data, status) => {
@@ -1296,8 +1479,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     if (mode !== "response") return [];
     if (running) return ["Running…"];
     if (last && !last.failed) {
-      const ans = Object.values(last.data.answers || {});
-      const autoN = ans.filter((a) => topAnswer(a).p >= thr).length;
+      const ans = Object.entries(last.data.answers || {});
+      const autoN = ans.filter(([k, a]) => isAuto(a, k)).length;
       return ["Ran " + ago(last.at) + ` · ${autoN}/${ans.length} auto`];
     }
     if (lastError) return ["Failed"];
@@ -1316,8 +1499,13 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     }
     return { label: "", p: 0 };
   }
-  const isAuto = (a) => topAnswer(a).p >= thr;
-  const decisionChip = (a) => isAuto(a) ? h("span", { class: "dchip auto", title: `Top answer at ${pct(topAnswer(a).p)}, at or above ${pct(thr)}` }, "AUTO") : h("span", { class: "dchip review", title: `Top answer at ${pct(topAnswer(a).p)}, below ${pct(thr)}` }, "REVIEW");
+  // a set can give a question its own threshold; otherwise the global one applies
+  const thrFor = (key, set = curSet()) => set?.thresholds?.[key] ?? thr;
+  const isAuto = (a, key, set) => topAnswer(a).p >= thrFor(key, set);
+  const decisionChip = (a, key) => {
+    const t = thrFor(key), p = topAnswer(a).p, own = curSet()?.thresholds?.[key] != null ? " (this question's own threshold)" : "";
+    return p >= t ? h("span", { class: "dchip auto", title: `Top answer at ${pct(p)}, at or above ${pct(t)}${own}` }, "AUTO") : h("span", { class: "dchip review", title: `Top answer at ${pct(p)}, below ${pct(t)}${own}` }, "REVIEW");
+  };
 
   function thrLabel() { $("#thrChip").textContent = `AUTO ≥ ${Math.round(thr * 100)}%`; }
   function nyBar() {
@@ -1334,7 +1522,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const barWrap = h("div", {}, nyBar());
     const range = h("input", { type: "range", min: "50", max: "99", value: String(Math.round(thr * 100)), "aria-label": "Confidence threshold" });
     range.addEventListener("input", () => {
-      thr = Number(range.value) / 100; store.set("zex.thr", thr);
+      thr = Number(range.value) / 100; store.set("zex.thr", thr); syncApi();
       big.textContent = `${range.value}%`; barWrap.replaceChildren(nyBar()); thrLabel(); renderOut();
     });
     const pop = h("div", { class: "win shadow thr-pop", onclick: (ev) => ev.stopPropagation() },
@@ -1443,7 +1631,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     } else {
       mid = h("pre", { class: "mid code" }, pretty(a));
     }
-    const right = h("div", { class: "r-type" }, h("span", { class: "type-chip" }, cap(q.type)), count ? h("span", { class: "n" }, count) : null, a ? decisionChip(a) : null);
+    const right = h("div", { class: "r-type" }, h("span", { class: "type-chip" }, cap(q.type)), count ? h("span", { class: "n" }, count) : null, a ? decisionChip(a, key) : null);
     row.append(chev, left, mid, right);
     return row;
   }
@@ -1653,97 +1841,534 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     return { questions: parseQuestions().value };
   }
 
-  // ---------------------------------------------------------------- batch
-  let batchResultsEl = null, batchRunBtn = null, batchCsvBtn = null;
+  // ---------------------------------------------------------------- batch: files in, results out
+  const FILE_ACCEPT = ".csv,.tsv,.tab,.txt,.json,.jsonl,.ndjson,.xlsx";
+  let batchSrc = store.get("zex.batchSrc", "paste");     // "file" or "paste"
+  let batchPar = store.get("zex.batchPar", 0);           // requests at a time, 0 = automatic
+  let bfile = null;                                      // { name, columns, rows, textCol, expect: { key: column } }
+  let batchFilter = "all", batchShow = 200, evalKey = null, evalTarget = store.get("zex.evalTarget", 0.95);
+  let batchResultsEl = null, batchCtlEl = null, fillTimer = 0;
+  const blankBatch = () => ({ running: false, paused: false, done: 0, total: 0, cursor: 0, items: [], results: [], questions: null, setId: null, error: null, evalThr: {} });
+  const scheduleFill = () => { if (!fillTimer) fillTimer = setTimeout(() => { fillTimer = 0; if (mode === "batch" && route === "playground") fillBatch(); }, 160); };
+  const isLocalConn = (c) => { try { return ["localhost", "127.0.0.1", "[::1]"].includes(new URL(c.url).hostname); } catch { return false; } };
+  const fmtN = (n) => Number(n).toLocaleString("en-US");
+  const hasValue = (v) => String(v ?? "").trim() !== "";
+
+  // ---- reading files, all inside the page
+  function parseDelimited(text, d) {
+    const rows = [];
+    let row = [], cell = "", quoted = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (quoted) {
+        if (c === '"') { if (text[i + 1] === '"') { cell += '"'; i++; } else quoted = false; }
+        else cell += c;
+      } else if (c === '"' && cell === "") quoted = true;
+      else if (c === d) { row.push(cell); cell = ""; }
+      else if (c === "\n" || c === "\r") { if (c === "\r" && text[i + 1] === "\n") i++; row.push(cell); rows.push(row); row = []; cell = ""; }
+      else cell += c;
+    }
+    if (cell !== "" || row.length) { row.push(cell); rows.push(row); }
+    return rows;
+  }
+  function sniffDelim(text) {
+    const head = text.slice(0, 4000).split(/\r?\n/).slice(0, 5);
+    const score = (d) => { const n = head.map((l) => l.split(d).length - 1); return n[0] > 0 && n.every((x) => x === n[0]) ? n[0] + 100 : n[0]; };
+    return [",", "\t", ";", "|"].reduce((b, d) => (score(d) > score(b) ? d : b), ",");
+  }
+  function tableFromRows(grid) {
+    grid = grid.filter((r) => r && r.some((c) => hasValue(c)));
+    if (!grid.length) return { columns: [], rows: [] };
+    const seen = {};
+    const columns = grid[0].map((c, i) => { let n = String(c ?? "").trim() || `column ${i + 1}`; if (seen[n]) n = `${n} ${++seen[n]}`; else seen[n] = 1; return n; });
+    const width = Math.max(...grid.map((r) => r.length));
+    for (let i = columns.length; i < width; i++) columns.push(`column ${i + 1}`);
+    return { columns, rows: grid.slice(1).map((r) => Object.fromEntries(columns.map((c, i) => [c, r[i] == null ? "" : String(r[i])]))) };
+  }
+  function tableFromObjects(arr) {
+    const columns = [], rows = [];
+    for (const v of arr) {
+      const o = v && typeof v === "object" && !Array.isArray(v) ? v : { text: v };
+      const r = {};
+      for (const [k, x] of Object.entries(o)) { if (!columns.includes(k)) columns.push(k); r[k] = x == null ? "" : typeof x === "object" ? JSON.stringify(x) : String(x); }
+      rows.push(r);
+    }
+    return { columns, rows };
+  }
+  async function readTableFile(file) {
+    const name = file.name.toLowerCase();
+    if (name.endsWith(".xlsx")) return readXlsx(await file.arrayBuffer());
+    if (name.endsWith(".xls")) throw new Error("Old .xls files aren't supported. Save it as .xlsx or CSV.");
+    const text = (await file.text()).replace(/^﻿/, "");
+    if (/\.(jsonl|ndjson)$/.test(name)) {
+      return tableFromObjects(text.split(/\r?\n/).filter((l) => l.trim()).map((l, i) => { try { return JSON.parse(l); } catch { throw new Error(`Line ${i + 1} of ${file.name} isn't valid JSON.`); } }));
+    }
+    if (name.endsWith(".json")) {
+      let v;
+      try { v = JSON.parse(text); } catch { throw new Error(`${file.name} isn't valid JSON.`); }
+      const arr = Array.isArray(v) ? v : Array.isArray(v?.rows) ? v.rows : Array.isArray(v?.data) ? v.data : null;
+      if (!arr) throw new Error(`${file.name} should hold a list of rows.`);
+      return tableFromObjects(arr);
+    }
+    if (/\.(csv|tsv|tab)$/.test(name)) return tableFromRows(parseDelimited(text, /\.(tsv|tab)$/.test(name) ? "\t" : sniffDelim(text)));
+    return { columns: ["text"], rows: text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).map((t) => ({ text: t })) };
+  }
+  // .xlsx is a zip of XML parts; read the first sheet's values
+  async function unzip(buf, want) {
+    const dv = new DataView(buf), u8 = new Uint8Array(buf), out = {}, dec = new TextDecoder();
+    let eocd = -1;
+    for (let i = u8.length - 22; i >= Math.max(0, u8.length - 65557); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    if (eocd < 0) throw new Error("That file isn't a valid .xlsx.");
+    let p = dv.getUint32(eocd + 16, true);
+    const count = dv.getUint16(eocd + 10, true);
+    for (let e = 0; e < count && dv.getUint32(p, true) === 0x02014b50; e++) {
+      const method = dv.getUint16(p + 10, true), size = dv.getUint32(p + 20, true), off = dv.getUint32(p + 42, true);
+      const nl = dv.getUint16(p + 28, true), name = dec.decode(u8.subarray(p + 46, p + 46 + nl));
+      p += 46 + nl + dv.getUint16(p + 30, true) + dv.getUint16(p + 32, true);
+      if (!want(name)) continue;
+      const start = off + 30 + dv.getUint16(off + 26, true) + dv.getUint16(off + 28, true), raw = u8.subarray(start, start + size);
+      if (method === 0) out[name] = dec.decode(raw);
+      else if (method === 8) out[name] = await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).text();
+    }
+    return out;
+  }
+  async function readXlsx(buf) {
+    const files = await unzip(buf, (n) => /^xl\/(workbook\.xml|_rels\/workbook\.xml\.rels|sharedStrings\.xml|worksheets\/[^/]+\.xml)$/.test(n));
+    const xml = (t) => new DOMParser().parseFromString(t, "application/xml");
+    let sheet = "xl/worksheets/sheet1.xml";
+    if (files["xl/workbook.xml"] && files["xl/_rels/workbook.xml.rels"]) {
+      const first = xml(files["xl/workbook.xml"]).getElementsByTagName("sheet")[0];
+      const rid = first && (first.getAttribute("r:id") || first.getAttributeNS("http://schemas.openxmlformats.org/officeDocument/2006/relationships", "id"));
+      const rel = [...xml(files["xl/_rels/workbook.xml.rels"]).getElementsByTagName("Relationship")].find((r) => r.getAttribute("Id") === rid);
+      if (rel) sheet = "xl/" + rel.getAttribute("Target").replace(/^\/?(xl\/)?/, "");
+    }
+    if (!files[sheet]) sheet = Object.keys(files).filter((n) => n.startsWith("xl/worksheets/")).sort()[0];
+    if (!sheet) throw new Error("That .xlsx has no sheets.");
+    const shared = files["xl/sharedStrings.xml"] ? [...xml(files["xl/sharedStrings.xml"]).getElementsByTagName("si")].map((si) => [...si.getElementsByTagName("t")].map((t) => t.textContent).join("")) : [];
+    const colIdx = (ref) => { let n = 0; for (const ch of ref.replace(/\d+$/, "")) n = n * 26 + (ch.charCodeAt(0) - 64); return n - 1; };
+    const grid = [];
+    for (const row of xml(files[sheet]).getElementsByTagName("row")) {
+      const r = [];
+      for (const c of row.getElementsByTagName("c")) {
+        const t = c.getAttribute("t"), v = c.getElementsByTagName("v")[0]?.textContent ?? "";
+        const val = t === "s" ? shared[Number(v)] ?? "" : t === "inlineStr" ? [...c.getElementsByTagName("t")].map((x) => x.textContent).join("") : t === "b" ? (v === "1" ? "true" : "false") : v;
+        r[c.getAttribute("r") ? colIdx(c.getAttribute("r")) : r.length] = val;
+      }
+      grid[Number(row.getAttribute("r") || grid.length + 1) - 1] = r;
+    }
+    return tableFromRows(Array.from(grid, (r) => Array.from(r || [], (x) => x ?? "")));
+  }
+
+  // ---- which column is the text, and which hold expected answers
+  const TEXT_COL = /^(text|message|messages|body|content|state|ticket|email|review|comment|description|input|query|feedback)$/i;
+  function guessTextCol(cols, rows) {
+    const named = cols.find((c) => TEXT_COL.test(c.trim()));
+    if (named) return named;
+    let best = cols[0], bestLen = -1;
+    for (const c of cols) {
+      const sample = rows.slice(0, 50).map((r) => String(r[c] ?? ""));
+      const avg = sample.reduce((n, v) => n + v.length, 0) / (sample.length || 1);
+      if (avg > bestLen) { bestLen = avg; best = c; }
+    }
+    return best;
+  }
+  const normName = (x) => String(x).toLowerCase().replace(/[^a-z0-9]+/g, "");
+  function guessExpect(cols, questions) {
+    const out = {}, keys = Object.keys(questions || {});
+    for (const k of keys) {
+      const nk = normName(k);
+      const hit = cols.find((c) => [nk, "expected" + nk, nk + "expected", "label" + nk, nk + "label", "gold" + nk, "true" + nk].includes(normName(c)));
+      if (hit) out[k] = hit;
+    }
+    if (keys.length === 1 && !out[keys[0]]) { const hit = cols.find((c) => /^(label|expected|answer|gold|truth|target)$/i.test(c.trim())); if (hit) out[keys[0]] = hit; }
+    return out;
+  }
+  async function loadBatchFile(f) {
+    try {
+      if (f.size > 50 * 1024 * 1024) throw new Error("That file is over 50 MB. Split it into smaller files.");
+      const t = await readTableFile(f);
+      if (!t.rows.length) throw new Error(`${f.name} has no rows.`);
+      bfile = { name: f.name, columns: t.columns, rows: t.rows, textCol: guessTextCol(t.columns, t.rows), expect: guessExpect(t.columns, playgroundQuestions() || {}) };
+      batchSrc = "file"; store.set("zex.batchSrc", "file");
+      if (!batch.running) batch = blankBatch();
+      toast(`Loaded ${fmtN(t.rows.length)} rows`);
+    } catch (e) {
+      batch.error = e.message; toast("Couldn't read that file");
+    }
+    renderOut();
+  }
+  function batchItems(keys) {
+    const items = batchSrc === "file" && bfile
+      ? bfile.rows.map((r) => ({ text: String(r[bfile.textCol] ?? "").trim(), row: r, expected: Object.fromEntries(keys.filter((k) => bfile.expect[k]).map((k) => [k, r[bfile.expect[k]]])) }))
+      : batchText.split("\n").map((x) => x.trim()).filter(Boolean).map((t) => ({ text: t, row: { text: t }, expected: {} }));
+    return items.filter((it) => it.text).map((it, i) => ({ ...it, i }));
+  }
+
+  // ---- answers compared with what you expected
+  function canonExpected(q, raw) {
+    if (!hasValue(raw) || !q) return null;
+    const v = String(raw).trim(), lv = v.toLowerCase();
+    if (q.type === "noul") return ["true", "yes", "y", "1", "t"].includes(lv) ? "true" : ["false", "no", "n", "0", "f"].includes(lv) ? "false" : lv;
+    if (q.type === "choice") { const opts = (Array.isArray(q.criteria) ? q.criteria : Object.keys(q.criteria || {})).map(String); return opts.find((o) => o.toLowerCase() === lv) ?? lv; }
+    if (q.type === "score") {
+      const levels = (Array.isArray(q.criteria) ? q.criteria : Object.values(q.criteria || {})).map(String);
+      if (/^\d+$/.test(v)) return v;
+      const i = levels.findIndex((l) => l.toLowerCase() === lv);
+      return i >= 0 ? String(i) : lv;
+    }
+    return lv;
+  }
+  function predLabel(a) {
+    if (!a) return null;
+    if (a.type === "noul") return a.noul >= 0.5 ? "true" : "false";
+    if (a.type === "choice") return a.choice;
+    if (a.type === "score") { const pr = a.probabilities || {}; return Object.keys(pr).reduce((b, x) => (pr[x] > (pr[b] ?? -1) ? x : b), Object.keys(pr)[0]); }
+    return null;
+  }
+  const sameLabel = (a, b) => a != null && b != null && String(a).toLowerCase() === String(b).toLowerCase();
+  function evalStats(key, q) {
+    const pts = [];
+    batch.items.forEach((it, i) => {
+      const r = batch.results[i], a = r?.answers?.[key], exp = canonExpected(q, it.expected[key]);
+      if (!r || r.error || !a || exp == null) return;
+      const pred = predLabel(a);
+      pts.push({ p: topAnswer(a).p, pred, exp, ok: sameLabel(pred, exp), near: q.type === "score" && /^\d+$/.test(exp) ? Math.abs(Number(pred) - Number(exp)) <= 1 : null });
+    });
+    const n = pts.length;
+    if (!n) return null;
+    const curve = [];
+    for (let t = 50; t <= 99; t++) {
+      const cov = pts.filter((x) => x.p >= t / 100);
+      curve.push({ t: t / 100, cov: cov.length / n, acc: cov.length ? cov.filter((x) => x.ok).length / cov.length : null, n: cov.length });
+    }
+    const labels = (q.type === "noul" ? ["true", "false"] : q.type === "choice" ? (Array.isArray(q.criteria) ? q.criteria : Object.keys(q.criteria || {})) : (Array.isArray(q.criteria) ? q.criteria : []).map((_, i) => i)).map(String);
+    for (const x of pts) for (const v of [x.exp, x.pred]) if (v != null && !labels.some((l) => sameLabel(l, v))) labels.push(String(v));
+    const at = (v) => labels.findIndex((l) => sameLabel(l, v));
+    const cm = labels.map(() => labels.map(() => 0));
+    for (const x of pts) cm[at(x.exp)][at(x.pred)]++;
+    const bins = [[0, 0.5], [0.5, 0.6], [0.6, 0.7], [0.7, 0.8], [0.8, 0.9], [0.9, 1.01]].map(([lo, hi]) => {
+      const b = pts.filter((x) => x.p >= lo && x.p < hi);
+      return { lo, hi, n: b.length, conf: b.length ? b.reduce((m, x) => m + x.p, 0) / b.length : null, acc: b.length ? b.filter((x) => x.ok).length / b.length : null };
+    }).filter((b) => b.lo >= 0.5 || b.n);
+    return { n, acc: pts.filter((x) => x.ok).length / n, curve, labels, cm, bins, near: q.type === "score" ? pts.filter((x) => x.near).length / n : null };
+  }
+  // the lowest threshold that keeps accuracy at the target automates the most
+  function recommend(curve, target, n) {
+    const minN = Math.max(3, Math.ceil(n * 0.05));
+    return curve.find((c) => c.acc != null && c.acc >= target && c.n >= minN) || null;
+  }
+
+  // ---- running
+  async function runBatch(resume = false) {
+    if (batch.running) return;
+    if (!resume) {
+      const q = questionsOrError();
+      if (q.error) { batch = { ...blankBatch(), error: q.error }; fillBatch(); return; }
+      const items = batchItems(Object.keys(q.questions));
+      if (!items.length) { batch = { ...blankBatch(), error: batchSrc === "file" ? (bfile ? "No rows have text in the column you chose." : "Choose a file first.") : "Paste at least one line." }; fillBatch(); return; }
+      batch = { ...blankBatch(), items, results: new Array(items.length), total: items.length, questions: q.questions,
+        setId: setMatchesPlayground(curSet()) ? curSetId : null, conn: activeConn(), model,
+        source: batchSrc === "file" && bfile ? bfile.name : "pasted lines", columns: batchSrc === "file" && bfile ? bfile.columns : ["text"] };
+      batchFilter = "all"; batchShow = 200; evalKey = null;
+    }
+    const b = batch;
+    b.running = true; b.paused = false; b.error = null; b.resumedAt = Date.now(); b.doneAtResume = b.done;
+    fillBatch();
+    const par = batchPar || (isLocalConn(b.conn) ? 1 : 4);
+    const worker = async () => {
+      while (!b.paused && b.cursor < b.items.length) {
+        const it = b.items[b.cursor++];
+        try {
+          const { data, rtt } = await decide({ model: b.model, state: it.text, questions: b.questions }, b.conn);
+          b.results[it.i] = { answers: data.answers || {}, rtt };
+        } catch (e) { b.results[it.i] = { error: e.message.split("\n")[0] }; }
+        b.done++; scheduleFill();
+      }
+    };
+    await Promise.all(Array.from({ length: Math.min(par, b.items.length) }, worker));
+    b.running = false;
+    if (batch !== b) return;
+    if (b.done >= b.total) toast(`Batch done: ${fmtN(b.total)} rows`);
+    fillBatch();
+  }
+
+  // ---- the pane
   function renderBatch() {
-    const ta = h("textarea", { class: "batch-input", dir: "auto", spellcheck: "false", "aria-label": "One state per line", placeholder: "One message per line. Each line is sent with the questions on the left." });
-    ta.value = batchText;
-    ta.addEventListener("input", () => { batchText = ta.value; store.set("zex.batch", batchText); });
-    batchRunBtn = h("button", { class: "btn solid", type: "button", onclick: () => (batch.running ? (batch.cancel = true) : runBatch()) });
-    batchCsvBtn = h("button", { class: "btn", type: "button", onclick: exportCsv }, "Export CSV");
-    const sample = h("button", { class: "btn", type: "button", onclick: () => {
-      batchText = SAMPLE_BATCH.join("\n"); store.set("zex.batch", batchText);
-      stateMode = "text"; stateText = SAMPLE_BATCH[0]; questionsText = pretty(CASES[0].questions);
-      saveAll(); renderState(); renderQuestions(); renderOut();
-    } }, "Load sample");
-    batchResultsEl = h("div", {});
-    const lines = batchText.split("\n").filter((x) => x.trim()).length;
-    const winEl = h("div", { class: "win shadow" },
-      h("div", { class: "win-title" }, "Zex.Batch", h("span", { class: "grow" }), `${lines} lines`),
-      h("div", { class: "win-body" }, ta,
-        h("div", { class: "btn-row" }, batchRunBtn, sample, batchCsvBtn, h("span", { class: "meta" }, `Questions come from the left. ${model} on ${activeConn().name}`))));
+    const pq = playgroundQuestions(), keys = pq ? Object.keys(pq) : [];
+    const x = curSet(), matches = setMatchesPlayground(x);
+    const setSel = h("select", { class: "chip-select", "aria-label": "Question set" },
+      matches ? null : h("option", { value: "" }, "Playground questions"), sets.map((y) => h("option", { value: y.id }, y.name)));
+    setSel.value = matches ? x.id : "";
+    setSel.addEventListener("change", () => { const y = setById(setSel.value); if (y) openSet(y); });
+    const tab = (id, label) => h("button", { role: "tab", type: "button", "aria-selected": String(batchSrc === id), onclick: () => { batchSrc = id; store.set("zex.batchSrc", id); renderOut(); } }, label);
+    let src;
+    if (batchSrc === "file") src = renderBatchFile(keys, pq || {});
+    else {
+      const ta = h("textarea", { class: "batch-input", dir: "auto", spellcheck: "false", "aria-label": "One message per line", placeholder: "One message per line. Each line is sent with the questions on the left." });
+      ta.value = batchText;
+      ta.addEventListener("input", () => { batchText = ta.value; store.set("zex.batch", batchText); });
+      src = h("div", {}, ta, h("div", { class: "btn-row" }, h("button", { class: "btn", type: "button", onclick: () => {
+        batchText = SAMPLE_BATCH.join("\n"); store.set("zex.batch", batchText);
+        stateMode = "text"; stateText = SAMPLE_BATCH[0]; questionsText = pretty(CASES[0].questions);
+        saveAll(); renderState(); renderQuestions(); renderOut();
+      } }, "Load sample"), h("span", { class: "meta" }, "Have a spreadsheet? Use the File tab.")));
+    }
+    batchCtlEl = h("div", { class: "btn-row b-ctl" });
+    const lines = batchText.split("\n").filter((l) => l.trim()).length;
+    const winEl = h("div", { class: "win shadow b-win" },
+      h("div", { class: "win-title" }, "Zex.Batch", h("span", { class: "grow" }), batchSrc === "file" ? (bfile ? `${fmtN(bfile.rows.length)} rows` : "file") : `${lines} lines`),
+      h("div", { class: "win-body" },
+        h("div", { class: "b-head" },
+          h("div", { class: "code-tabs", role: "tablist", "aria-label": "Where the messages come from" }, tab("file", "File"), tab("paste", "Paste")),
+          h("span", { class: "grow" }), h("label", { class: "b-set" }, h("span", {}, "Questions"), setSel)),
+        src, batchCtlEl));
+    if (batchSrc === "file") dropTarget(winEl, loadBatchFile);
+    batchResultsEl = h("div", { class: "b-results" });
     fillBatch();
     return h("div", { class: "pane" }, winEl, batchResultsEl);
   }
+  function renderBatchFile(keys, questions) {
+    const choose = () => pickFile(FILE_ACCEPT, loadBatchFile);
+    if (!bfile) {
+      const dz = h("div", { class: "dropzone dots", role: "button", tabindex: "0", "aria-label": "Choose a file to run" },
+        icon("i-layers"), h("b", { class: "pix" }, "DROP A FILE HERE"), h("span", {}, "CSV, TSV, Excel, JSONL, JSON or plain text, one message per row"), h("span", { class: "dz-or" }, "or click to choose one"));
+      dz.addEventListener("click", choose);
+      dz.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(); } });
+      return dz;
+    }
+    const g = guessExpect(bfile.columns, questions);
+    for (const k of keys) if (bfile.expect[k] === undefined && g[k]) bfile.expect[k] = g[k];
+    const colSel = (value, onChange, none) => {
+      const el = h("select", { class: "chip-select" }, none ? h("option", { value: "" }, "none") : null, bfile.columns.map((c) => h("option", { value: c }, c)));
+      el.value = value || ""; el.addEventListener("change", () => onChange(el.value));
+      return el;
+    };
+    const cols = [bfile.textCol, ...keys.map((k) => bfile.expect[k])].filter((c, i, a) => c && a.indexOf(c) === i);
+    return h("div", { class: "b-file" },
+      h("div", { class: "bf-bar" }, h("span", { class: "tagline" }, bfile.name), h("span", { class: "muted" }, `${fmtN(bfile.rows.length)} rows · ${bfile.columns.length} columns`), h("span", { class: "grow" }),
+        h("button", { class: "text-btn xs bordered", type: "button", onclick: choose }, "Replace…"),
+        h("button", { class: "text-btn xs", type: "button", onclick: () => { bfile = null; renderOut(); } }, "Remove")),
+      h("div", { class: "b-map" },
+        h("div", { class: "mrow" }, h("span", { class: "ml" }, "Text to read"), colSel(bfile.textCol, (v) => { bfile.textCol = v; renderOut(); })),
+        keys.length ? h("div", { class: "mhead" }, "Expected answers", h("span", {}, "optional, to measure accuracy")) : null,
+        keys.map((k) => h("div", { class: "mrow" }, h("span", { class: "ml mono" }, k), colSel(bfile.expect[k], (v) => { bfile.expect[k] = v; renderOut(); }, true)))),
+      h("div", { class: "b-prev-wrap" }, h("table", { class: "btable b-prev" },
+        h("thead", {}, h("tr", {}, cols.map((c) => h("th", {}, c)))),
+        h("tbody", {}, bfile.rows.slice(0, 3).map((r) => h("tr", {}, cols.map((c) => h("td", { class: "st", dir: "auto", title: r[c] }, r[c]))))))));
+  }
+  function fillCtl() {
+    if (!batchCtlEl) return;
+    const b = batch, has = b.items.length > 0, finished = has && !b.running && b.done >= b.total, paused = has && !b.running && !finished;
+    const par = h("select", { class: "chip-select", "aria-label": "Requests at a time", title: "Requests at a time. Automatic sends one at a time to a model on this computer and four to a hosted one." },
+      [[0, "auto"], [1, "1 at a time"], [2, "2 at a time"], [4, "4 at a time"], [8, "8 at a time"]].map(([v, l]) => h("option", { value: String(v) }, l)));
+    par.value = String(batchPar);
+    par.addEventListener("change", () => { batchPar = Number(par.value); store.set("zex.batchPar", batchPar); });
+    const btns = [];
+    if (b.running) btns.push(h("button", { class: "btn solid", type: "button", onclick: () => { b.paused = true; fillCtl(); } }, b.paused ? "Pausing…" : "Pause"));
+    else if (paused) btns.push(h("button", { class: "btn solid", type: "button", onclick: () => runBatch(true) }, "Resume"), h("button", { class: "btn", type: "button", onclick: () => runBatch() }, "Start over"));
+    else btns.push(h("button", { class: "btn solid", type: "button", onclick: () => runBatch() }, finished ? "Run again" : "Run batch"));
+    if (b.done) btns.push(h("button", { class: "btn", type: "button", onclick: () => batchExport("csv") }, "Export CSV"), h("button", { class: "btn", type: "button", onclick: () => batchExport("jsonl") }, "JSONL"));
+    batchCtlEl.replaceChildren(...[...btns, b.running ? null : par, has ? progress() : h("span", { class: "meta" }, `${model} on ${activeConn().name}`)].filter(Boolean));
+  }
+  function progress() {
+    const b = batch, frac = b.total ? b.done / b.total : 0, cells = 32;
+    let txt = `${fmtN(b.done)} / ${fmtN(b.total)}`;
+    if (b.running && b.done > b.doneAtResume) {
+      const rate = (b.done - b.doneAtResume) / ((Date.now() - b.resumedAt) / 1000), left = (b.total - b.done) / rate;
+      txt += ` · ${rate >= 1 ? rate.toFixed(1) : rate.toFixed(2)}/s · ${left > 90 ? Math.round(left / 60) + " min" : Math.round(left) + " s"} left`;
+    } else if (!b.running) txt += b.done < b.total ? " · paused" : " · done";
+    return h("div", { class: "b-progw" },
+      h("div", { class: "b-prog", "aria-hidden": "true" }, Array.from({ length: cells }, (_, i) => h("i", { class: i < Math.round(frac * cells) ? "on" : "" }))),
+      h("span", { class: "pix" }, txt));
+  }
   function fillBatch() {
-    if (batchRunBtn) batchRunBtn.textContent = batch.running ? `Stop (${batch.done}/${batch.total})` : "Run batch";
-    if (batchCsvBtn) batchCsvBtn.disabled = !batch.rows.length;
+    fillCtl();
     $("#outTitle").replaceChildren(...titleParts());
     if (!batchResultsEl) return;
     const kids = [];
     if (batch.error) kids.push(h("div", { class: "banner err", style: "margin:0" }, batch.error));
-    if (batch.rows.length && batch.questions) {
-      const keys = Object.keys(batch.questions);
-      const cells = [];
-      for (const r of batch.rows) for (const k of keys) cells.push(r.error ? "err" : isAuto(r.answers?.[k]) ? "auto" : "review");
-      const prevCells = batch.paintedCells || 0, prevRows = batch.paintedRows || 0;
-      batch.paintedCells = cells.length; batch.paintedRows = batch.rows.length;
-      const autoN = cells.filter((c) => c === "auto").length;
-      kids.push(h("div", { class: "win shadow" },
-        h("div", { class: "win-title" }, "Zex.Confidence", h("span", { class: "grow" }), `AUTO ≥ ${Math.round(thr * 100)}%`),
-        h("div", { class: "win-body" },
-          h("span", { class: "tagline" }, `${String(autoN).padStart(2, "0")} / ${cells.length} AUTO`),
-          h("div", { class: "passgrid", title: "Each square is one answer: filled = AUTO, hatched = REVIEW, red = error" }, cells.map((c, i) => h("i", { class: c + (i >= prevCells ? " new" : "") }))),
-          h("div", { style: "margin-top:10px" }, nyBar()))));
-      kids.push(h("div", { style: "overflow:auto" }, h("table", { class: "btable" },
-        h("thead", {}, h("tr", {}, h("th", {}, "#"), h("th", {}, "state"), keys.map((k) => h("th", {}, k)))),
-        h("tbody", {}, batch.rows.map((r, i) => h("tr", { class: i >= prevRows ? "new" : "" },
-          h("td", { class: "pp" }, String(i + 1)),
-          h("td", { class: "st", dir: "auto" }, r.state),
-          r.error ? h("td", { class: "err", colspan: String(keys.length) }, r.error) : keys.map((k) => {
-            const a = r.answers?.[k], ta = topAnswer(a);
-            return h("td", { class: isAuto(a) ? "auto" : "review" }, h("div", { class: "a", dir: "auto" }, ta.label), h("div", { class: "pp" }, pct(ta.p), " · ", isAuto(a) ? "auto" : "review"));
-          })))))));
+    if (batch.items.length && batch.questions) {
+      const keys = Object.keys(batch.questions), set = setById(batch.setId);
+      kids.push(confidenceWin(keys, set));
+      if (batch.done) kids.push(evalWin(keys, set), resultsWin(keys, set));
     } else if (!batch.running && !batch.error) {
-      kids.push(h("div", { class: "empty-hint", style: "padding:10px 0" }, "Run the batch to see every answer and how many the model would handle on its own."));
+      kids.push(h("div", { class: "empty-hint", style: "padding:10px 0" }, "Run the batch to see every answer, how many the model handles on its own, and how often it is right."));
     }
     batchResultsEl.replaceChildren(...kids);
   }
-  async function runBatch() {
-    const lines = batchText.split("\n").map((x) => x.trim()).filter(Boolean);
-    const q = questionsOrError();
-    if (q.error) { batch = { ...batch, error: q.error, rows: [] }; fillBatch(); return; }
-    if (!lines.length) { batch = { ...batch, error: "Paste at least one line.", rows: [] }; fillBatch(); return; }
-    batch = { running: true, cancel: false, done: 0, total: lines.length, rows: [], questions: q.questions, error: null };
-    fillBatch();
-    for (const line of lines) {
-      if (batch.cancel) break;
-      try {
-        const { data, rtt } = await decide({ model, state: line, questions: q.questions });
-        batch.rows.push({ state: line, answers: data.answers || {}, model: data.model, rtt });
-      } catch (e) {
-        batch.rows.push({ state: line, error: e.message.split("\n")[0] });
+  const verdictOf = (r, k, set) => (!r ? "todo" : r.error ? "err" : isAuto(r.answers?.[k], k, set) ? "auto" : "review");
+  function confidenceWin(keys, set) {
+    const per = Object.fromEntries(keys.map((k) => [k, { auto: 0, review: 0, err: 0 }]));
+    const small = batch.items.length * keys.length <= 640, cells = [];
+    let autoN = 0, all = 0;
+    batch.items.forEach((it, i) => {
+      for (const k of keys) {
+        const v = verdictOf(batch.results[i], k, set);
+        if (v !== "todo") { per[k][v]++; all++; if (v === "auto") autoN++; }
+        if (small) cells.push(v);
       }
-      batch.done++;
-      if (mode === "batch") fillBatch();
-    }
-    batch.running = false;
-    if (mode === "batch") fillBatch();
+    });
+    return h("div", { class: "win shadow" },
+      h("div", { class: "win-title" }, "Zex.Confidence", h("span", { class: "grow" }), set ? set.name : "thresholds"),
+      h("div", { class: "win-body" },
+        h("span", { class: "tagline" }, `${fmtN(autoN)} / ${fmtN(all)} AUTO`),
+        small ? h("div", { class: "passgrid", title: "Each square is one answer: filled is AUTO, hatched is REVIEW, red is an error, empty is still to run" }, cells.map((c) => h("i", { class: c }))) : null,
+        h("div", { class: "qbars" }, keys.map((k) => {
+          const c = per[k], n = c.auto + c.review + c.err || 1;
+          return h("div", { class: "qbar-row" }, h("span", { class: "k" }, k),
+            h("div", { class: "qbar" }, h("i", { class: "auto", style: `width:${(c.auto / n) * 100}%` }), h("i", { class: "review", style: `width:${(c.review / n) * 100}%` }), h("i", { class: "err", style: `width:${(c.err / n) * 100}%` })),
+            h("span", { class: "v pix" }, `${Math.round((c.auto / n) * 100)}% auto`),
+            h("span", { class: "t pix", title: "AUTO threshold for this question" }, `≥${Math.round(thrFor(k, set) * 100)}`));
+        }))));
   }
-  function exportCsv() {
-    if (!batch.rows.length || !batch.questions) return;
-    const keys = Object.keys(batch.questions);
+  const etile = (k, v, sub) => h("div", { class: "etile" }, h("span", { class: "ek" }, k), h("b", { class: "ev" }, v), h("span", { class: "es" }, sub));
+  function evalWin(keys, set) {
+    const qs_ = batch.questions;
+    const labeled = keys.filter((k) => batch.items.some((it) => hasValue(it.expected[k])));
+    const shell = (right, ...body) => h("div", { class: "win shadow eval" }, h("div", { class: "win-title" }, "Zex.Eval", h("span", { class: "grow" }), right), h("div", { class: "win-body" }, ...body));
+    if (!labeled.length) {
+      return shell("accuracy", h("div", { class: "eval-empty" }, h("b", {}, "How often is the model right?"),
+        h("p", {}, "Run a file that has a column with the answer you expect, and pick that column under Expected answers. Zex measures accuracy for each question and suggests the threshold that keeps it above your aim.")));
+    }
+    if (!labeled.includes(evalKey)) evalKey = labeled[0];
+    const stats = Object.fromEntries(labeled.map((k) => [k, evalStats(k, qs_[k])]));
+    const tabs = h("div", { class: "eval-tabs", role: "tablist" }, labeled.map((k) => h("button", { role: "tab", type: "button", "aria-selected": String(k === evalKey), onclick: () => { evalKey = k; fillBatch(); } },
+      h("span", { class: "k" }, k), h("span", { class: "v pix" }, stats[k] ? pct(stats[k].acc) : "–"))));
+    const k = evalKey, q = qs_[k], st = stats[k];
+    if (!st) return shell(set ? set.name : "accuracy", tabs, h("div", { class: "eval-empty" }, "Waiting for answers that have an expected value."));
+    let t = batch.evalThr[k] ?? thrFor(k, set);
+    const tiles = h("div", { class: "eval-tiles" }), chart = h("div", { class: "eval-chart" }), sugg = h("div", { class: "eval-sugg" });
+    const range = h("input", { type: "range", min: "50", max: "99", value: String(Math.round(t * 100)), "aria-label": `AUTO threshold for ${k}` });
+    const tLab = h("b", { class: "pix" }), useBtn = h("button", { class: "btn solid", type: "button" });
+    const aimSel = h("select", { class: "chip-select", "aria-label": "Accuracy to aim for" }, [0.9, 0.95, 0.97, 0.99].map((v) => h("option", { value: String(v) }, `${Math.round(v * 100)}% right`)));
+    aimSel.value = String(evalTarget);
+    const paint = () => {
+      const c = st.curve[Math.round(t * 100) - 50], saved = thrFor(k, set);
+      tLab.textContent = `${Math.round(t * 100)}%`;
+      tiles.replaceChildren(
+        etile("accuracy", pct(st.acc), `all ${fmtN(st.n)} answers` + (st.near != null ? ` · ${pct(st.near)} within a level` : "")),
+        etile("auto", pct(c.cov), `at ≥ ${Math.round(t * 100)}%`),
+        etile("right when auto", c.acc != null ? pct(c.acc) : "–", `${fmtN(c.n)} answers`),
+        etile("for review", fmtN(st.n - c.n), "a person checks these"));
+      chart.replaceChildren(curveSvg(st.curve, t, evalTarget));
+      const rec = recommend(st.curve, evalTarget, st.n);
+      sugg.replaceChildren(rec
+        ? h("span", {}, "Suggested ", h("b", { class: "pix" }, `≥ ${Math.round(rec.t * 100)}%`), ` automates ${pct(rec.cov)} and is right ${pct(rec.acc)} of the time. `,
+            h("button", { class: "text-btn xs bordered", type: "button", onclick: () => { t = rec.t; range.value = String(Math.round(t * 100)); batch.evalThr[k] = t; paint(); } }, "Try it"))
+        : h("span", {}, `No threshold reaches ${pct(evalTarget)} right on this data. Lower the aim, or send these answers to a person.`));
+      const same = Math.abs(saved - t) < 0.001, own = set?.thresholds?.[k] != null;
+      useBtn.textContent = same ? (own ? `Saved: ${k} is AUTO at ≥ ${Math.round(t * 100)}%` : `${k} uses the global ≥ ${Math.round(t * 100)}%`)
+        : set ? `Use ≥ ${Math.round(t * 100)}% for ${k}` : `Use ≥ ${Math.round(t * 100)}% everywhere`;
+      useBtn.disabled = same;
+    };
+    range.addEventListener("input", () => { t = Number(range.value) / 100; batch.evalThr[k] = t; paint(); });
+    aimSel.addEventListener("change", () => { evalTarget = Number(aimSel.value); store.set("zex.evalTarget", evalTarget); paint(); });
+    useBtn.addEventListener("click", () => {
+      if (set) { set.thresholds = { ...(set.thresholds || {}), [k]: t }; set.updatedAt = Date.now(); saveSets(); toast(`${k} is AUTO at ≥ ${Math.round(t * 100)}% in ${set.name}`); }
+      else { thr = t; store.set("zex.thr", thr); syncApi(); thrLabel(); toast(`Every question is AUTO at ≥ ${Math.round(t * 100)}% now`); }
+      delete batch.evalThr[k]; fillBatch();
+    });
+    paint();
+    return shell(set ? set.name : "accuracy", tabs, tiles,
+      h("div", { class: "eval-main" }, chart,
+        h("div", { class: "eval-side" },
+          h("div", { class: "eval-ctl" }, h("span", {}, "AUTO at"), tLab), range,
+          h("div", { class: "eval-ctl" }, h("span", {}, "Aim for"), aimSel),
+          sugg, h("div", { class: "btn-row" }, useBtn),
+          set ? null : h("p", { class: "eval-note" }, "Save these questions as a set to keep a threshold for each question."))),
+      h("div", { class: "eval-grid" }, confusion(st, q), calibration(st)));
+  }
+  function curveSvg(curve, t, aim) {
+    const W = 520, H = 196, L = 40, R = 14, T = 14, B = 30;
+    const x = (v) => L + ((v - 0.5) / 0.49) * (W - L - R), y = (v) => T + (1 - v) * (H - T - B);
+    const line = (key) => curve.filter((c) => c[key] != null).map((c, i) => `${i ? "L" : "M"}${x(c.t).toFixed(1)} ${y(c[key]).toFixed(1)}`).join("");
+    const ns = "http://www.w3.org/2000/svg";
+    const el = (tag, attrs, text) => { const e = document.createElementNS(ns, tag); for (const [a, v] of Object.entries(attrs)) e.setAttribute(a, v); if (text != null) e.textContent = text; return e; };
+    const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, class: "curve", role: "img", "aria-label": "Accuracy and the share answered on its own, at each threshold" });
+    for (const v of [0, 0.25, 0.5, 0.75, 1]) svg.append(el("line", { x1: L, x2: W - R, y1: y(v), y2: y(v), class: "grid" }), el("text", { x: L - 7, y: y(v) + 4, class: "lab", "text-anchor": "end" }, `${v * 100}%`));
+    for (const v of [0.5, 0.6, 0.7, 0.8, 0.9, 0.99]) svg.append(el("text", { x: x(v), y: H - 10, class: "lab", "text-anchor": "middle" }, `≥${Math.round(v * 100)}`));
+    svg.append(el("line", { x1: L, x2: W - R, y1: y(aim), y2: y(aim), class: "aim" }), el("text", { x: W - R, y: y(aim) - 6, class: "lab aimt", "text-anchor": "end" }, `aim ${Math.round(aim * 100)}%`));
+    svg.append(el("path", { d: line("cov"), class: "cov" }), el("path", { d: line("acc"), class: "acc" }));
+    const c = curve[Math.round(t * 100) - 50];
+    svg.append(el("line", { x1: x(t), x2: x(t), y1: T, y2: H - B, class: "mark" }));
+    svg.append(el("rect", { x: x(t) - 4.5, y: y(c.cov) - 4.5, width: 9, height: 9, class: "dot cov" }));
+    if (c.acc != null) svg.append(el("rect", { x: x(t) - 4.5, y: y(c.acc) - 4.5, width: 9, height: 9, class: "dot acc" }));
+    return h("div", { class: "curve-wrap" }, svg,
+      h("div", { class: "curve-key" }, h("span", { class: "acc" }, "right when AUTO"), h("span", { class: "cov" }, "answered on its own"), h("span", { class: "aim" }, "your aim")));
+  }
+  function confusion(st, q) {
+    const name = (l) => (q.type === "score" && Array.isArray(q.criteria) && q.criteria[Number(l)] != null ? `${l} ${q.criteria[Number(l)]}` : l);
+    const max = Math.max(1, ...st.cm.flat());
+    return h("div", { class: "cm-wrap" }, h("div", { class: "eh" }, "What it said, by what you expected"),
+      h("div", { style: "overflow:auto" }, h("table", { class: "cm" },
+        h("thead", {}, h("tr", {}, h("th", { class: "corner" }, "said →", h("br"), "expected ↓"), st.labels.map((l) => h("th", { title: name(l) }, name(l))))),
+        h("tbody", {}, st.labels.map((l, i) => h("tr", {}, h("th", { title: name(l) }, name(l)),
+          st.cm[i].map((n, j) => h("td", { class: (i === j ? "hit" : "miss") + (n ? "" : " zero"), style: `--a:${(n / max).toFixed(3)}` }, n ? String(n) : "·"))))))));
+  }
+  function calibration(st) {
+    return h("div", { class: "cal" }, h("div", { class: "eh" }, "When it was this sure, it was right"),
+      st.bins.map((b) => h("div", { class: "cal-row" + (b.n ? "" : " empty") },
+        h("span", { class: "r pix" }, b.lo === 0 ? "<50%" : `${Math.round(b.lo * 100)}–${Math.min(100, Math.round(b.hi * 100))}%`),
+        h("div", { class: "cal-bar" }, h("i", { style: `width:${b.acc != null ? b.acc * 100 : 0}%` }), b.conf != null ? h("b", { style: `left:${b.conf * 100}%`, title: `It said ${pct(b.conf)} on average` }) : null),
+        h("span", { class: "v pix" }, b.n ? `${pct(b.acc)} of ${fmtN(b.n)}` : "–"))));
+  }
+  function resultsWin(keys, set) {
+    const qs_ = batch.questions, exp = keys.filter((k) => batch.items.some((it) => hasValue(it.expected[k])));
+    const info = [];
+    batch.items.forEach((it, i) => {
+      const r = batch.results[i];
+      if (!r) return;
+      info.push({ it, r,
+        review: !r.error && keys.some((k) => !isAuto(r.answers?.[k], k, set)),
+        wrong: !r.error && exp.some((k) => { const e = canonExpected(qs_[k], it.expected[k]); return e != null && !sameLabel(predLabel(r.answers?.[k]), e); }) });
+    });
+    const counts = { all: info.length, review: info.filter((x) => x.review).length, wrong: info.filter((x) => x.wrong).length, err: info.filter((x) => x.r.error).length };
+    const shown = info.filter((x) => batchFilter === "all" || (batchFilter === "review" && x.review) || (batchFilter === "wrong" && x.wrong) || (batchFilter === "err" && x.r.error));
+    const chip = (id, label) => (id === "all" || counts[id] ? h("button", { class: "fchip", type: "button", "aria-pressed": String(batchFilter === id), onclick: () => { batchFilter = id; batchShow = 200; fillBatch(); } }, label, h("b", { class: "pix" }, fmtN(counts[id]))) : null);
+    const table = h("table", { class: "btable" },
+      h("thead", {}, h("tr", {}, h("th", {}, "#"), h("th", {}, "text"), keys.map((k) => h("th", {}, k)))),
+      h("tbody", {}, shown.slice(0, batchShow).map(({ it, r }) => h("tr", {},
+        h("td", { class: "pp" }, String(it.i + 1)),
+        h("td", { class: "st", dir: "auto", title: it.text }, it.text),
+        r.error ? h("td", { class: "err", colspan: String(keys.length) }, r.error) : keys.map((k) => {
+          const a = r.answers?.[k], ta = topAnswer(a), auto = isAuto(a, k, set);
+          const e = exp.includes(k) ? canonExpected(qs_[k], it.expected[k]) : null, ok = e == null ? null : sameLabel(predLabel(a), e);
+          return h("td", { class: (auto ? "auto" : "review") + (ok === false ? " wrong" : "") },
+            h("div", { class: "a", dir: "auto" }, ta.label, ok ? h("span", { class: "ok", title: "Matches the expected answer" }, " ✓") : null),
+            h("div", { class: "pp" }, pct(ta.p), " · ", auto ? "auto" : "review"),
+            ok === false ? h("div", { class: "exp" }, "expected ", String(it.expected[k]).trim()) : null);
+        })))));
+    return h("div", { class: "win shadow" },
+      h("div", { class: "win-title" }, "Zex.Results", h("span", { class: "grow" }), batch.source || ""),
+      h("div", { class: "win-body" },
+        h("div", { class: "fchips" }, chip("all", "All"), chip("review", "Needs review"), exp.length ? chip("wrong", "Wrong") : null, chip("err", "Errors")),
+        h("div", { style: "overflow:auto" }, table),
+        shown.length > batchShow ? h("div", { class: "btn-row" }, h("button", { class: "btn", type: "button", onclick: () => { batchShow += 200; fillBatch(); } }, `Show ${fmtN(Math.min(200, shown.length - batchShow))} more`),
+          h("span", { class: "meta" }, `${fmtN(batchShow)} of ${fmtN(shown.length)} shown. Exports include every row.`)) : null));
+  }
+  function batchExport(kind) {
+    const keys = Object.keys(batch.questions), set = setById(batch.setId), qs_ = batch.questions;
+    const exp = keys.filter((k) => batch.items.some((it) => hasValue(it.expected[k])));
+    const cols = batch.columns || ["text"];
+    const base = String(batch.source || "batch").replace(/\.[^.]+$/, "").replace(/[^\w.-]+/g, "-") + "-zex";
+    const done = batch.items.map((it, i) => [it, batch.results[i]]).filter(([, r]) => r);
+    const dec = (it, r, k) => {
+      const a = r.answers?.[k], ta = topAnswer(a), e = exp.includes(k) ? canonExpected(qs_[k], it.expected[k]) : null;
+      return { answer: ta.label, p: Number(ta.p.toFixed(4)), verdict: isAuto(a, k, set) ? "auto" : "review",
+        ...(e == null ? {} : { expected: String(it.expected[k]).trim(), correct: sameLabel(predLabel(a), e) }) };
+    };
+    if (kind === "jsonl") {
+      download(`${base}.jsonl`, done.map(([it, r]) => JSON.stringify(r.error ? { row: it.row, error: r.error } : { row: it.row, decisions: Object.fromEntries(keys.map((k) => [k, dec(it, r, k)])), answers: r.answers })).join("\n") + "\n", "application/x-ndjson");
+      return;
+    }
     const qv = (v) => `"${String(v ?? "").replace(/"/g, '""')}"`;
-    const head = ["state", ...keys.flatMap((k) => [k, k + "_p", k + "_auto"])];
-    const lines = batch.rows.map((r) => [r.state, ...keys.flatMap((k) => {
-      if (r.error) return [r.error, "", ""];
-      const a = r.answers?.[k], ta = topAnswer(a);
-      return [ta.label, ta.p.toFixed(3), isAuto(a) ? "yes" : "no"];
-    })].map(qv).join(","));
-    const blob = new Blob(["﻿" + [head.map(qv).join(","), ...lines].join("\n")], { type: "text/csv;charset=utf-8" });
-    const a = h("a", { href: URL.createObjectURL(blob), download: "zex-batch.csv" });
-    document.body.append(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+    const head = [...cols, ...keys.flatMap((k) => [k, `${k}_p`, `${k}_verdict`, ...(exp.includes(k) ? [`${k}_expected`, `${k}_correct`] : [])]), "error"];
+    const lines = done.map(([it, r]) => [...cols.map((c) => it.row[c]), ...keys.flatMap((k) => {
+      if (r.error) return Array(exp.includes(k) ? 5 : 3).fill("");
+      const d = dec(it, r, k);
+      return [d.answer, d.p.toFixed(3), d.verdict, ...(exp.includes(k) ? [d.expected ?? "", d.correct == null ? "" : d.correct ? "yes" : "no"] : [])];
+    }), r.error || ""].map(qv).join(","));
+    download(`${base}.csv`, "﻿" + [head.map(qv).join(","), ...lines].join("\n") + "\n", "text/csv;charset=utf-8");
   }
 
   // ---------------------------------------------------------------- compare (race two models, any connections)
@@ -1772,7 +2397,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         lines.push(h("div", { class: "dim" }, `answered by ${r.data.model || m}`), h("div", { class: "blank" }, "{"));
         for (const [k, a] of Object.entries(r.data.answers || {})) {
           const ta = topAnswer(a);
-          lines.push(h("div", { dir: "auto" }, `  "${k}": "${ta.label}"  ${pct(ta.p)}${isAuto(a) ? "" : "  (review)"}`));
+          lines.push(h("div", { dir: "auto" }, `  "${k}": "${ta.label}"  ${pct(ta.p)}${isAuto(a, k) ? "" : "  (review)"}`));
         }
         lines.push(h("div", { class: "blank" }, "}"));
       }
@@ -1838,11 +2463,188 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
 
 
+
+  // ---------------------------------------------------------------- question sets
+  function setById(id) { return sets.find((x) => x.id === id); }
+  function curSet() { return setById(curSetId); }
+  const qCount = (q) => Object.keys(q || {}).length;
+  function playgroundQuestions() { const p = parseQuestions(); return p.ok && p.value && typeof p.value === "object" && !Array.isArray(p.value) ? p.value : null; }
+  function setMatchesPlayground(x) { const q = playgroundQuestions(); return !!(x && q && canon(q) === canon(x.questions)); }
+  function saveSets() { store.set("zex.sets", sets); store.set("zex.curSet", curSetId); paintSetChip(); syncApi(); }
+  function uniqueSlug(name, exceptId) { const base = slugify(name); let sl = base, i = 2; while (sets.some((x) => x.slug === sl && x.id !== exceptId)) sl = `${base}-${i++}`; return sl; }
+  function uniqueName(name) { let n = name, i = 2; while (sets.some((x) => x.name === n)) n = `${name} ${i++}`; return n; }
+  function validQuestions(q) {
+    if (!q || typeof q !== "object" || Array.isArray(q) || !Object.keys(q).length) return false;
+    return Object.values(q).every((v) => v && typeof v === "object" && ["noul", "choice", "score"].includes(v.type));
+  }
+  function addSet(name, questions, extra = {}) {
+    const nm = uniqueName(String(name || "").trim() || "Untitled set");
+    const x = { id: "s-" + Math.random().toString(36).slice(2, 9), name: nm, slug: uniqueSlug(nm), note: extra.note || "", questions, thresholds: extra.thresholds || {}, version: 1, updatedAt: Date.now() };
+    sets.unshift(x);
+    return x;
+  }
+  function openSet(x, rerender = true) {
+    curSetId = x.id; questionsText = pretty(x.questions); saveAll(); saveSets();
+    if (rerender) { renderQuestions(); renderOut(); }
+  }
+  function saveIntoSet(x) {
+    const q = playgroundQuestions();
+    if (!validQuestions(q)) { toast("Fix the questions first"); return false; }
+    x.questions = q; x.version = (x.version || 1) + 1; x.updatedAt = Date.now();
+    for (const k of Object.keys(x.thresholds || {})) if (!(k in q)) delete x.thresholds[k];
+    curSetId = x.id; saveSets();
+    return true;
+  }
+  function saveAsSet(name) {
+    const q = playgroundQuestions();
+    if (!validQuestions(q)) { toast("Fix the questions first"); return null; }
+    const x = addSet(name, q, { thresholds: { ...(curSet()?.thresholds || {}) } });
+    curSetId = x.id; saveSets();
+    return x;
+  }
+  function renameSet(x, name) {
+    name = String(name).trim();
+    if (!name || name === x.name) return;
+    x.name = sets.some((y) => y.name === name && y !== x) ? uniqueName(name) : name;
+    x.slug = uniqueSlug(x.name, x.id); x.updatedAt = Date.now(); saveSets();
+  }
+  function deleteSet(x) { sets = sets.filter((y) => y !== x); if (curSetId === x.id) curSetId = null; saveSets(); }
+  function duplicateSet(x) { const d = addSet(x.name + " copy", JSON.parse(JSON.stringify(x.questions)), { note: x.note, thresholds: { ...x.thresholds } }); saveSets(); return d; }
+  function download(name, text, type = "application/json") {
+    const a = h("a", { href: URL.createObjectURL(new Blob([text], { type })), download: name });
+    document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  }
+  const setFile = (x) => ({ zex: "question-set", format: 1, name: x.name, note: x.note || undefined, questions: x.questions, thresholds: Object.keys(x.thresholds || {}).length ? x.thresholds : undefined });
+  function exportSet(x) { download(`${x.slug}.zex.json`, JSON.stringify(setFile(x), null, 2) + "\n"); }
+  function exportAllSets() { download("zex-sets.json", JSON.stringify({ zex: "question-sets", format: 1, sets: sets.map(setFile) }, null, 2) + "\n"); }
+  async function importSets(file) {
+    let v;
+    try { v = JSON.parse(await file.text()); } catch { throw new Error(`${file.name} isn't valid JSON.`); }
+    const items = v && v.zex === "question-sets" && Array.isArray(v.sets) ? v.sets : Array.isArray(v) ? v : [v];
+    const base = file.name.replace(/\.zex\.json$|\.json$/i, "").replace(/[-_]+/g, " ").trim();
+    const added = [];
+    for (const it of items) {
+      const q = it && validQuestions(it.questions) ? it.questions : validQuestions(it) ? it : null;
+      if (!q) continue;
+      added.push(addSet(it.name || base || "Imported set", q, { note: it.note, thresholds: it.thresholds && typeof it.thresholds === "object" ? it.thresholds : {} }));
+    }
+    if (!added.length) throw new Error(`${file.name} has no question sets in it.`);
+    saveSets();
+    return added;
+  }
+  const importedMsg = (a) => (a.length === 1 ? `Imported ${a[0].name}` : `Imported ${a.length} sets`);
+
+  // A file picker that also works in the macOS app, whose web view has no open panel of its own.
+  async function pickFile(accept, onFile) {
+    if (window.zexOpenFile) {
+      const r = await window.zexOpenFile(accept.split(",").map((x) => x.trim().replace(/^\./, "")).join(","));
+      if (r && r.data) onFile(new File([Uint8Array.from(atob(r.data), (c) => c.charCodeAt(0))], r.name));
+      return;
+    }
+    const inp = h("input", { type: "file", accept, style: "display:none" });
+    inp.addEventListener("change", () => { const f = inp.files && inp.files[0]; inp.remove(); if (f) onFile(f); });
+    document.body.append(inp); inp.click();
+  }
+  function dropTarget(el, onFile) {
+    el.addEventListener("dragover", (e) => { e.preventDefault(); el.classList.add("over"); });
+    el.addEventListener("dragleave", (e) => { if (!el.contains(e.relatedTarget)) el.classList.remove("over"); });
+    el.addEventListener("drop", (e) => { e.preventDefault(); el.classList.remove("over"); const f = e.dataTransfer?.files?.[0]; if (f) onFile(f); });
+    return el;
+  }
+
+  // the chip in the Playground toolbar: which set the questions belong to, and whether they changed
+  setChipEl = h("button", { class: "set-chip", id: "setChip", type: "button", title: "Question set", "aria-haspopup": "dialog" });
+  $(".toolbar .title").after(setChipEl);
+  function paintSetChip() {
+    if (!setChipEl) return;
+    let x = curSet();
+    if (!setMatchesPlayground(x)) {
+      const m = sets.find(setMatchesPlayground);
+      if (m) { x = m; curSetId = m.id; store.set("zex.curSet", curSetId); }
+    }
+    const dirty = !!x && !setMatchesPlayground(x);
+    setChipEl.classList.toggle("dirty", dirty);
+    setChipEl.replaceChildren(...[h("span", { class: "sc-tag" }, "SET"), h("span", { class: "sc-name" }, x ? x.name : "Unsaved"),
+      dirty ? h("i", { class: "sc-dot", title: "Changed since it was saved" }) : null, icon("i-chev", "i sc-chev")].filter(Boolean));
+  }
+  setChipEl.addEventListener("click", (e) => { e.stopPropagation(); if ($(".set-pop")) $(".set-pop").remove(); else openSetPop(); });
+  document.addEventListener("click", () => $(".set-pop")?.remove());
+  function openSetPop(view = "menu") {
+    $(".set-pop")?.remove();
+    const x = curSet(), dirty = !!x && !setMatchesPlayground(x);
+    const pop = h("div", { class: "win shadow set-pop", onclick: (ev) => ev.stopPropagation() });
+    const close = () => pop.remove();
+    const nameForm = (label, initial, onOk) => {
+      const inp = h("input", { class: "fld", value: initial, "aria-label": "Set name", maxlength: "80", placeholder: "Set name" });
+      const done = () => { if (inp.value.trim()) { onOk(inp.value.trim()); close(); } else inp.focus(); };
+      inp.addEventListener("keydown", (e) => { if (e.key === "Enter") done(); if (e.key === "Escape") close(); });
+      setTimeout(() => { inp.focus(); inp.select(); }, 0);
+      return h("div", { class: "sp-form" }, inp, h("button", { class: "btn solid", type: "button", onclick: done }, label));
+    };
+    let body;
+    if (view === "saveas") body = nameForm("Save", x ? `${x.name} copy` : "", (n) => { const ns = saveAsSet(n); if (ns) toast(`Saved as ${ns.name}`); });
+    else if (view === "rename" && x) body = nameForm("Rename", x.name, (n) => { renameSet(x, n); toast("Renamed"); });
+    else body = h("div", {},
+      h("div", { class: "sp-list" }, sets.length
+        ? sets.map((y) => h("button", { class: "sp-item" + (y.id === x?.id ? " on" : ""), type: "button", onclick: () => { close(); openSet(y); } },
+            h("span", { class: "n" }, y.name), h("span", { class: "m" }, `${qCount(y.questions)} q · v${y.version || 1}`)))
+        : h("div", { class: "sp-empty" }, "No saved sets yet.")),
+      h("div", { class: "btn-row sp-acts" },
+        x && dirty ? h("button", { class: "btn solid", type: "button", onclick: () => { if (saveIntoSet(x)) { toast(`Saved ${x.name} v${x.version}`); close(); } } }, "Save changes") : null,
+        h("button", { class: "btn" + (x ? "" : " solid"), type: "button", onclick: () => openSetPop("saveas") }, x ? "Save as new…" : "Save as a set…"),
+        x ? h("button", { class: "btn", type: "button", onclick: () => openSetPop("rename") }, "Rename…") : null,
+        x ? h("button", { class: "btn", type: "button", onclick: () => { exportSet(x); close(); } }, "Export") : null,
+        h("button", { class: "btn", type: "button", onclick: () => { close(); pickFile(".json", async (f) => { try { const a = await importSets(f); openSet(a[0]); toast(importedMsg(a)); } catch (err) { toast(err.message); } }); } }, "Import…"),
+        h("button", { class: "btn", type: "button", onclick: () => { close(); go("sets"); } }, "All sets")));
+    pop.append(h("div", { class: "win-title" }, "Zex.Sets", h("span", { class: "grow" }), view === "menu" ? `${sets.length} saved` : view === "rename" ? "rename" : "save as"),
+      h("div", { class: "win-body" }, body));
+    $(".toolbar").append(pop);
+  }
+
+  // the Sets page
+  function renderSets() {
+    const card = (x) => {
+      const qs_ = Object.entries(x.questions || {});
+      const del = h("button", { class: "btn", type: "button" }, "Delete");
+      del.addEventListener("click", () => {
+        if (del.dataset.sure) { deleteSet(x); applyRoute(); toast(`Deleted ${x.name}`); }
+        else { del.dataset.sure = "1"; del.textContent = "Delete for good?"; del.classList.add("danger"); }
+      });
+      const openIn = (m) => { openSet(x, false); renderQuestions(); mode = m; go("playground"); };
+      return win(x.name, `v${x.version || 1}`, h("div", { class: "set-card" },
+        x.note ? h("p", { class: "note" }, x.note) : null,
+        h("div", { class: "qlist" }, qs_.map(([k, q]) => h("div", { class: "qrow" },
+          h("span", { class: "qt" }, String(q.type).toUpperCase()), h("span", { class: "k" }, k),
+          x.thresholds?.[k] != null ? h("span", { class: "th", title: "This question's own AUTO threshold" }, `≥ ${Math.round(x.thresholds[k] * 100)}%`) : null))),
+        h("div", { class: "meta" }, `${qs_.length} question${qs_.length === 1 ? "" : "s"} · saved ${ago(x.updatedAt)}`,
+          apiCfg.enabled ? h("span", { class: "mono" }, ` · POST /api/sets/${x.slug}`) : null),
+        h("div", { class: "btn-row" },
+          h("button", { class: "btn solid", type: "button", onclick: () => openIn("response") }, "Open"),
+          h("button", { class: "btn", type: "button", onclick: () => openIn("batch") }, "Batch"),
+          h("button", { class: "btn", type: "button", onclick: () => { duplicateSet(x); applyRoute(); } }, "Duplicate"),
+          h("button", { class: "btn", type: "button", onclick: () => exportSet(x) }, "Export"),
+          del)), "set-win" + (x.id === curSetId ? " current" : ""));
+    };
+    const onImport = async (f) => { try { const a = await importSets(f); applyRoute(); toast(importedMsg(a)); } catch (err) { toast(err.message); } };
+    return dropTarget(h("div", { class: "conns sets" },
+      h("section", { class: "c-head" },
+        h("span", { class: "tagline" }, "Zex.Sets 0.1"),
+        h("h1", { class: "giant sm" }, words("Question Sets")),
+        h("p", {}, "A set is a named group of typed questions you can reuse in the Playground, in Batch, on Home and through the local API. Sets live on this computer. Export one to share it or keep it next to your code."),
+        h("div", { class: "btn-row" },
+          h("button", { class: "btn solid", type: "button", onclick: () => { curSetId = null; questionsText = ""; saveAll(); store.set("zex.curSet", null); renderQuestions(); mode = "response"; go("playground"); } }, "New set"),
+          h("button", { class: "btn", type: "button", onclick: () => pickFile(".json", onImport) }, "Import…"),
+          h("button", { class: "btn", type: "button", disabled: !sets.length || undefined, onclick: exportAllSets }, "Export all"),
+          h("span", { class: "meta" }, "or drop a .zex.json file anywhere on this page"))),
+      sets.length ? h("div", { class: "c-grid" }, sets.map(card)) : h("div", { class: "empty-hint" }, "No sets yet. Write questions in the Playground and save them as a set.")), onImport);
+  }
+
   // ---------------------------------------------------------------- routes
   const page = $("#page");
   function routeFromHash() {
     if (location.hash.startsWith("#share/")) return "playground";
-    const m = location.hash.match(/^#\/(home|playground|connections)\b/);
+    const m = location.hash.match(/^#\/(home|playground|connections|sets|api)\b/);
     return m ? m[1] : "home";
   }
   let route = routeFromHash();
@@ -1965,6 +2767,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     });
     if (route === "home") { page.replaceChildren(renderHome()); animateHome(page.firstChild); }
     else if (route === "connections") page.replaceChildren(renderConnections());
+    else if (route === "sets") page.replaceChildren(renderSets());
+    else if (route === "api") page.replaceChildren(renderApi());
     else { page.replaceChildren(); renderOut(); }
     page.scrollTop = 0;
   }
@@ -1995,7 +2799,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const tile = (n, ic, t, d, onclick) => h("button", { class: "opt-tile", type: "button", onclick }, h("span", { class: "num" }, n), icon(ic), h("span", { class: "t" }, t), h("span", { class: "d" }, d));
     const loadLesson = (l) => { stateMode = "text"; stateText = l.state; questionsText = pretty(l.questions); last = null; lastError = null; examplesOpen = true; saveAll(); renderState(); renderQuestions(); openMode("response"); };
     const sampleBatch = () => {
-      batchText = SAMPLE_BATCH.join("\n"); store.set("zex.batch", batchText);
+      batchText = SAMPLE_BATCH.join("\n"); store.set("zex.batch", batchText); batchSrc = "paste"; store.set("zex.batchSrc", "paste");
       stateMode = "text"; stateText = SAMPLE_BATCH[0]; questionsText = pretty(CASES[0].questions);
       saveAll(); renderState(); renderQuestions(); openMode("batch");
     };
@@ -2004,30 +2808,32 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const dist = (probs) => h("div", { class: "dist", "aria-hidden": "true" }, probs.map((p, i) => h("div", {}, h("span", {}, String(i)), h("span", { class: "tr" }, h("i", { style: `width:${p * 100}%` })), h("span", {}, pct(p)))));
 
     // quick run: paste text, pick a question set, run it in the Playground
-    const pq = parseQuestions();
-    const sets = [...(pq.ok && pq.value && Object.keys(pq.value).length ? [{ t: "Playground questions", questions: pq.value }] : []), ...CASES];
+    const pq = playgroundQuestions();
+    const qsets = [...(pq && qCount(pq) && !sets.some(setMatchesPlayground) ? [{ t: "Playground questions", questions: pq }] : []), ...sets.map((x) => ({ t: x.name, questions: x.questions, id: x.id }))];
     const ta = h("textarea", { placeholder: "Paste a message, a ticket or an email…", "aria-label": "Text for the model to read", dir: "auto" });
     ta.value = store.get("zex.quickDraft", "");
-    const sel = h("select", { class: "chip-select", "aria-label": "Questions to ask" }, sets.map((x, i) => h("option", { value: String(i) }, x.t)));
-    sel.value = String(Math.max(0, sets.findIndex((x) => x.t === store.get("zex.quickSet", ""))));
+    const sel = h("select", { class: "chip-select", "aria-label": "Questions to ask" }, qsets.map((x, i) => h("option", { value: String(i) }, x.t)));
+    sel.value = String(Math.max(0, qsets.findIndex((x) => x.t === store.get("zex.quickSet", ""))));
     const keys = h("span", { class: "qr-keys" });
     const runQ = h("button", { class: "run", type: "button" }, h("span", {}, "Run"), h("kbd", {}, $("#runKbd").textContent));
     const paintQ = () => {
-      const x = sets[Number(sel.value)];
+      const x = qsets[Number(sel.value)];
       keys.textContent = "asks " + Object.keys(x.questions).join(" · "); keys.title = keys.textContent;
       runQ.classList.toggle("idle", !ta.value.trim());
     };
     const quickRun = () => {
       const text = ta.value.trim();
       if (!text) { ta.focus(); toast("Paste something to ask about"); return; }
-      stateMode = "text"; stateText = text; questionsText = pretty(sets[Number(sel.value)].questions);
+      const picked = qsets[Number(sel.value)];
+      stateMode = "text"; stateText = text; questionsText = pretty(picked.questions);
+      if (picked.id) { curSetId = picked.id; store.set("zex.curSet", curSetId); }
       last = null; lastError = null; examplesOpen = false; mode = "response";
       store.set("zex.quickDraft", "");
       saveAll(); renderState(); renderQuestions(); go("playground"); run();
     };
     ta.addEventListener("input", () => { store.set("zex.quickDraft", ta.value); paintQ(); });
     ta.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") { e.preventDefault(); e.stopPropagation(); quickRun(); } });
-    sel.addEventListener("change", () => { store.set("zex.quickSet", sets[Number(sel.value)].t); paintQ(); });
+    sel.addEventListener("change", () => { store.set("zex.quickSet", qsets[Number(sel.value)].t); paintQ(); });
     runQ.addEventListener("click", quickRun);
     paintQ();
 
@@ -2085,8 +2891,9 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         tile("01", "i-flask", "Playground", "Write a state and typed questions, then read each answer with its probability.", () => openMode("response")),
         tile("02", "i-layers", "Batch", "Run many messages at once and export the answers as CSV.", () => openMode("batch")),
         tile("03", "i-split", "Compare", "Race two models on the same request.", () => openMode("compare")),
-        tile("04", "i-clock", "History", "Your last 30 runs, kept in this browser.", () => openMode("history")),
-        tile("05", "i-plug", "Connections", "Add a model server or switch between them.", () => go("connections"))),
+        tile("04", "i-box", "Sets", "Your saved question sets. Import, export and reuse them.", () => go("sets")),
+        tile("05", "i-code", "Local API", "Call a set from scripts, n8n or Zapier.", () => go("api")),
+        tile("06", "i-plug", "Connections", "Add a model server or switch between them.", () => go("connections"))),
       h("section", { class: "h-prims", "aria-label": "Templates" },
         h("div", { class: "intro" }, h("span", { class: "tagline" }, "Zex.Templates"), h("p", {}, "Start from one question type. It opens in the Playground.")),
         h("button", { class: "spec", type: "button", onclick: () => loadLesson(LESSONS[0]) },
@@ -2145,6 +2952,118 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         win("Zex.Link · add", "", h("div", { class: "preset-grid" }, Object.entries(KINDS).map(([k, v]) => h("button", { class: "preset", type: "button", onclick: () => addConn(k) }, h("b", {}, "+ " + v.label), h("span", {}, v.note)))))));
   }
 
+
+  // ---------------------------------------------------------------- local API
+  // While Zex runs, every set is an HTTP endpoint on this computer. The page tells the local
+  // server which sets and which connection to answer with; the server keeps them in its
+  // config file only while the API is on.
+  let apiShowToken = false, apiTab = "curl";
+  const apiTry = { slug: null, text: "I was charged twice this month. Please refund one of the payments.", out: "" };
+  async function loadApi() {
+    try {
+      const r = await fetch("/zex/api-config", { headers: { "X-Zex": "1" } });
+      if (!r.ok) throw new Error(String(r.status));
+      const d = await r.json();
+      apiCfg = { available: true, enabled: !!d.enabled, token: d.token || "" };
+      if (apiCfg.enabled) syncApi(true);
+    } catch { apiCfg = { available: false, enabled: false, token: "" }; }
+    if (route === "api" || route === "sets") applyRoute();
+  }
+  function apiPayload() {
+    const c = activeConn();
+    return { enabled: apiCfg.enabled, model, thr, connection: { kind: c.kind, name: c.name, url: c.url, key: c.key || "" },
+      sets: sets.map((x) => ({ slug: x.slug, name: x.name, questions: x.questions, thresholds: x.thresholds || {} })) };
+  }
+  function syncApi(now = false, extra = {}) {
+    if (!apiCfg.available || (!apiCfg.enabled && !extra.force)) return Promise.resolve();
+    clearTimeout(apiTimer);
+    return new Promise((resolve) => {
+      apiTimer = setTimeout(async () => {
+        try {
+          const { force, ...rest } = extra;
+          const r = await fetch("/zex/api-config", { method: "POST", headers: { "X-Zex": "1", "Content-Type": "application/json" }, body: JSON.stringify({ ...apiPayload(), ...rest }) });
+          const d = await r.json();
+          if (r.ok) { apiCfg.enabled = !!d.enabled; apiCfg.token = d.token || ""; }
+        } catch { /* the next change syncs again */ }
+        resolve();
+      }, now === true ? 0 : 400);
+    });
+  }
+  async function setApiEnabled(on) { apiCfg.enabled = on; await syncApi(true, { force: true }); applyRoute(); toast(on ? "The local API is on" : "The local API is off"); }
+  async function newApiToken() { await syncApi(true, { force: true, regenerate: true }); apiShowToken = true; applyRoute(); toast("New token made. Update your scripts."); }
+
+  function renderApi() {
+    const base = `${location.origin}/api`;
+    const head = h("section", { class: "c-head" },
+      h("span", { class: "tagline" }, "Zex.API 0.1"),
+      h("h1", { class: "giant sm" }, words("Local API")),
+      h("p", {}, "Call your question sets from scripts, n8n, Zapier or anything that can send an HTTP request. Requests stay on this computer, and the API answers while Zex is open."));
+    if (!apiCfg.available) {
+      return h("div", { class: "conns api" }, head, h("div", { class: "banner warn", style: "margin:20px 0 0" }, "The local API comes with the Zex app, and with server.py when you run Zex from source. This page was opened another way, so the API isn't here."));
+    }
+    const c = activeConn();
+    const copyBtn = (text, label = "Copy") => h("button", { class: "text-btn xs bordered", type: "button", onclick: async () => toast((await copyText(typeof text === "function" ? text() : text)) ? "Copied" : "Copy failed") }, label);
+    const sw = h("button", { class: "switch" + (apiCfg.enabled ? " on" : ""), type: "button", role: "switch", "aria-checked": String(apiCfg.enabled), "aria-label": "Local API", onclick: () => setApiEnabled(!apiCfg.enabled) },
+      h("i"), h("span", { class: "pix" }, apiCfg.enabled ? "ON" : "OFF"));
+    const masked = () => (apiCfg.token ? (apiShowToken ? apiCfg.token : apiCfg.token.slice(0, 8) + "•".repeat(24)) : "made when you turn the API on");
+    const tokEl = h("code", { class: "tok" }, masked());
+    const showBtn = apiCfg.token ? h("button", { class: "text-btn xs", type: "button" }, apiShowToken ? "Hide" : "Show") : null;
+    showBtn?.addEventListener("click", () => { apiShowToken = !apiShowToken; tokEl.textContent = masked(); showBtn.textContent = apiShowToken ? "Hide" : "Show"; });
+    const status = win("Zex.API", apiCfg.enabled ? "listening" : "off", h("div", { class: "kv" },
+      h("div", { class: "kvr" }, h("span", { class: "kk" }, "Status"), h("div", { class: "kvv" }, sw,
+        h("span", { class: "muted" }, apiCfg.enabled ? `${sets.length} set${sets.length === 1 ? "" : "s"} you can call` : "Turn it on to call your sets over HTTP."))),
+      h("div", { class: "kvr" }, h("span", { class: "kk" }, "Base URL"), h("div", { class: "kvv" }, h("code", { class: "tok" }, base), copyBtn(base))),
+      h("div", { class: "kvr" }, h("span", { class: "kk" }, "Token"), h("div", { class: "kvv" }, tokEl, showBtn, apiCfg.token ? copyBtn(() => apiCfg.token) : null,
+        apiCfg.enabled ? h("button", { class: "text-btn xs", type: "button", onclick: newApiToken }, "New token") : null)),
+      h("div", { class: "kvr" }, h("span", { class: "kk" }, "Answers with"), h("div", { class: "kvv" }, h("span", {}, `${c.name} · ${model}`), h("span", { class: "muted" }, "your active connection and model"))),
+      h("p", { class: "note" }, "Send the token in an Authorization header. Anyone who has it can use your sets, and the key of your active connection, from this computer. Make a new token to cut off old scripts.")), "api-status");
+    if (!apiCfg.enabled) return h("div", { class: "conns api" }, head, h("div", { class: "api-grid" }, status));
+
+    if (!sets.some((x) => x.slug === apiTry.slug)) apiTry.slug = sets[0]?.slug || null;
+    const slug = apiTry.slug || "your-set", url = `${base}/sets/${slug}`;
+    const trySel = h("select", { class: "chip-select", "aria-label": "Set to call" }, sets.map((x) => h("option", { value: x.slug }, x.name)));
+    trySel.value = apiTry.slug || "";
+    trySel.addEventListener("change", () => { apiTry.slug = trySel.value; apiTry.out = ""; applyRoute(); });
+    const tryTa = h("textarea", { class: "api-try-in", dir: "auto", "aria-label": "Text to send" });
+    tryTa.value = apiTry.text;
+    tryTa.addEventListener("input", () => { apiTry.text = tryTa.value; });
+    const out = h("pre", { class: "code api-out", dir: "ltr" }, apiTry.out || "The response shows up here.");
+    const send = h("button", { class: "btn solid", type: "button" }, "Send");
+    send.addEventListener("click", async () => {
+      send.disabled = true; send.textContent = "Sending…"; out.textContent = "…";
+      try {
+        const r = await fetch(`/api/sets/${encodeURIComponent(apiTry.slug)}`, { method: "POST", headers: { Authorization: `Bearer ${apiCfg.token}`, "Content-Type": "application/json" }, body: JSON.stringify({ text: apiTry.text }) });
+        apiTry.out = `HTTP ${r.status}\n` + pretty(await r.json());
+      } catch (e) { apiTry.out = String(e.message || e); }
+      send.disabled = false; send.textContent = "Send"; out.textContent = apiTry.out;
+    });
+    const tryWin = win("Zex.API · try it", "POST", h("div", { class: "api-try" },
+      h("div", { class: "api-try-head" }, h("span", { class: "muted" }, "Set"), trySel, h("code", { class: "tok" }, `/api/sets/${slug}`)),
+      tryTa, h("div", { class: "btn-row" }, send), out), "api-trywin");
+
+    const snip = {
+      curl: `curl -s ${url} \\\n  -H "Authorization: Bearer $ZEX_TOKEN" \\\n  -H "Content-Type: application/json" \\\n  -d '{"text": "I was charged twice this month."}'`,
+      python: `import os, requests\n\nr = requests.post(\n    "${url}",\n    headers={"Authorization": "Bearer " + os.environ["ZEX_TOKEN"]},\n    json={"text": "I was charged twice this month."},\n)\nfor key, d in r.json()["decisions"].items():\n    print(key, d["answer"], d["confidence"], d["verdict"])`,
+      js: 'const r = await fetch("' + url + '", {\n  method: "POST",\n  headers: {\n    Authorization: "Bearer " + process.env.ZEX_TOKEN,\n    "Content-Type": "application/json",\n  },\n  body: JSON.stringify({ text: "I was charged twice this month." }),\n});\nconst { decisions, all_auto } = await r.json();',
+      n8n: `HTTP Request node\n  Method          POST\n  URL             ${url}\n  Authentication  Generic credential type, Header Auth\n                  Name   Authorization\n                  Value  Bearer <your token>\n  Send Body       JSON\n                  { "text": "{{ $json.message }}" }\n\nThen branch on {{ $json.all_auto }}: act when it is true,\nand send the item to a person when it is false.`,
+      response: `{\n  "set": "${slug}",\n  "model": "${model}",\n  "decisions": {\n    "team": { "answer": "billing", "confidence": 0.952, "verdict": "auto", "threshold": 0.8 }\n  },\n  "all_auto": true,\n  "answers": { "...": "the model's full answers" }\n}\n\nSend {"items": ["first text", "second text"]} for up to 100 at once.\nGET ${base}/sets lists your sets and their questions.`,
+    };
+    const tabs = [["curl", "cURL"], ["python", "Python"], ["js", "JavaScript"], ["n8n", "n8n"], ["response", "Response"]];
+    const pre = h("pre", { class: "code", dir: "ltr" }, snip[apiTab]), lab = h("span", {}, tabs.find((t) => t[0] === apiTab)[1]);
+    const tabBtns = tabs.map(([id, l]) => {
+      const b = h("button", { role: "tab", type: "button", "aria-selected": String(apiTab === id) }, l);
+      b.addEventListener("click", () => { apiTab = id; pre.textContent = snip[id]; lab.textContent = l; tabBtns.forEach((x) => x.setAttribute("aria-selected", String(x === b))); });
+      return b;
+    });
+    const codeWin = h("div", { class: "api-code" },
+      h("div", { class: "code-tabs", role: "tablist" }, tabBtns, h("span", { style: "flex:1" }), copyBtn(() => snip[apiTab])),
+      h("div", { class: "win shadow" }, h("div", { class: "win-title" }, "Zex.Terminal", h("span", { class: "grow" }), lab), pre));
+    const ends = win("Zex.API · endpoints", `${sets.length}`, h("div", { class: "api-ends" },
+      h("div", { class: "end" }, h("span", { class: "verb pix" }, "GET"), h("code", {}, "/api/sets"), h("span", { class: "muted" }, "your sets and their questions"), copyBtn(`${base}/sets`, "Copy URL")),
+      sets.map((x) => h("div", { class: "end" }, h("span", { class: "verb pix post" }, "POST"), h("code", {}, `/api/sets/${x.slug}`), h("span", { class: "muted" }, x.name), copyBtn(`${base}/sets/${x.slug}`, "Copy URL")))));
+    return h("div", { class: "conns api" }, head, h("div", { class: "api-grid" }, status, tryWin), codeWin, ends);
+  }
+
   // ---------------------------------------------------------------- load body (share link)
   function loadBody(body, rerender = true) {
     if (!body || typeof body !== "object") return;
@@ -2183,7 +3102,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
 
   // ---------------------------------------------------------------- boot
-  applyTheme(); applyLayout(); renderState(); renderQuestions(); applyRoute(); runSplash(bootConns());
+  applyTheme(); applyLayout(); renderState(); renderQuestions(); applyRoute(); runSplash(bootConns()); loadApi();
   if (qs.has("run")) relayReady.then(() => setTimeout(run, 200));
 })();
 </script>

@@ -4,6 +4,7 @@ package main
 #cgo CFLAGS: -x objective-c
 #cgo LDFLAGS: -framework Cocoa
 #import <Cocoa/Cocoa.h>
+#include <stdlib.h>
 
 // A plain app gets no menu bar, and without an Edit menu WebKit ignores Cmd+C, Cmd+V and
 // friends. This adds the standard App, Edit and Window menus.
@@ -57,6 +58,24 @@ static void zexDrag(void *ptr) {
 	if (e) [(NSWindow *)ptr performWindowDragWithEvent:e];
 }
 
+// The web view has no open panel of its own, so file pickers in the page come here.
+// Returns a path the caller frees, or NULL when the user cancels.
+static char *zexOpenPanel(const char *exts) {
+	NSOpenPanel *p = [NSOpenPanel openPanel];
+	p.canChooseFiles = YES;
+	p.canChooseDirectories = NO;
+	p.allowsMultipleSelection = NO;
+	NSString *list = [NSString stringWithUTF8String:exts];
+	if (list.length) {
+		#pragma clang diagnostic push
+		#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+		p.allowedFileTypes = [list componentsSeparatedByString:@","];
+		#pragma clang diagnostic pop
+	}
+	if ([p runModal] != NSModalResponseOK || !p.URL) return NULL;
+	return strdup(p.URL.path.UTF8String);
+}
+
 // Double-click on the top strip does what the system setting says (zoom by default).
 static void zexTitleDoubleClick(void *ptr) {
 	NSWindow *w = (NSWindow *)ptr;
@@ -67,7 +86,11 @@ static void zexTitleDoubleClick(void *ptr) {
 */
 import "C"
 
-import webview "github.com/webview/webview_go"
+import (
+	"unsafe"
+
+	webview "github.com/webview/webview_go"
+)
 
 // macTitleBarJS marks the page as the macOS app (for its CSS) and makes the top strip of the
 // window drag it, like a title bar, everywhere except on controls.
@@ -97,6 +120,17 @@ func runWindow(url string) error {
 	w.Bind("zexSave", saveDownload)
 	w.Bind("zexDrag", func() { C.zexDrag(win) })
 	w.Bind("zexTitleDoubleClick", func() { C.zexTitleDoubleClick(win) })
+	w.Bind("zexOpenFile", func(exts string) (map[string]string, error) {
+		ce := C.CString(exts)
+		defer C.free(unsafe.Pointer(ce))
+		p := C.zexOpenPanel(ce)
+		if p == nil {
+			return nil, nil
+		}
+		path := C.GoString(p)
+		C.free(unsafe.Pointer(p))
+		return readPicked(path)
+	})
 	w.Init(bridgeJS + macTitleBarJS)
 	w.Navigate(url)
 	w.Run()

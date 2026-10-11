@@ -3,6 +3,7 @@
 package main
 
 import (
+	"encoding/base64"
 	"errors"
 	"flag"
 	"fmt"
@@ -123,6 +124,22 @@ func openURL(u string) error {
 	default:
 		return exec.Command("xdg-open", u).Start()
 	}
+}
+
+// readPicked hands a file chosen in a native open panel to the page, as base64.
+func readPicked(path string) (map[string]string, error) {
+	fi, err := os.Stat(path)
+	if err != nil {
+		return nil, err
+	}
+	if fi.Size() > 50<<20 {
+		return nil, errors.New("that file is over 50 MB")
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return map[string]string{"name": filepath.Base(path), "data": base64.StdEncoding.EncodeToString(data)}, nil
 }
 
 // revealFile shows a saved file in Finder or Explorer; tests swap it out.

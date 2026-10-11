@@ -26,7 +26,7 @@ var (
 func newHandler(site fs.FS, port int) http.Handler {
 	origins := map[string]bool{
 		fmt.Sprintf("http://127.0.0.1:%d", port): true,
-		fmt.Sprintf("http://localhost:%d", port):  true,
+		fmt.Sprintf("http://localhost:%d", port): true,
 	}
 	files := http.FileServer(http.FS(site))
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -36,6 +36,10 @@ func newHandler(site fs.FS, port int) http.Handler {
 			writeJSON(w, 200, map[string]any{"ok": true, "app": "zex", "relay": true})
 		case strings.HasPrefix(r.URL.Path, "/zex/proxy"):
 			relay(w, r, origins)
+		case strings.HasPrefix(r.URL.Path, "/zex/api-config"):
+			handleAPIConfig(w, r, origins)
+		case r.URL.Path == "/api" || strings.HasPrefix(r.URL.Path, "/api/"):
+			handleAPI(w, r)
 		case r.Method == http.MethodGet || r.Method == http.MethodHead:
 			files.ServeHTTP(w, r)
 		default:

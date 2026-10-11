@@ -33,30 +33,71 @@ Chat models answer in sentences you have to parse. Typed-decision models answer 
 
 <p align="center"><sub><b>Playground.</b> A state, typed questions, and every answer with its distribution, timing and AUTO or REVIEW verdict.</sub></p>
 
+## Built for real work
+
+### Question sets
+
+<img alt="Question sets: saved groups of typed questions" src="docs/screenshots/sets.png">
+
+Save the questions you write as a **set**: a named, versioned group you can reuse in the Playground, in Batch, from Home and through the local API. A set can give each question its own AUTO threshold. Export a set as a `.zex.json` file to share it or keep it next to your code, and drop one onto the Sets page to import it.
+
+### Files in, accuracy out
+
+<img alt="An accuracy check: threshold curve, confusion matrix and calibration for one question" src="docs/screenshots/eval.png">
+
+Drop a **CSV, TSV, Excel, JSONL or JSON** file into Batch. Zex finds the text column, runs every row with pause and resume, and exports the answers with their probabilities as CSV or JSONL.
+
+If the file also has a column with the answer you expect, Zex measures how often the model is right, for each question:
+
+- accuracy, and the share it can answer on its own at each threshold;
+- a confusion matrix of what it said against what you expected;
+- calibration: when it said 90%, how often it was right.
+
+Pick the accuracy you need, and Zex suggests the threshold that automates the most while staying above it. One click saves that threshold to the set.
+
+### A local API for every set
+
+<img alt="The local API page: status, token, a live request and code to copy" src="docs/screenshots/api.png">
+
+Turn on the **local API** and every set becomes an endpoint on your computer, ready for scripts, n8n, Zapier or anything else that can send an HTTP request:
+
+```sh
+curl -s http://127.0.0.1:18765/api/sets/support-triage \
+  -H "Authorization: Bearer $ZEX_TOKEN" \
+  -d '{"text": "I was charged twice this month."}'
+```
+
+```json
+{
+  "set": "support-triage",
+  "decisions": {
+    "team": { "answer": "billing", "confidence": 0.952, "verdict": "auto", "threshold": 0.8 },
+    "refund_requested": { "answer": "true", "confidence": 0.836, "verdict": "auto", "threshold": 0.8 }
+  },
+  "all_auto": true
+}
+```
+
+Requests use your active connection and the thresholds saved in the set, so `all_auto` tells your workflow when to act on its own and when to hand the item to a person. Send `{"items": [...]}` for up to 100 texts at once. `GET /api/sets` lists your sets.
+
+## More
+
 <table>
   <tr>
-    <td width="50%"><img alt="Batch: many tickets through the same questions" src="docs/screenshots/batch-light.png"></td>
     <td width="50%"><img alt="Compare: two models racing on one request" src="docs/screenshots/compare-light.png"></td>
-  </tr>
-  <tr>
-    <td><sub><b>Batch.</b> Run a list of messages through the same questions, see how many the model handles alone, and export everything as CSV.</sub></td>
-    <td><sub><b>Compare.</b> Race two models on the same request, even from two different servers, and see where they agree.</sub></td>
-  </tr>
-  <tr>
     <td width="50%"><img alt="Connections: model servers and their status" src="docs/screenshots/connections-light.png"></td>
-    <td width="50%"><img alt="The boot screen" src="docs/screenshots/splash.png"></td>
   </tr>
   <tr>
+    <td><sub><b>Compare.</b> Race two models on the same request, even from two different servers, and see where they agree.</sub></td>
     <td><sub><b>Connections.</b> Add, test and switch between model servers. Keys stay on your computer.</sub></td>
-    <td><sub><b>Boot.</b> Zex checks its relay and your models before you start.</sub></td>
   </tr>
   <tr>
     <td width="50%"><img alt="Start here: question types and worked examples, in dark mode" src="docs/screenshots/start-dark.png"></td>
-    <td width="50%"><img alt="The home screen in dark mode" src="docs/screenshots/home-dark.png"></td>
+    <td width="50%"><img alt="The boot screen" src="docs/screenshots/splash.png"></td>
   </tr>
   <tr>
-    <td><sub><b>Start here.</b> The three question types and worked examples, one click from a blank Playground.</sub></td>
-    <td><sub><b>Light and dark.</b> Zex follows your system, or pick a theme in the sidebar.</sub></td>
+    <td><sub><b>Start here.</b> The three question types and worked examples, one click from a blank Playground. Zex follows your system theme, or pick one in the sidebar.</sub></td>
+    <td><sub><b>Boot.</b> Zex checks its relay and your models before you start.</sub></td>
   </tr>
 </table>
 
@@ -105,18 +146,21 @@ Get them from the [latest release](https://github.com/mahdiarfrm/zex/releases/la
 - Your history, settings and API keys stay in the app's local storage on your computer.
 - A key is only ever sent to the server you added it for.
 - The local relay listens on `127.0.0.1` only, and it forwards decision-model API paths only.
+- The local API is off until you turn it on, answers on `127.0.0.1` only, and needs a token that you can replace at any time. Turning it off removes your sets and connection from its settings file.
 
 ## How it works
 
 ```mermaid
 flowchart LR
-  UI["Zex UI<br/>(native window)"] -->|same origin| R["Local relay<br/>127.0.0.1"]
+  UI["Zex UI<br/>(native window)"] -->|same origin| R["Local server<br/>127.0.0.1"]
+  S["Your scripts<br/>n8n · Zapier"] -->|token| A["Local API<br/>/api/sets/…"]
+  A --- R
   UI -->|direct, when CORS allows| L["Local model<br/>Ollaya · Laya"]
   R --> L
   R --> C["Hosted APIs<br/>TypeSafe Jev · Vercel · OpenJev"]
 ```
 
-The interface is a single page (`web/index.html`) with no build step. Many hosted model APIs send no CORS headers, so a page can't call them directly, and a small local relay forwards those requests. The desktop app (`desktop/`, Go) embeds the page and the relay in one binary and shows them in a native window: WebKit on macOS, WebView2 on Windows, WebKitGTK on Linux. `server.py` is the same server in Python, for running from source.
+The interface is a single page (`web/index.html`) with no build step. Many hosted model APIs send no CORS headers, so a page can't call them directly, and a small local server relays those requests and serves the local API. The desktop app (`desktop/`, Go) embeds the page and the relay in one binary and shows them in a native window: WebKit on macOS, WebView2 on Windows, WebKitGTK on Linux. `server.py` is the same server in Python, for running from source.
 
 ## Build from source
 
@@ -127,15 +171,14 @@ desktop/build.sh            # builds the macOS app (on a Mac), the Windows apps,
 sh assets/build_icons.sh    # regenerates the icons (needs librsvg and ImageMagick)
 ```
 
-Pushing a tag such as `v0.1.0` runs [the release workflow](.github/workflows/release.yml), which builds the apps for all three systems and attaches them to a GitHub release.
-
 <details>
 <summary><b>Tests</b></summary>
 <br>
 
 ```sh
-go test ./desktop/               # server and relay
-python3 server.py --port 8766    # then, with Ollaya running, the browser click-through:
+go test ./desktop/                                  # server, relay and local API
+ZEX_CONFIG_DIR=$(mktemp -d) python3 server.py --port 8766
+# then, with Ollaya running, the browser click-through:
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
   --force-prefers-reduced-motion --virtual-time-budget=400000 \
   --dump-dom http://127.0.0.1:8766/tests/flows.html | grep -E "FAIL|passed"

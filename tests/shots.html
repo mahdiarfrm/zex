@@ -29,7 +29,7 @@ const TRI = { model: "laya:latest", state: "Third time this year you've double-c
     click('[data-mode="batch"]'); await sleep(100);
     [...d.querySelectorAll(".btn")].find((b) => b.textContent === "Load sample").click(); await sleep(100);
     [...d.querySelectorAll(".btn")].find((b) => b.textContent === "Run batch").click();
-    await waitFor(() => d.querySelector(".btable") && /Run batch/.test(d.querySelector(".btn.solid").textContent), 120000);
+    await waitFor(() => d.querySelector(".btable") && /Run again/.test(d.querySelector(".btn.solid").textContent), 120000);
   }
   if (what === "compare") {
     click('[data-mode="compare"]'); await sleep(100);
