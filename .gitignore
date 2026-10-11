@@ -1,0 +1,4 @@
+dist/
+desktop/rsrc_windows_*.syso
+.DS_Store
+__pycache__/

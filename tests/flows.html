@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Zex flow tests</title></head>
+<body>
+<pre id="out">running</pre>
+<iframe id="f" style="width:1280px;height:800px;border:0"></iframe>
+<script>
+// Click-through tests of the main flows (F01-F04) against the real page and a local Ollaya server.
+// Run headless Chrome with --force-prefers-reduced-motion: page changes use View Transitions,
+// which wait for a painted frame that headless virtual time never produces.
+const out = document.getElementById("out");
+const results = [];
+const ok = (id, cond, note = "") => results.push(`${cond ? "PASS" : "FAIL"} ${id}${note ? "  " + note : ""}`);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const b64 = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+async function waitFor(fn, ms = 30000) { const t = Date.now(); while (Date.now() - t < ms) { try { const v = fn(); if (v) return v; } catch {} await sleep(150); } return null; }
+function load(url) { return new Promise((res) => { const f = document.getElementById("f"); f.onload = () => res(f.contentWindow); f.src = url; }); }
+function type(ta, value) { ta.value = value; ta.dispatchEvent(new Event("input", { bubbles: true })); }
+async function goRoute(w, d, r) {
+  w.location.hash = "#/" + r;
+  await waitFor(() => d.querySelector("#app").dataset.route === r && (r !== "connections" || d.querySelector(".conns")) && (r !== "home" || d.querySelector(".hm-grid")), 8000);
+  await sleep(120);
+}
+
+(async () => {
+  try {
+    // F01: from nothing, pick a primitive, run
+    let w = await load("/?theme=light#share/" + b64({ model: "laya:latest", state: "", questions: {} }));
+    w.localStorage.clear();
+    let d = w.document;
+    await waitFor(() => d.querySelector("#dot").classList.contains("ok"), 15000);
+    ok("F01-H1 picker shows for empty questions", d.querySelectorAll("#qBody .prim").length === 3);
+    ok("F01-H2 examples panel shows", !!d.querySelector(".examples"));
+    ok("F01-H3 run looks idle with nothing to run", d.querySelector("#run").classList.contains("idle"));
+    ok("F01-H4 server connected", d.querySelector("#dot").classList.contains("ok"), d.querySelector("#statusText").textContent);
+    d.querySelector("#run").click(); await sleep(100);
+    ok("F01-E1 run with empty state explains why", /state is empty/i.test(d.querySelector(".banner.err")?.textContent || ""));
+    type(d.querySelector(".state-text"), "The checkout page crashes every time I press Pay.");
+    d.querySelectorAll("#qBody .prim")[0].click(); await sleep(50);
+    const qta = d.querySelector("#qBody .ce-input");
+    ok("F01-H5 template inserted", !!qta && /"type": "noul"/.test(qta.value));
+    ok("F01-H6 issues 0 and run active", d.querySelector("#issueCount").textContent === "0" && !d.querySelector("#run").classList.contains("idle"));
+    d.querySelector("#addQ").click(); await sleep(50);
+    d.querySelectorAll(".pop-picker .prim")[2].click(); await sleep(50);
+    ok("F01-H7 + adds a second question", /"team"/.test(d.querySelector("#qBody .ce-input").value));
+    d.querySelector("#run").click();
+    const rows = await waitFor(() => d.querySelectorAll(".r-row:not(.skeleton)").length === 2 && d.querySelectorAll(".r-row:not(.skeleton)"), 40000);
+    ok("F01-H8 response rows rendered", !!rows);
+    ok("F01-H9 each row has a top option", rows && [...rows].every((r) => r.querySelector(".opt.top")));
+    ok("F01-H10 header says Ran", /Ran /.test(d.querySelector("#outTitle").textContent));
+    ok("F01-H11 timings shown", /ms|s/.test(d.querySelector(".r-head .timing")?.textContent || ""));
+
+    // F01 edge: invalid JSON
+    type(d.querySelector("#qBody .ce-input"), '{ "a": { "type": "noul", ');
+    ok("F01-E2 invalid JSON counts an issue", d.querySelector("#issueCount").textContent === "1");
+    d.querySelector("#format").click(); await sleep(50);
+    ok("F01-E3 format on invalid JSON explains", /Can't format/.test(d.querySelector(".banner.err")?.textContent || ""));
+    type(d.querySelector("#qBody .ce-input"), '{"a":{"type":"choice","instructions":"x","criteria":{"only":"one"}}}');
+    ok("F01-E4 choice with one option is an issue", d.querySelector("#issueCount").textContent === "1");
+    d.querySelector("#format").click(); await sleep(50);
+
+    // F02: start from a worked example in another language
+    d.querySelector("#clear").click(); await sleep(50);
+    ok("F02-H1 clear brings back the picker and examples", d.querySelectorAll("#qBody .prim").length === 3 && !!d.querySelector(".examples"));
+    d.querySelectorAll(".case")[3].click(); await sleep(50);
+    ok("F02-H2 German review loaded", /Lieferung/.test(d.querySelector(".state-text").value));
+    ok("F02-H3 state textarea is dir=auto", d.querySelector(".state-text").getAttribute("dir") === "auto");
+    d.querySelector("#run").click();
+    const fa = await waitFor(() => d.querySelectorAll(".r-row:not(.skeleton)").length === 3 && d.querySelectorAll(".r-row:not(.skeleton)"), 40000);
+    ok("F02-H4 three answers for the review", !!fa);
+    ok("F02-H5 router explains which checkpoint answered", /Routed to laya:/.test(d.querySelector(".resp")?.textContent || ""), (d.querySelector(".resp")?.textContent.match(/Routed to [^:]+/) || [""])[0]);
+    const intent = fa && fa[0].querySelector(".opt.top .lbl")?.textContent;
+    ok("F02-H6 intent answer present", !!intent, "top = " + intent);
+
+    // F03: read the response
+    fa[0].querySelector(".chev").click(); await sleep(30);
+    ok("F03-H1 row collapses", fa[0].classList.contains("collapsed"));
+    d.querySelector(".r-head .icon-btn").click(); await sleep(30);
+    ok("F03-H2 expand/collapse all", [...d.querySelectorAll(".r-row")].every((r) => r.classList.contains("collapsed")) || [...d.querySelectorAll(".r-row")].every((r) => !r.classList.contains("collapsed")));
+    d.querySelector("#viewCode").click(); await sleep(30);
+    ok("F03-H3 code view shows the raw response", /"answers"/.test(d.querySelector("pre.code")?.textContent || ""));
+    [...d.querySelectorAll(".code-tabs button")].find((b) => b.textContent === "cURL").click(); await sleep(30);
+    ok("F03-H4 curl uses /v1/systemone", /\/v1\/systemone/.test(d.querySelector("pre.code").textContent));
+    d.querySelector("#viewTable").click(); await sleep(30);
+
+    // F04: share and reopen
+    d.querySelector("#share").click(); await sleep(150);
+    const hash = w.location.hash;
+    ok("F04-H1 share puts the request in the hash", hash.startsWith("#share/"));
+    w = await load("/?theme=dark" + hash); d = w.document; await sleep(300);
+    ok("F04-H2 shared link restores the state", /Lieferung/.test(d.querySelector(".state-text")?.value || ""));
+    ok("F04-H3 shared link restores the questions", /"sentiment"/.test(d.querySelector("#qBody .ce-input")?.value || ""));
+    ok("F04-H4 dark theme from the URL", w.document.documentElement.dataset.theme === "dark");
+
+    // layout, state modes, sidebar
+    d.querySelector("#layCols").click(); await sleep(30);
+    ok("UI-1 side-by-side layout", d.querySelector("#app").classList.contains("layout-cols"));
+    d.querySelector("#layRows").click(); await sleep(30);
+    d.querySelector("#stCode").click(); await sleep(30);
+    ok("UI-2 state switches to JSON with line numbers", !!d.querySelector("#stateBody .ce-num") && /^"/.test(d.querySelector("#stateBody .ce-input").value));
+    d.querySelector("#stText").click(); await sleep(30);
+    ok("UI-3 state switches back to text", /Lieferung/.test(d.querySelector(".state-text").value) && !/^"/.test(d.querySelector(".state-text").value));
+    d.querySelector("#collapse").click(); await sleep(30);
+    ok("UI-4 sidebar collapses", d.querySelector("#app").classList.contains("sb-collapsed"));
+    d.querySelector("#collapse").click();
+
+    // threshold
+    d.querySelector("#thrChip").click(); await sleep(50);
+    const range = d.querySelector(".thr-pop input[type=range]");
+    ok("NEW-1 threshold window opens", !!range);
+    range.value = "95"; range.dispatchEvent(new Event("input")); await sleep(50);
+    ok("NEW-2 threshold chip follows the slider", /95%/.test(d.querySelector("#thrChip").textContent));
+    range.value = "80"; range.dispatchEvent(new Event("input")); d.body.click(); await sleep(30);
+
+    // batch
+    d.querySelector('[data-mode="batch"]').click(); await sleep(50);
+    [...d.querySelectorAll(".btn")].find((b) => b.textContent === "Load sample").click(); await sleep(50);
+    const bta = d.querySelector(".batch-input");
+    type(bta, "Refund me now or I cancel.\nHow do I change my email?\nThe app crashes on the reports page.");
+    [...d.querySelectorAll(".btn")].find((b) => b.textContent === "Run batch").click();
+    const btab = await waitFor(() => d.querySelectorAll(".btable tbody tr").length === 3 && /Run batch/.test(d.querySelector(".btn.solid").textContent) && d.querySelector(".btable"), 90000);
+    ok("NEW-3 batch answers every line", !!btab);
+    ok("NEW-4 pass grid has one cell per answer", d.querySelectorAll(".passgrid i").length === 12, d.querySelector(".pane .tagline")?.textContent);
+    ok("NEW-5 CSV export is enabled", ![...d.querySelectorAll(".btn")].find((b) => b.textContent === "Export CSV").disabled);
+
+    // compare
+    d.querySelector('[data-mode="compare"]').click(); await sleep(50);
+    [...d.querySelectorAll(".btn")].find((b) => b.textContent === "Race").click();
+    const agree = await waitFor(() => d.querySelector(".agree"), 60000);
+    ok("NEW-6 race shows both models and an agreement table", !!agree && d.querySelectorAll(".race .win").length === 2, d.querySelector(".pane .tagline:last-of-type")?.textContent);
+
+    // history
+    d.querySelector('[data-mode="history"]').click(); await sleep(50);
+    const items = d.querySelectorAll(".hist-item");
+    ok("NEW-7 history lists past runs", items.length >= 1, items.length + " runs");
+    items[0].click(); await sleep(50);
+    ok("NEW-8 opening a history run shows its answers", d.querySelectorAll(".r-row:not(.skeleton)").length > 0 && d.querySelector('[data-mode="response"]').getAttribute("aria-selected") === "true");
+
+    // 3D mark and stickers
+    ok("NEW-9 iso mark drawn in the sidebar", d.querySelectorAll("#mark path").length >= 6);
+    d.querySelector("#clear").click(); await sleep(50);
+    ok("NEW-10 hero canvas and three stickers", !!d.querySelector("canvas.hero3d") && d.querySelectorAll(".stk").length === 3);
+
+    // connections: an unreachable server explains itself
+    await goRoute(w, d, "connections");
+    ok("CON-1 connections page lists Ollaya", /Ollaya/.test(d.querySelector(".conns")?.textContent || ""));
+    [...d.querySelectorAll(".preset")].find((b) => /Custom/.test(b.textContent)).click(); await sleep(100);
+    const custom = [...d.querySelectorAll(".conn")].find((x) => /Custom/.test(x.querySelector(".win-title").textContent));
+    ok("CON-2 custom connection added", !!custom);
+    await waitFor(() => /Not reachable/.test(custom.textContent), 8000);
+    ok("CON-3 unreachable server shows Not reachable", /Not reachable/.test(custom.textContent));
+    [...custom.querySelectorAll(".btn")].find((b) => b.textContent === "Use").click(); await sleep(100);
+    ok("ERR-1 sidebar shows the active connection is down", d.querySelector("#dot").classList.contains("bad") && /Custom/.test(d.querySelector("#connName").textContent));
+    await goRoute(w, d, "playground");
+    d.querySelector('[data-mode="response"]').click(); await sleep(50);
+    d.querySelectorAll(".case")[0].click(); await sleep(50);
+    d.querySelector("#run").click();
+    await waitFor(() => d.querySelector(".banner.err"), 15000);
+    ok("ERR-2 run explains the server is down", /Can't reach Custom/.test(d.querySelector(".banner.err")?.textContent || ""), (d.querySelector(".banner.err")?.textContent || "").slice(0, 80));
+    await goRoute(w, d, "connections");
+    const custom2 = [...d.querySelectorAll(".conn")].find((x) => /Custom/.test(x.querySelector(".win-title").textContent));
+    [...custom2.querySelectorAll(".btn")].find((b) => b.textContent === "Remove").click(); await sleep(100);
+    ok("CON-4 removing it falls back to Ollaya", /Ollaya/.test(d.querySelector("#connName").textContent));
+
+    // home
+    await goRoute(w, d, "home");
+    ok("HOME-1 home shows quick run, connections, recent runs, stats and five tools", !!d.querySelector(".qr textarea") && !!d.querySelector(".hm-conn") && !!d.querySelector(".hm-recent") && !!d.querySelector(".hm-stats") && d.querySelectorAll(".opt-tile").length === 5);
+    ok("HOME-2 clock shows the time", /\d\d:\d\d:\d\d/.test(d.querySelector(".hm-top .zclock")?.textContent || ""));
+    ok("HOME-6 no landing-page call-to-action links", !d.querySelector(".h-hero, .h-desk, .h-cta, .big-link"));
+    ok("HOME-10 giant headline is the live server status", /Models? Ready\./.test(d.querySelector("[data-hmstatus]")?.textContent || ""), d.querySelector("[data-hmstatus]")?.textContent);
+    ok("HOME-11 3D mark and stippled desk drawn", !!d.querySelector(".hm-sky canvas.hero3d") && !!d.querySelector(".hm-desk canvas.hm-dots") && d.querySelector(".hm-dots").width > 0);
+    ok("HOME-7 recent runs listed", d.querySelectorAll(".hm-recent .hist-item").length >= 1);
+    ok("HOME-8 active connection shows its live status", /Online/.test(d.querySelector(".hm-conn [data-ctext]")?.textContent || ""));
+    ok("HOME-5 no personal or platform-specific copy", !/persian|\bthis mac\b|\bon your mac\b|laptop|menu bar/i.test(d.body.textContent));
+    [...d.querySelectorAll(".opt-tile")].find((b) => /Compare/.test(b.textContent)).click(); await sleep(200);
+    ok("HOME-3 option tile opens that mode", w.location.hash === "#/playground" && d.querySelector('[data-mode="compare"]').getAttribute("aria-selected") === "true");
+    ok("HOME-4 favicon linked", !!d.querySelector('link[rel="icon"][href="favicon.svg"]'));
+    await goRoute(w, d, "home");
+    type(d.querySelector(".qr textarea"), "My card was charged twice for one order.");
+    const qsel = d.querySelector(".qr select");
+    qsel.value = [...qsel.options].find((o) => o.textContent === "Support triage").value; qsel.dispatchEvent(new Event("change", { bubbles: true }));
+    d.querySelector(".qr .run").click();
+    await waitFor(() => w.location.hash === "#/playground" && d.querySelectorAll(".r-row:not(.skeleton)").length > 0, 60000);
+    ok("HOME-9 quick run opens the Playground with answers", w.location.hash === "#/playground" && d.querySelectorAll(".r-row:not(.skeleton)").length === 4 && /charged twice/.test(d.querySelector(".state-text")?.value || ""), d.querySelectorAll(".r-row:not(.skeleton)").length + " rows");
+    w.localStorage.clear();
+  } catch (e) {
+    results.push("FAIL harness " + e.message);
+  }
+  const fails = results.filter((r) => r.startsWith("FAIL")).length;
+  out.textContent = results.join("\n") + `\n\n${results.length - fails} passed, ${fails} failed`;
+  out.dataset.done = "1";
+})();
+</script>
+</body>
+</html>

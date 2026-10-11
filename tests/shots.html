@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Zex screenshot driver</title>
+<style>html,body{margin:0;height:100%}iframe{border:0;width:100%;height:100%;display:block}</style></head>
+<body>
+<iframe id="f"></iframe>
+<script>
+// Drives index.html into a given state for screenshots: ?do=home|examples|response|batch|compare|history|threshold&theme=light|dark
+const q = new URLSearchParams(location.search);
+const what = q.get("do") || "examples", theme = q.get("theme") || "light";
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const b64 = (o) => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+async function waitFor(fn, ms = 60000) { const t = Date.now(); while (Date.now() - t < ms) { try { const v = fn(); if (v) return v; } catch {} await sleep(150); } return null; }
+const f = document.getElementById("f");
+const TRI = { model: "laya:latest", state: "Third time this year you've double-charged me. Refund it today or I'm cancelling and moving to a competitor.",
+  questions: { customer_intent: { type: "choice", instructions: "What is the customer's main reason for contacting support?", criteria: { refund: "The customer wants a refund.", technical_issue: "A technical problem.", billing: "A question about a charge or invoice.", other: "Anything else." } },
+    churn_risk: { type: "noul", instructions: "Is the customer threatening to leave?" },
+    frustration: { type: "score", instructions: "How upset is the customer?", criteria: ["calm", "annoyed", "angry", "furious"] } } };
+(async () => {
+  const empty = { model: "laya:latest", state: "", questions: {} };
+  f.src = what === "home" ? `/?theme=${theme}#/home` : `/?theme=${theme}${what === "response" || what === "threshold" ? "&run=1" : ""}#share/${b64(what === "examples" ? empty : TRI)}`;
+  await new Promise((r) => (f.onload = r));
+  const w = f.contentWindow, d = w.document;
+  await waitFor(() => d.querySelector("#dot").classList.contains("ok"), 8000);
+  const click = (sel) => d.querySelector(sel).click();
+  if (what === "response" || what === "threshold") await waitFor(() => d.querySelectorAll(".r-row:not(.skeleton)").length === 3);
+  if (what === "threshold") { click("#thrChip"); await sleep(200); }
+  if (what === "batch") {
+    click('[data-mode="batch"]'); await sleep(100);
+    [...d.querySelectorAll(".btn")].find((b) => b.textContent === "Load sample").click(); await sleep(100);
+    [...d.querySelectorAll(".btn")].find((b) => b.textContent === "Run batch").click();
+    await waitFor(() => d.querySelector(".btable") && /Run batch/.test(d.querySelector(".btn.solid").textContent), 120000);
+  }
+  if (what === "compare") {
+    click('[data-mode="compare"]'); await sleep(100);
+    [...d.querySelectorAll(".btn")].find((b) => b.textContent === "Race").click();
+    await waitFor(() => d.querySelector(".agree"), 60000);
+  }
+  if (what === "history") {
+    click("#run"); await waitFor(() => d.querySelectorAll(".r-row:not(.skeleton)").length === 3);
+    click('[data-mode="history"]');
+  }
+  await sleep(600);
+  document.title = "ready";
+})();
+</script>
+</body>
+</html>
