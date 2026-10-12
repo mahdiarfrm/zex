@@ -401,7 +401,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         path = urllib.parse.urlparse(self.path).path.rstrip("/")
         sets = cfg.get("sets") or []
         if path == "/api" and self.command == "GET":
-            return self._json(200, {"ok": True, "app": "zex", "version": "0.3.1", "sets": len(sets)})
+            return self._json(200, {"ok": True, "app": "zex", "version": "0.3.2", "sets": len(sets)})
         if path == "/api/sets" and self.command == "GET":
             return self._json(200, {"sets": [{"slug": s["slug"], "name": s["name"], "endpoint": "/api/sets/" + s["slug"],
                                               "questions": {k: (v or {}).get("type") for k, v in (s.get("questions") or {}).items()}} for s in sets]})

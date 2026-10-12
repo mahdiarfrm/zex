@@ -202,7 +202,7 @@ async function goRoute(w, d, r) {
     ok("SET-4 save as a new set", /Triage plus urgency/.test(d.querySelector("#setChip").textContent) && !d.querySelector("#setChip").classList.contains("dirty"));
     await goRoute(w, d, "sets");
     drop(d.querySelector(".sets"), new w.File([JSON.stringify({ zex: "question-set", format: 1, name: "Imported spam check", questions: { spam: { type: "noul", instructions: "Is this spam?" } } })], "spam.zex.json", { type: "application/json" }));
-    await waitFor(() => [...d.querySelectorAll(".set-win .win-title")].some((t) => /Imported spam check/.test(t.textContent)), 3000);
+    await waitFor(() => [...d.querySelectorAll(".set-win .win-title")].some((t) => /Imported spam check/.test(t.textContent)));
     ok("SET-5 dropping a set file imports it", [...d.querySelectorAll(".set-win .win-title")].some((t) => /Imported spam check/.test(t.textContent)));
 
     // batch from a file with expected answers, then accuracy
@@ -273,16 +273,14 @@ async function goRoute(w, d, r) {
     ok("REVIEW-6 Home shows the week's numbers", d.querySelector(".hm-kpis .hm-kpi b")?.textContent === "3" && !!d.querySelector(".hm-live .hm-dec td.n"), d.querySelector(".hm-kpis")?.textContent.slice(0, 90));
     ok("REVIEW-7 the report lists answers waiting for review, with a Review button", /waiting for review/.test(d.querySelector(".hm-report .hm-items")?.textContent || "") && [...d.querySelectorAll(".hm-report .btn")].some((b) => b.textContent === "Review"), d.querySelector(".hm-report .hm-items")?.textContent.slice(0, 120));
     await waitFor(() => /3 REQUESTS/.test(d.querySelector('.hm-atlas [data-at="count"]')?.textContent || ""), 15000);
-    ok("ATLAS-1 the atlas draws the week: globe, route, confidence, savings and trend", ["cv-globe", "cv-flow", "cv-hist", "cv-saved"].every((c) => d.querySelector(".hm-atlas canvas." + c)) && !!d.querySelector(".hm-atlas .at-trend-svg"));
-    ok("ATLAS-2 every request is a dot on the globe", /3 REQUESTS/.test(d.querySelector('.hm-atlas [data-at="count"]')?.textContent || "") && d.querySelector('.hm-atlas [data-at="empty"]').hidden, d.querySelector('.hm-atlas [data-at="count"]')?.textContent);
-    ok("ATLAS-3 Last 7 Days draws the globe as a lit sphere of dots, as on the desk", (() => {
-      const cv = d.querySelector(".hm-atlas .cv-globe"), px = cv.getContext("2d").getImageData(0, 0, cv.width, cv.height).data;
-      let n = 0; for (let i = 3; i < px.length; i += 4) if (px[i]) n++;
-      return d.querySelector(".hm-atlas .at-title")?.textContent.replace(/\s+/g, " ").trim() === "Last 7 Days" && n > 2000;
-    })(), d.querySelector(".hm-atlas .at-title")?.textContent);
-    const gCell = d.querySelector(".hm-atlas .at-globe"), gH = gCell.getBoundingClientRect().height;
-    d.querySelector(".hm-atlas .cv-globe").height = 4000; await sleep(60);
-    ok("ATLAS-4 the globe's pixel size never stretches its cell", Math.abs(gCell.getBoundingClientRect().height - gH) < 2, `${gH} → ${gCell.getBoundingClientRect().height}`);
+    ok("ATLAS-1 Last 7 Days draws the Z, the week, the route, confidence, savings and the trend", ["cv-mark", "cv-week", "cv-flow", "cv-hist", "cv-saved"].every((c) => d.querySelector(".hm-atlas canvas." + c)) && !!d.querySelector(".hm-atlas .at-trend-svg"));
+    ok("ATLAS-2 every request is a block in the week", /3 REQUESTS/.test(d.querySelector('.hm-atlas [data-at="count"]')?.textContent || "") && d.querySelector('.hm-atlas [data-at="empty"]').hidden && /One block is one request/.test(d.querySelector('.hm-atlas [data-at="per"]')?.textContent || ""), d.querySelector('.hm-atlas [data-at="count"]')?.textContent);
+    const lit = (cls) => { const cv = d.querySelector(".hm-atlas ." + cls), px = cv.getContext("2d").getImageData(0, 0, cv.width, cv.height).data; let n = 0; for (let i = 3; i < px.length; i += 4) if (px[i]) n++; return n; };
+    ok("ATLAS-3 the title sits on a wireframe Z drawn in dotted lines, and the week's towers are drawn", d.querySelector(".hm-atlas .at-title")?.textContent.trim() === "Last 7 Days" && lit("cv-mark") > 800 && lit("cv-week") > 300, `${lit("cv-mark")} / ${lit("cv-week")} pixels`);
+    ok("ATLAS-5 the Z says how full it is", /^Filled to \d+%/.test(d.querySelector('.hm-atlas [data-at="fill"]')?.textContent || ""), d.querySelector('.hm-atlas [data-at="fill"]')?.textContent);
+    const gCell = d.querySelector(".hm-atlas .at-week"), gH = gCell.getBoundingClientRect().height;
+    d.querySelector(".hm-atlas .cv-week").height = 4000; await sleep(60);
+    ok("ATLAS-4 the week canvas's pixel size never stretches its cell", Math.abs(gCell.getBoundingClientRect().height - gH) < 2, `${gH} → ${gCell.getBoundingClientRect().height}`);
     ok("REVIEW-8 the sidebar counts what is waiting", Number(d.querySelector("#reviewBadge")?.textContent || 0) >= 1 && !d.querySelector("#reviewBadge").hidden);
     await w.fetch("/zex/log/clear", { method: "POST", headers: page, body: "{}" });
     await goRoute(w, d, "api");
@@ -344,8 +342,20 @@ async function goRoute(w, d, r) {
     await goRoute(w, d, "sets");
     d.querySelector("#page").scrollTop = 260; await sleep(50);
     const before2 = d.querySelector("#page").scrollTop;
-    [...triCard().querySelectorAll(".route .text-btn")].find((b) => /route/i.test(b.textContent)).click(); await sleep(80);
-    ok("UI-5 a click re-renders quietly: scroll kept, no entrance animation", before2 > 0 && Math.abs(d.querySelector("#page").scrollTop - before2) < 4 && d.querySelector("#page > .quiet") !== null, `${before2} → ${d.querySelector("#page").scrollTop}`);
+    const routeBtn = [...triCard().querySelectorAll(".route .text-btn")].find((b) => /route/i.test(b.textContent));
+    routeBtn.focus(); routeBtn.click(); await sleep(80);
+    const entering = () => d.getAnimations().filter((a) => ["rise", "wordUp", "winIn"].includes(a.animationName) && d.querySelector("#page").contains(a.effect?.target)).length;
+    ok("UI-5 a click re-renders quietly: scroll kept, no entrance animation, transitions held", before2 > 0 && Math.abs(d.querySelector("#page").scrollTop - before2) < 4 && entering() === 0 && d.querySelector("#page").classList.contains("settle"), `${before2} → ${d.querySelector("#page").scrollTop}, ${entering()} entering`);
+    const save = [...triCard().querySelectorAll(".route .btn")].find((b) => b.textContent === "+ Add a stage");
+    save.focus(); save.click(); await sleep(80);
+    ok("UI-6 the focused control keeps focus through a re-render", d.activeElement?.textContent === "+ Add a stage" && d.activeElement !== save, d.activeElement?.outerHTML.slice(0, 80));
+    const up = [...triCard().querySelectorAll('.re-row button[aria-label="Move earlier"]')][1], ur = up.getBoundingClientRect(), ux = ur.left + ur.width / 2, uy = ur.top + ur.height / 2;
+    d.dispatchEvent(new w.PointerEvent("pointermove", { clientX: ux, clientY: uy, bubbles: true }));
+    up.click(); await sleep(50);
+    const under = d.elementFromPoint(ux, uy)?.closest("button");
+    ok("UI-8 after a redraw, the button under the pointer keeps its hover look", !!under && under !== up && under.classList.contains("hov") && [...d.styleSheets[0].cssRules].some((r) => /\.btn\.hov/.test(r.selectorText || "")), under?.outerHTML.slice(0, 80));
+    await goRoute(w, d, "api"); await goRoute(w, d, "sets");
+    ok("UI-7 going to another page shows it at once", !d.querySelector("#page").classList.contains("intro") && entering() === 0, `${entering()} entering`);
     [...triCard().querySelectorAll(".route .btn")].find((b) => b.textContent === "Cancel").click(); await sleep(50);
     w.localStorage.clear();
   } catch (e) {

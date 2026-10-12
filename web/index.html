@@ -528,23 +528,23 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 @keyframes toastIn { from { opacity: 0; transform: translate(-50%, 14px) scale(.96); } to { opacity: 1; transform: translate(-50%, 0); } }
 @keyframes toastOut { to { opacity: 0; transform: translate(-50%, 8px); } }
 
-.page > * { animation: rise .5s var(--ease-out) both; }
+.page.intro > * { animation: rise .5s var(--ease-out) both; }
 .enter > *, .enter.pane > * { animation: rise .45s var(--ease-out) both; }
 .enter > *:nth-child(2) { animation-delay: .06s; } .enter > *:nth-child(3) { animation-delay: .12s; } .enter > *:nth-child(4) { animation-delay: .18s; }
 .enter .r-row:not(.skeleton) { animation: rise .5s var(--ease-out) both; animation-delay: calc(var(--i, 0) * 80ms + 60ms); }
 .enter .opt.top .ring { animation: ringPop .5s var(--ease-spring) both; animation-delay: calc(var(--i, 0) * 80ms + 320ms); }
 .enter .dchip { animation: pop .35s var(--ease-spring) both; animation-delay: calc(var(--i, 0) * 80ms + 420ms); }
 .scale-mini .mk { transition: left .8s var(--ease-out); }
-.giant .w { display: inline-block; animation: wordUp .9s var(--ease-out) both; animation-delay: calc(var(--i) * 75ms + 80ms); }
+.giant .w { display: inline-block; } .intro .giant .w { animation: wordUp .9s var(--ease-out) both; animation-delay: calc(var(--i) * 75ms + 80ms); }
 .tagline.cursor::after { content: "▌"; margin-left: 3px; animation: blink 1s steps(1) infinite; }
-.home .hm-grid > .win, .home .opt-tile { animation: winIn .6s var(--ease-spring) backwards; animation-delay: calc(var(--i, 0) * 70ms + 80ms); }
+.intro .home .hm-grid > .win, .intro .home .opt-tile { animation: winIn .6s var(--ease-spring) backwards; animation-delay: calc(var(--i, 0) * 70ms + 80ms); }
 @keyframes skyDrift { 50% { transform: translate(-3%, 2.5%) scale(1.07); } }
 .hm-sky::before { animation: skyDrift 22s ease-in-out infinite; }
-.hm-leader { animation: fadeIn .8s .1s both; } .hm-leader .dl { animation: growX .9s var(--ease-out) .25s both; transform-origin: left; }
-.hm-mark { animation: winIn .9s var(--ease-spring) .2s backwards; }
+.intro .hm-leader { animation: fadeIn .8s .1s both; } .intro .hm-leader .dl { animation: growX .9s var(--ease-out) .25s both; transform-origin: left; }
+.intro .hm-mark { animation: winIn .9s var(--ease-spring) .2s backwards; }
 .hm-desk .win { transition: box-shadow .25s var(--ease-out), transform .25s var(--ease-out); }
 .hm-desk .win:hover { box-shadow: 9px 9px 0 var(--desk-ink); transform: translate(-2px, -2px); }
-.hm-recent .hist-item { animation: rise .45s var(--ease-out) backwards; animation-delay: calc(var(--j, 0) * 60ms + 320ms); }
+.intro .hm-recent .hist-item { animation: rise .45s var(--ease-out) backwards; animation-delay: calc(var(--j, 0) * 60ms + 320ms); }
 .qr textarea { transition: border-color .2s, box-shadow .25s var(--ease-out); } .qr textarea:focus { box-shadow: 4px 4px 0 var(--text); }
 .qr .run { transition: background .25s, color .25s, transform .12s; }
 .reveal { opacity: 0; transform: translateY(26px); transition: opacity .8s var(--ease-out), transform .8s var(--ease-out); }
@@ -820,6 +820,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .hm-items .acts { display: flex; gap: 6px; } .hm-items .btn { height: 32px; padding: 0 12px; white-space: nowrap; }
 .tone-ok .hm-tone { background: var(--text); color: var(--bg); } .tone-wait .hm-tone { background: var(--surface-2); color: var(--text-muted); }
 .quiet, .quiet *:not(.dot) { animation-duration: 0s !important; animation-delay: 0s !important; }
+.settle, .settle * { transition: none !important; }
 .quiet .reveal { opacity: 1; transform: none; transition: none; }
 .hm-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 170px)); margin-top: 22px; border-top: 1.5px solid var(--text); border-left: 1.5px solid var(--text); width: max-content; max-width: 100%; }
 .hm-kpi { display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 10px 14px 12px; border-right: 1.5px solid var(--text); border-bottom: 1.5px solid var(--text); background: color-mix(in srgb, var(--bg) 55%, transparent); min-width: 0; }
@@ -866,55 +867,66 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .rp-flip.k-fixed .rv-tag { color: var(--success); } .rp-flip.k-broke .rv-tag { color: var(--danger); } .rp-flip.k-changed .rv-tag { color: var(--text-muted); }
 .meta.warn { color: var(--danger); }
 
-/* ---------- the atlas ---------- */
-.hm-atlas { --at-bg: #0b0a0d; --at-line: #3e262e; background: var(--at-bg); color: #f4f1ee; padding: 34px 28px 36px; position: relative; overflow: hidden; }
-.hm-atlas::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(#22151a 1px, transparent 1.3px); background-size: 6px 6px; pointer-events: none; }
-.at-head { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 24px; align-items: end; margin-bottom: 22px; }
-.at-head .tagline { grid-column: 1 / -1; justify-self: start; background: #f38aa2; color: #160a0f; }
-.at-title { margin: 6px 0 0; font-size: clamp(38px, 4.4vw, 72px); line-height: 1.02; letter-spacing: -.05em; font-weight: 650; }
-.at-lede { grid-column: 1; margin: 0; max-width: 620px; color: rgba(244, 241, 238, .72); font-size: 14.5px; }
-.at-legend { grid-column: 2; grid-row: 2 / 4; display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; font-size: 12px; color: rgba(244, 241, 238, .72); }
+/* ---------- Last 7 Days: a dark band in flat colours ---------- */
+.hm-atlas { --at-bg: #1e1e1e; --at-line: #3a3838; --at-dim: #9b9792; --at-mid: #c9c5bf; --at-ink: #f4f1ee; --at-pink: #f38aa2; background: var(--at-bg); color: var(--at-ink); padding: 26px 28px 36px; position: relative; overflow: hidden; }
+.hm-atlas::before { content: ""; position: absolute; inset: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Crect width='1' height='1' fill='%23302e2e'/%3E%3C/svg%3E"); pointer-events: none; }
+.at-hero { position: relative; height: clamp(320px, 36vw, 470px); display: grid; place-items: center; margin-bottom: 14px; }
+.cv-mark { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-y; }
+.cv-mark:active { cursor: grabbing; }
+.at-frame { position: relative; text-align: center; padding: 20px 40px 18px; max-width: 100%; pointer-events: none; }
+.at-cn { position: absolute; width: 14px; height: 14px; border: 0 solid var(--at-dim); }
+.at-cn.tl { top: 0; left: 0; border-top-width: 1px; border-left-width: 1px; } .at-cn.tr { top: 0; right: 0; border-top-width: 1px; border-right-width: 1px; }
+.at-cn.bl { bottom: 0; left: 0; border-bottom-width: 1px; border-left-width: 1px; } .at-cn.br { bottom: 0; right: 0; border-bottom-width: 1px; border-right-width: 1px; }
+.at-frame .tagline { background: var(--at-pink); color: var(--at-bg); }
+.at-title { margin: 12px 0 10px; font-size: clamp(60px, 10vw, 156px); line-height: .88; letter-spacing: -.06em; font-weight: 600; color: var(--at-ink); white-space: nowrap; }
+.at-intro { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 340px)); justify-content: center; gap: 18px 56px; margin: 0 0 30px; }
+.at-intro > div { border-left: 1px dashed var(--at-dim); padding-left: 12px; }
+.at-intro span { font-size: 16px; color: var(--at-pink); letter-spacing: .03em; }
+.at-intro p { margin: 4px 0 0; font-size: 13.5px; line-height: 1.45; color: var(--at-mid); }
+.at-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.at-cell { position: relative; border: 1px solid var(--at-line); background: var(--at-bg); padding: 0 14px 14px; min-width: 0; }
+.at-t { display: flex; align-items: center; gap: 8px; margin: -1px -15px 10px -1px; font-size: 16px; line-height: 20px; color: var(--at-dim); }
+.at-t b { background: var(--at-ink); color: var(--at-bg); font-weight: 400; padding: 0 6px; letter-spacing: .03em; }
+.at-t .grow { flex: 1; } .at-t > :last-child:not(b) { padding-right: 14px; }
+.at-t .at-sub { font-size: 14px; }
+.at-cap { margin: 8px 0 0; font-size: 12.5px; line-height: 1.45; color: var(--at-mid); }
+.at-cap:empty { display: none; }
+.at-week { grid-row: 1 / 3; display: flex; flex-direction: column; }
+.cv-week { width: 100%; flex: 1 1 0; height: 0; min-height: 380px; cursor: grab; touch-action: pan-y; display: block; }
+.cv-week:active { cursor: grabbing; }
+.at-legend { display: flex; gap: 6px 14px; flex-wrap: wrap; font-size: 12px; color: var(--at-mid); margin-top: 6px; }
 .at-legend span { display: inline-flex; align-items: center; gap: 6px; } .at-legend i { width: 9px; height: 9px; display: inline-block; }
-.lg-auto i { background: #f38aa2; } .lg-wait i { border: 1.5px solid #f4f1ee; } .lg-spot i { background: #9fd8c4; } .lg-ok i { background: #f4f1ee; } .lg-fix i { background: #f2cf6e; }
-.at-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto auto; gap: 14px; }
-.at-cell { position: relative; border: 1px solid var(--at-line); background: var(--at-bg); padding: 10px 12px 12px; min-width: 0; }
-.at-t { display: flex; align-items: center; gap: 8px; font-size: 16px; letter-spacing: .04em; color: #f38aa2; }
-.at-t .grow { flex: 1; } .at-t [data-at] { color: rgba(244, 241, 238, .55); }
-.at-t .at-sub { color: rgba(244, 241, 238, .55); font-size: 14px; }
-.at-globe { grid-row: 1 / 3; display: flex; flex-direction: column; }
-.cv-globe { width: 100%; flex: 1 1 0; height: 0; min-height: 400px; cursor: grab; touch-action: none; display: block; }
-.cv-globe:active { cursor: grabbing; }
-.at-poles { position: absolute; right: 14px; top: 44px; bottom: 26px; display: flex; flex-direction: column; justify-content: space-between; font-size: 14px; color: rgba(244, 241, 238, .45); text-align: right; pointer-events: none; }
-.at-tip { position: absolute; z-index: 3; display: flex; flex-direction: column; gap: 2px; min-width: 170px; padding: 7px 9px; background: #160a0f; border: 1px solid #f38aa2; box-shadow: 4px 4px 0 #f38aa2; font-size: 12px; pointer-events: none; }
-.at-tip b { font-weight: 600; } .at-tip span { color: rgba(244, 241, 238, .75); }
-.at-empty { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 26px; color: #f38aa2; pointer-events: none; text-align: center; }
-.at-empty small { font-family: var(--sans); font-size: 12.5px; color: rgba(244, 241, 238, .6); }
+.lg-pink i { background: #f38aa2; } .lg-mint i { background: #9fd8c4; } .lg-white i { background: #f4f1ee; } .lg-butter i { background: #f2cf6e; } .lg-hollow i { border: 1.5px solid #f4f1ee; } .lg-coral i { background: #e5735f; }
+.at-tip { position: absolute; z-index: 3; display: flex; flex-direction: column; gap: 2px; min-width: 180px; padding: 7px 9px; background: var(--at-bg); border: 1px solid var(--at-pink); box-shadow: 4px 4px 0 var(--at-pink); font-size: 12px; pointer-events: none; }
+.at-tip b { font-weight: 600; } .at-tip span { color: var(--at-mid); }
+.at-empty { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 26px; color: var(--at-pink); pointer-events: none; text-align: center; }
+.at-empty small { font-family: var(--sans); font-size: 12.5px; color: var(--at-mid); }
 .at-flow { grid-column: 2 / 4; }
 .cv-flow { width: 100%; height: 150px; display: block; }
 .at-nodes { position: relative; height: 62px; margin-top: -12px; }
 .at-node { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; text-align: center; width: 130px; }
-.at-node b { font-size: 30px; font-weight: 400; line-height: 1; color: #f38aa2; } .at-node.person b { color: #f4f1ee; }
+.at-node b { font-size: 30px; font-weight: 400; line-height: 1; color: var(--at-pink); } .at-node.person b { color: var(--at-ink); }
 .at-node .m { font: 11.5px var(--mono); max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.at-node small { font-size: 10.5px; color: rgba(244, 241, 238, .5); white-space: nowrap; }
-.at-note { margin: 6px 0 0; font-size: 12px; color: rgba(244, 241, 238, .6); }
-.cv-hist { width: 100%; height: 150px; display: block; margin-top: 6px; }
-.at-axis { display: flex; justify-content: space-between; font-size: 14px; color: rgba(244, 241, 238, .45); }
+.at-node small { font-size: 10.5px; color: var(--at-dim); white-space: nowrap; }
+.cv-hist { width: 100%; height: 160px; display: block; }
+.at-axis { display: flex; justify-content: space-between; font-size: 14px; color: var(--at-dim); }
 .at-saved { display: flex; flex-direction: column; }
 .cv-saved { width: 100%; height: 150px; display: block; }
 .at-big { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
-.at-big b { font-size: 44px; font-weight: 400; line-height: 1; color: #f38aa2; padding-top: .04em; }
-.at-big span { font-size: 11.5px; color: rgba(244, 241, 238, .6); max-width: 240px; }
+.at-big b { font-size: 44px; font-weight: 400; line-height: 1; color: var(--at-pink); padding-top: .04em; }
+.at-big span { font-size: 11.5px; color: var(--at-mid); max-width: 240px; }
 .at-trend { grid-column: 1 / -1; }
-.at-trend-svg { width: 100%; height: auto; display: block; margin-top: 6px; }
-.at-trend-svg .vol { fill: #5a3340; }
-.at-trend-svg path { fill: none; stroke-width: 2; } .at-trend-svg path.acc { stroke: #f38aa2; stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 3; } .at-trend-svg path.agr { stroke: #f4f1ee; stroke-dasharray: 5 4; }
+.at-trend-svg { width: 100%; height: auto; display: block; margin-top: 2px; shape-rendering: crispEdges; }
+.at-trend-svg .grid { stroke: var(--at-line); stroke-width: 1; stroke-dasharray: 1 3; }
+.at-trend-svg .vol { fill: #5c5856; }
+.at-trend-svg path { fill: none; stroke-width: 2; } .at-trend-svg path.acc { stroke: #f38aa2; stroke-dasharray: 2 4; } .at-trend-svg path.agr { stroke: #f4f1ee; stroke-dasharray: 6 4; }
 .at-trend-svg rect.acc { fill: #f38aa2; } .at-trend-svg rect.agr { fill: #f4f1ee; }
-.at-trend-svg .lab { font-family: var(--pix); font-size: 14px; fill: rgba(244, 241, 238, .45); }
-.at-key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: rgba(244, 241, 238, .6); margin-top: 4px; }
+.at-trend-svg .lab { font-family: var(--pix); font-size: 14px; fill: var(--at-dim); }
+.at-key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: var(--at-mid); margin-top: 4px; }
 .at-key span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: middle; }
-.at-key .acc::before { background: #f38aa2; } .at-key .agr::before { background: #f4f1ee; } .at-key .vol::before { background: #5a3340; border-radius: 50%; }
-@media (max-width: 1180px) { .at-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .at-globe { grid-row: auto; grid-column: 1 / -1; } .cv-globe { min-height: 360px; } .at-flow, .at-trend { grid-column: 1 / -1; } }
-@media (max-width: 900px) { .hm-atlas { padding: 26px 16px; } .at-grid { grid-template-columns: minmax(0, 1fr); } .at-head { grid-template-columns: minmax(0, 1fr); } .at-legend { grid-column: 1; grid-row: auto; justify-content: flex-start; } .at-poles { display: none; } }
+.at-key .acc::before { background: #f38aa2; } .at-key .agr::before { background: #f4f1ee; } .at-key .vol::before { background: #5c5856; }
+@media (max-width: 1180px) { .at-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .at-week { grid-row: auto; grid-column: 1 / -1; } .cv-week { min-height: 340px; } .at-flow, .at-trend { grid-column: 1 / -1; } }
+@media (max-width: 900px) { .hm-atlas { padding: 22px 16px 28px; } .at-grid { grid-template-columns: minmax(0, 1fr); } .at-frame { padding: 16px 18px; } .at-title { white-space: normal; } .at-hero { height: 340px; } .at-intro { grid-template-columns: minmax(0, 1fr); } }
 
 /* ---------- boot splash ---------- */
 #splash { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; overflow: hidden; background: var(--bg); color: var(--text);
@@ -1172,6 +1184,26 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     document.body.append(t);
     setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 260); }, 1500);
   }
+  // the pointer, and the nodes under it given .hov after a redraw (see settle)
+  const ptr = { x: -1, y: -1, hov: [] };
+  const unHover = () => { for (const e of ptr.hov) e.classList.remove("hov"); ptr.hov = []; };
+  function reHover(root) {
+    const at = ptr.x < 0 ? null : document.elementFromPoint(ptr.x, ptr.y);
+    if (!at || !root.contains(at)) return;
+    unHover();
+    for (let e = at; e && e !== document.body; e = e.parentElement) { e.classList.add("hov"); ptr.hov.push(e); }
+  }
+  for (const t of ["pointermove", "pointerdown"]) document.addEventListener(t, (e) => { ptr.x = e.clientX; ptr.y = e.clientY; if (ptr.hov.length) unHover(); }, { passive: true, capture: true });
+  document.documentElement.addEventListener("pointerleave", () => { ptr.x = -1; unHover(); });
+  for (const t of ["wheel", "scroll", "keydown"]) document.addEventListener(t, () => { if (ptr.hov.length) unHover(); }, { passive: true, capture: true });
+  (function copyHoverRules(list) {
+    for (let i = list.cssRules.length - 1; i >= 0; i--) {
+      const r = list.cssRules[i];
+      if (r.cssRules && !r.selectorText) { copyHoverRules(r); continue; }
+      const sel = (r.selectorText || "").split(",").filter((x) => x.includes(":hover")).map((x) => x.replace(/:hover/g, ".hov"));
+      if (sel.length) list.insertRule(`${sel.join(",")} { ${r.style.cssText} }`, i + 1);
+    }
+  })(document.querySelector("style").sheet);
   const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const pretty = (o) => JSON.stringify(o, null, 2);
 
@@ -1707,9 +1739,10 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   document.querySelectorAll("[data-mode]").forEach((b) => b.addEventListener("click", () => { mode = b.dataset.mode; renderOut(); }));
 
   let lastPaintKey = "", outEnter = false;
-  function paintOut(node) { if (outEnter) node.classList.add("enter"); outBody.replaceChildren(node); }
+  function paintOut(node) { if (outEnter) node.classList.add("enter"); outBody.replaceChildren(node); settle(outBody); }
   function renderOut() {
-    const paintKey = [route, mode, outView, codeTab, last ? last.at : 0, running ? 1 : 0, lastError ? 1 : 0, examplesOpen ? 1 : 0].join("|");
+    // only a new answer animates in; switching modes or views shows the pane at once
+    const paintKey = [last ? last.at : 0, running ? 1 : 0, lastError ? 1 : 0].join("|");
     outEnter = paintKey !== lastPaintKey; lastPaintKey = paintKey;
     document.querySelectorAll("[data-mode]").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.mode === mode)));
     $("#outTitle").replaceChildren(...titleParts());
@@ -3034,7 +3067,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
   let route = routeFromHash();
   function go(r) { if (location.hash === "#/" + r) { route = r; rerender(); } else location.hash = "#/" + r; }
-  window.addEventListener("hashchange", () => { route = routeFromHash(); withTransition(applyRoute); });
+  window.addEventListener("hashchange", () => { route = routeFromHash(); applyRoute(); });
   // 3D dot shapes, on the desk and in Last 7 Days: point clouds on globes and tori, seven numbers
   // a point (x y z, its normal, a random threshold). A dot is drawn when its shade from a fixed
   // light beats its threshold, so the shading is in how dense the dots are, and the dots
@@ -3133,20 +3166,20 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     return desk;
   }
 
-  function animateHome(root) {
+  function animateHome(root, intro) {
     if (!root) return;
     root.querySelectorAll(".hm-grid > .win, .opt-tile").forEach((el, i) => el.style.setProperty("--i", i));
     root.querySelectorAll(".hm-recent .hist-item").forEach((el, i) => el.style.setProperty("--j", i));
     root.querySelectorAll(".barcode i, .dotm i").forEach((el, i) => el.style.setProperty("--i", i % 44));
     root.querySelectorAll("[data-count]").forEach((el) => {
       const to = Number(el.dataset.count), suffix = el.dataset.suffix || "", t0 = performance.now() + 350;
-      if (reduceMotion || !to) { el.textContent = to + suffix; return; }
+      if (reduceMotion || !intro || !to) { el.textContent = to + suffix; return; }
       el.textContent = "0" + suffix;
       const step = (now) => { const k = Math.max(0, Math.min(1, (now - t0) / 900)), e = 1 - Math.pow(1 - k, 3); el.textContent = Math.round(to * e) + suffix; if (k < 1) requestAnimationFrame(step); };
       requestAnimationFrame(step);
     });
     const band = root.querySelector(".h-prims");
-    if (!band) return;
+    if (!band || !intro) return;
     band.classList.add("reveal");
     const io = new IntersectionObserver((entries) => entries.forEach((en) => {
       if (!en.isIntersecting) return;
@@ -3155,26 +3188,46 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     io.observe(band);
   }
 
-  // Navigation renders a page with its entrance animations. Re-rendering the same page after
-  // a click (rerender) is quiet: nothing replays, and the scroll position stays put.
+  // A page plays its entrance animations only once, at launch. Going to another page shows it
+  // at once; re-rendering the same page after a click (rerender) also keeps the scroll
+  // position and the focused control.
   function applyRoute(opts = {}) {
-    const top = page.scrollTop;
+    const top = page.scrollTop, fk = opts.same ? focusKey(page) : null;
     app.dataset.route = route;
     document.querySelectorAll("[data-route-link]").forEach((a) => {
       const on = a.dataset.routeLink === route;
       a.classList.toggle("active", on);
       if (on) a.setAttribute("aria-current", "page"); else a.removeAttribute("aria-current");
     });
-    if (route === "home") { page.replaceChildren(renderHome()); animateHome(page.firstChild); refreshLive(); }
+    page.classList.toggle("intro", !!opts.intro);
+    if (route === "home") { page.replaceChildren(renderHome()); animateHome(page.firstChild, opts.intro); refreshLive(); }
     else if (route === "connections") page.replaceChildren(renderConnections());
     else if (route === "sets") page.replaceChildren(renderSets());
     else if (route === "api") page.replaceChildren(renderApi());
     else if (route === "review") page.replaceChildren(renderReview());
     else { page.replaceChildren(); renderOut(); }
-    if (opts.quiet) { page.firstElementChild?.classList.add("quiet"); page.scrollTop = top; }
+    settle(page);
+    if (opts.same) { page.scrollTop = top; refocus(page, fk); }
     else page.scrollTop = 0;
   }
-  function rerender() { applyRoute({ quiet: true }); }
+  function rerender() { applyRoute({ same: true }); }
+  // Fresh nodes start without :hover. WebKit gives it to them only some frames later, and then
+  // animates into it, so a button under the pointer blinks. After a redraw, transitions stay off
+  // for a moment, and whatever is under the pointer gets .hov, a copy of every :hover style,
+  // until the pointer moves.
+  function settle(el) { el.classList.add("settle"); clearTimeout(el.settleT); el.settleT = setTimeout(() => el.classList.remove("settle"), 240); reHover(el); }
+  const focusable = (root) => [...root.querySelectorAll("button, a[href], input, select, textarea, [tabindex]")];
+  const focusName = (el) => el.tagName + "|" + (el.getAttribute("aria-label") || el.textContent.trim().slice(0, 60));
+  function focusKey(root) {
+    const a = document.activeElement;
+    return a && a !== document.body && root.contains(a) ? { i: focusable(root).indexOf(a), name: focusName(a) } : null;
+  }
+  function refocus(root, fk) {
+    if (!fk) return;
+    const same = focusable(root).map((el, i) => [el, i]).filter(([el]) => focusName(el) === fk.name);
+    same.sort((a, b) => Math.abs(a[1] - fk.i) - Math.abs(b[1] - fk.i));
+    same[0]?.[0].focus({ preventScroll: true });
+  }
   const openMode = (m) => { mode = m; go("playground"); };
 
   // ---------------------------------------------------------------- clock
@@ -3412,7 +3465,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   function paintReview() {
     if (!rvBody) return;
     const rows = rvBody.querySelector(".rv-rows")?.scrollTop || 0, top = page.scrollTop;
-    rvBody.replaceChildren(...reviewBody().filter(Boolean));
+    rvBody.replaceChildren(...reviewBody().filter(Boolean)); settle(rvBody);
     const nr = rvBody.querySelector(".rv-rows");
     if (nr) nr.scrollTop = rows;
     page.scrollTop = top;
@@ -3576,32 +3629,108 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     } catch (e) { toast(e.message); }
   }
 
-  // ---------------------------------------------------------------- the atlas: the week on Home, in dots
-  // Every request of the last 7 days is a dot on a slowly turning globe: around it by time, up
-  // it by how sure the model was. Next to it, the route as flowing particles, the spread of
-  // confidence, the money a route saved and the accuracy trend.
-  // Last 7 Days uses flat, opaque colours: no gradients, no glow
-  const AT = { pink: "#f38aa2", mint: "#9fd8c4", white: "#f4f1ee", coral: "#e5735f", butter: "#f2cf6e", bg: "#0b0a0d", ringBack: "#33433f", tick: "#3a2129" };
+  // ---------------------------------------------------------------- Last 7 Days: the week on Home
+  // A dark band in flat, opaque colours (no gradients, no glow). Its shapes are wireframes drawn
+  // as dashed lines of square pixels: nearer edges in white dashes, farther ones in grey dots.
+  // The Z is filled to the share of requests answered on their own, each day of the week is a
+  // tower with a block per request, and the route, confidence, savings and trend sit below.
+  const AT = { pink: "#f38aa2", mint: "#9fd8c4", white: "#f4f1ee", coral: "#e5735f", butter: "#f2cf6e", bg: "#1e1e1e", grey: "#6b6866", deep: "#9a5a69", line: "#3a3838", dim: "#9b9792" };
+  const ATI = Object.fromEntries(Object.entries(AT).map(([k, v]) => [k, inkRGBA(v)]));
   let atlas = null;
-  const ATI = { body: inkRGBA("#a35d6e"), pink: inkRGBA(AT.pink), cream: inkRGBA(AT.white), dim: inkRGBA("#57504f"), dust: inkRGBA("#3a2129"), line: inkRGBA("#5a3340") };
-  // point clouds for the atlas, as dense as the desk's (denser when small, so a small shape still
-  // reads); rebuilt when a size changes
-  function atlasShape(S, key, kind, R) {
-    const c = S.shp[key];
-    if (c && c.kind === kind && Math.abs(c.R - R) < 4) return c.pts;
-    let seed = 29 + key.length * 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    const pts = (kind === "globe" ? dotGlobe : dotTorus)(Math.min(26000, Math.round(R * R * (kind === "globe" ? 0.62 : 0.5) * (R < 70 ? 1.6 : 1))), rnd);
-    // a ring is a torus laid flat, so turning it spins it around its own axis
-    if (kind === "ring") for (let i = 0; i < pts.length; i += 7) { [pts[i + 1], pts[i + 2]] = [pts[i + 2], pts[i + 1]]; [pts[i + 4], pts[i + 5]] = [pts[i + 5], pts[i + 4]]; }
-    S.shp[key] = { kind, R, pts };
-    return pts;
+
+  // one square of s device pixels into a buffer L = { buf, cw, ch }
+  function pixSq(L, x, y, s, c) {
+    const X = x | 0, Y = y | 0, cw = L.cw, buf = L.buf;
+    if (X < 0 || Y < 0 || X + s > cw || Y + s > L.ch) return;
+    for (let j = 0; j < s; j++) { const o = (Y + j) * cw + X; for (let i = 0; i < s; i++) buf[o + i] = c; }
   }
+  // a line of squares from (x0, y0) to (x1, y1), lit `on` squares at a time with `off` dark between
+  function pixLine(L, x0, y0, x1, y1, c, on = 1, off = 0) {
+    const s = L.lw, n = Math.max(1, Math.round(Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0)) / s)), per = on + off;
+    for (let i = 0; i <= n; i++) if (i % per < on) pixSq(L, x0 + ((x1 - x0) * i) / n, y0 + ((y1 - y0) * i) / n, s, c);
+  }
+  // turns a point by ay around Y, then tips it by ax around X; y runs down the screen, z toward you
+  function turn(x, y, z, ay, ax) {
+    const x1 = x * Math.cos(ay) + z * Math.sin(ay), z1 = -x * Math.sin(ay) + z * Math.cos(ay);
+    return [x1, y * Math.cos(ax) - z1 * Math.sin(ax), y * Math.sin(ax) + z1 * Math.cos(ax)];
+  }
+  // A wireframe { v: points, e: [i, j] pairs } at device pixel (ox, oy), s pixels to a unit. An
+  // edge nearer than the shape's centre is drawn in `near` dashes, a farther one in grey dots.
+  function drawWire(L, m, ox, oy, s, ay, ax, near = ATI.white, far = ATI.grey) {
+    const p = m.v.map(([x, y, z]) => turn(x, y, z, ay, ax)), front = [];
+    for (const [i, j] of m.e) {
+      const a = p[i], b = p[j];
+      if (a[2] + b[2] > 0) front.push([a, b]);
+      else pixLine(L, ox + a[0] * s, oy + a[1] * s, ox + b[0] * s, oy + b[1] * s, far, 1, 2);
+    }
+    for (const [a, b] of front) pixLine(L, ox + a[0] * s, oy + a[1] * s, ox + b[0] * s, oy + b[1] * s, near, 4, 2);
+  }
+  function boxWire(x0, x1, y0, y1, z0, z1) {
+    const v = []; for (const x of [x0, x1]) for (const y of [y0, y1]) for (const z of [z0, z1]) v.push([x, y, z]);
+    // a corner's index has a bit per axis; an edge joins two corners one bit apart
+    const e = []; for (let i = 0; i < 8; i++) for (const b of [1, 2, 4]) if (!(i & b)) e.push([i, i | b]);
+    return { v, e };
+  }
+  const CUBE = boxWire(-1, 1, -1, 1, -1, 1);
+  const OCTA = { v: [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]], e: [[0, 2], [0, 3], [0, 4], [0, 5], [1, 2], [1, 3], [1, 4], [1, 5], [2, 4], [2, 5], [3, 4], [3, 5]] };
+  // the Z outline (Z2D) extruded: its front and back outlines and the edges between them
+  const ZD = 0.55;
+  const ZWIRE = (() => {
+    const n = Z2D.length, v = [...Z2D.map(([x, y]) => [x - 1.2, y - 1.5, ZD]), ...Z2D.map(([x, y]) => [x - 1.2, y - 1.5, -ZD])], e = [];
+    for (let i = 0; i < n; i++) e.push([i, (i + 1) % n], [n + i, n + ((i + 1) % n)], [i, n + i]);
+    return { v, e };
+  })();
+  const inZ = (x, y) => {
+    let c = false;
+    for (let i = 0, j = Z2D.length - 1; i < Z2D.length; j = i++) {
+      const [xi, yi] = Z2D[i], [xj, yj] = Z2D[j];
+      if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) c = !c;
+    }
+    return c;
+  };
+  // where a level line (Z2D's y) crosses the Z: pairs of x from left to right
+  function zSpans(y) {
+    const xs = [];
+    for (let i = 0; i < Z2D.length; i++) {
+      const [x0, y0] = Z2D[i], [x1, y1] = Z2D[(i + 1) % Z2D.length];
+      if ((y0 > y) !== (y1 > y)) xs.push(x0 + ((x1 - x0) * (y - y0)) / (y1 - y0));
+    }
+    xs.sort((a, b) => a - b);
+    const out = []; for (let i = 0; i + 1 < xs.length; i += 2) out.push([xs[i], xs[i + 1]]);
+    return out;
+  }
+  // points spread through a volume, for fills: inside the Z, or inside the cube
+  function fillPts(n, inside, box) {
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647, a = [];
+    while (a.length < n * 3) { const x = box[0] + rnd() * (box[1] - box[0]), y = box[2] + rnd() * (box[3] - box[2]); if (inside(x, y)) a.push(x, y, (rnd() * 2 - 1) * box[4]); }
+    return a;
+  }
+  const Z_FILL = fillPts(5200, (x, y) => inZ(x + 1.2, y + 1.5), [-1.2, 1.2, -1.5, 1.5, ZD * 0.94]);
+  const CUBE_FILL = fillPts(1300, () => true, [-0.96, 0.96, -0.96, 0.96, 0.96]);
+  // Fills a shape with dots up to `share` of its height (top and bottom are y = lo and hi in its
+  // own units), with a dashed surface; nearer dots pink, farther ones a deeper pink.
+  function drawFill(L, pts, lo, hi, share, ox, oy, s, ay, ax, t, spans, size = L.ds) {
+    if (!(share > 0)) return;
+    const level = hi - (hi - lo) * share;
+    for (let i = 0; i < pts.length; i += 3) {
+      const x = pts[i], y = pts[i + 1], z = pts[i + 2];
+      if (y < level + Math.sin(x * 4 + z * 3 + t * 1.6) * 0.035) continue;
+      const p = turn(x, y, z, ay, ax);
+      pixSq(L, ox + p[0] * s, oy + p[1] * s, size, p[2] > 0 ? ATI.pink : ATI.deep);
+    }
+    if (share >= 0.995) return;
+    for (const [x0, x1] of spans(level)) {
+      const c = [[x0, -1], [x1, -1], [x1, 1], [x0, 1]].map(([x, z]) => turn(x, level, z * pts.depth, ay, ax));
+      for (let k = 0; k < 4; k++) { const a = c[k], b = c[(k + 1) % 4]; pixLine(L, ox + a[0] * s, oy + a[1] * s, ox + b[0] * s, oy + b[1] * s, ATI.pink, 2, 2); }
+    }
+  }
+  Z_FILL.depth = ZD; CUBE_FILL.depth = 0.96;
   // a device-pixel buffer the size of a fitted canvas, kept between frames
   function atlasBuf(S, key, fc) {
     const cw = fc.ctx.canvas.width, ch = fc.ctx.canvas.height;
     let L = S.bufs[key];
     if (!L || L.cw !== cw || L.ch !== ch) { const img = fc.ctx.createImageData(cw, ch); L = S.bufs[key] = { img, buf: new Uint32Array(img.data.buffer), cw, ch }; }
-    L.dpr = cw / fc.w; L.ds = Math.max(2, Math.round(1.6 * L.dpr)); L.buf.fill(0);
+    L.dpr = cw / fc.w; L.lw = Math.max(1, Math.round(L.dpr)); L.ds = Math.max(2, Math.round(1.5 * L.dpr)); L.buf.fill(0);
     return L;
   }
   function fitCanvas(cv) {
@@ -3614,78 +3743,103 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
   const hashUnit = (n) => { const x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
   const quantile = (xs, q) => { if (!xs.length) return null; const a = [...xs].sort((p, r) => p - r); return a[Math.min(a.length - 1, Math.floor(q * a.length))]; };
+  // what a request's code means, and its block's colour, from the bottom of a tower up
+  const AT_CODES = [[0, "on its own", "pink"], [2, "spot check", "mint"], [3, "reviewed, right", "white"], [4, "corrected", "butter"], [1, "waiting", "hollow"], [5, "failed", "coral"]];
+  const autoCode = (p) => p.code === 0 || p.code === 2 || (p.code >= 3 && p.by >= 0);
 
   function atlasData() {
-    const raw = live.points?.points || [], names = live.points?.sets || [], now = Date.now(), week = 7 * 864e5;
-    // up the globe: how sure the model was; around it: an even golden-angle spread; brightness: how recent
-    const pts = raw.map(([at, si, c, code, by, ms], i) => ({ at, set: names[si], c, code, by, ms, age: Math.min(1, Math.max(0, (now - at) / week)),
-      lon: i * 2.399963 + hashUnit(i + 1) * 0.3, lat: (Math.max(0, Math.min(1, c)) - 0.5) * Math.PI * 0.94 + (hashUnit(i + 7) - 0.5) * 0.06 }));
+    const raw = live.points?.points || [], names = live.points?.sets || [];
+    const pts = raw.map(([at, si, c, code, by, ms]) => ({ at, set: names[si], c, code, by, ms }));
+    // the week as 7 days, today last, each a stack of its requests by outcome
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const start = new Date(today); start.setDate(today.getDate() - 6 + i);
+      return { start: start.getTime(), name: i === 6 ? "TODAY" : start.toLocaleDateString("en-US", { weekday: "short" }).toUpperCase(), date: start.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }), n: 0, by: [0, 0, 0, 0, 0, 0] };
+    });
+    for (const p of pts) {
+      let i = 6; while (i > 0 && p.at < days[i].start) i--;
+      if (p.at >= days[0].start) { days[i].n++; days[i].by[p.code] = (days[i].by[p.code] || 0) + 1; }
+    }
+    // towers stand up to six times as tall as they are wide: the narrowest that holds the
+    // busiest day, a block per request until even 5 by 5 by 30 runs out
+    const maxN = Math.max(0, ...days.map((x) => x.n)), k = [2, 3, 4, 5].find((n) => 6 * n ** 3 >= maxN) || 5, per = Math.max(1, Math.ceil(maxN / (6 * k ** 3)));
+    for (const x of days) { x.blocks = []; for (const [code] of AT_CODES) { const m = x.by[code] ? Math.max(1, Math.round(x.by[code] / per)) : 0; for (let j = 0; j < m; j++) x.blocks.push(code); } }
     // the route to draw: the busiest decision that has one, else the active connection
     const routes = live.stats?.routes || {}, sum = (o) => Object.values(o || {}).reduce((m, x) => m + x, 0);
     const slug = Object.keys(routes).sort((a, b) => sum(routes[b]) - sum(routes[a]))[0];
     const set = sets.find((x) => x.slug === slug);
+    const ok = pts.filter((p) => p.code !== 5), auto = ok.filter(autoCode).length;
     let stages, flowName;
     if (set && (set.route || []).length) {
       const counts = routes[slug], total = sum(counts) || 1;
       stages = [...set.route.map((st) => ({ label: st.model, sub: stageConn(st)?.name || "", cost: Number(st.cost) || 0, share: (counts[stageLabel(st)] || 0) / total })), { label: "person", sub: "review queue", person: true, share: (counts.person || 0) / total }];
       flowName = set.name;
     } else {
-      const ok = pts.filter((p) => p.code !== 5), auto = ok.filter((p) => p.code === 0 || p.code === 2 || (p.code >= 3 && p.by >= 0)).length;
       stages = [{ label: model, sub: activeConn().name, cost: 0, share: ok.length ? auto / ok.length : 0 }, { label: "person", sub: "review queue", person: true, share: ok.length ? 1 - auto / ok.length : 0 }];
       flowName = "all decisions";
     }
     const bins = Array.from({ length: 20 }, () => ({ auto: 0, other: 0 }));
-    for (const p of pts) if (p.code !== 5) bins[Math.min(19, Math.floor(p.c * 20))][p.code === 0 || p.code === 2 || (p.code >= 3 && p.by >= 0) ? "auto" : "other"]++;
+    for (const p of ok) bins[Math.min(19, Math.floor(p.c * 20))][autoCode(p) ? "auto" : "other"]++;
     const D = live.stats?.days?.length || 0, ser = Object.values(live.stats?.sets || {});
     const add = (key, from = 0) => ser.reduce((m, x) => m + (x[key] || []).slice(from).reduce((a, b) => a + b, 0), 0);
     const spent = add("spent", D - 7), base = add("baseline", D - 7);
     const trend = (live.stats?.days || []).map((day, i) => {
-      const at = (k) => ser.reduce((m, x) => m + ((x[k] || [])[i] || 0), 0);
+      const at = (key) => ser.reduce((m, x) => m + ((x[key] || [])[i] || 0), 0);
       return { day, req: at("requests"), ac: at("audit_checked"), ag: at("audit_agreed"), rc: at("review_checked"), ra: at("review_agreed") };
     });
     const ms = pts.map((p) => p.ms).filter((x) => x > 0);
-    return { pts, stages, flowName, bins, spent, base, trend, p50: quantile(ms, 0.5), p95: quantile(ms, 0.95) };
+    const layers = Math.max(3, ...days.map((x) => Math.ceil(x.blocks.length / (k * k))));
+    return { pts, days, k, per, layers, autoShare: ok.length ? auto / ok.length : 0, stages, flowName, bins, spent, base, trend, p50: quantile(ms, 0.5), p95: quantile(ms, 0.95) };
   }
 
   function renderAtlas() {
     const cv = (cls, label) => h("canvas", { class: cls, role: "img", "aria-label": label });
-    const el = h("section", { class: "hm-atlas", "aria-label": "The last 7 days, drawn in dots" },
-      h("div", { class: "at-head" },
-        h("span", { class: "tagline" }, "Zex.Atlas"),
-        h("h2", { class: "at-title" }, words("Last 7 Days")),
-        h("p", { class: "at-lede" }, "Every request is a square on the globe, and the nearer side faces you. Higher means the model was surer. The mint ring is the AUTO line."),
-        h("div", { class: "at-legend" }, [["auto", "on its own"], ["wait", "waiting"], ["spot", "spot check"], ["ok", "reviewed"], ["fix", "corrected"]].map(([k, t]) => h("span", { class: "lg-" + k }, h("i"), t)))),
+    const corners = ["tl", "tr", "bl", "br"].map((c) => h("i", { class: "at-cn " + c, "aria-hidden": "true" }));
+    const tab = (name, ...right) => h("div", { class: "at-t pix" }, h("b", {}, name), h("span", { class: "grow" }), ...right);
+    const el = h("section", { class: "hm-atlas", "aria-label": "The last 7 days" },
+      h("div", { class: "at-hero" },
+        cv("cv-mark", "The Zex Z in dotted lines, filled to the share of requests answered on their own"),
+        h("div", { class: "at-frame" }, corners,
+          h("span", { class: "tagline" }, "Zex.Atlas"),
+          h("h2", { class: "at-title" }, "Last 7 Days"))),
+      h("div", { class: "at-intro" },
+        h("div", {}, h("span", { class: "pix" }, "THE WEEK"), h("p", {}, "What came in each day, where the route finished it, how sure the model was, and what that saved.")),
+        h("div", {}, h("span", { class: "pix" }, "THE Z"), h("p", { "data-at": "fill" }))),
       h("div", { class: "at-grid" },
-        h("div", { class: "at-cell at-globe" }, h("div", { class: "at-t pix" }, "ATLAS.GLOBE", h("span", { class: "grow" }), h("span", { "data-at": "count" })),
-          cv("cv-globe", "A globe of dots, one per request"), h("div", { class: "at-tip", hidden: true }),
-          h("div", { class: "at-poles pix" }, h("span", {}, "100% SURE"), h("span", {}, "50%"), h("span", {}, "0%")),
-          h("div", { class: "at-empty pix", "data-at": "empty", hidden: true }, "NO REQUESTS YET", h("small", {}, "Turn on the local API and every request lands here as a dot."))),
-        h("div", { class: "at-cell at-flow" }, h("div", { class: "at-t pix" }, "ATLAS.ROUTE", h("span", { class: "grow" }), h("span", { "data-at": "flowname" })),
+        h("div", { class: "at-cell at-week" }, tab("ATLAS.WEEK", h("span", { "data-at": "count" })),
+          cv("cv-week", "Seven towers, one per day, with a block per request"), h("div", { class: "at-tip", hidden: true }),
+          h("div", { class: "at-empty pix", "data-at": "empty", hidden: true }, "NO REQUESTS YET", h("small", {}, "Turn on the local API and every request lands here as a block.")),
+          h("div", { class: "at-legend" }, AT_CODES.map(([, t, c]) => h("span", { class: "lg-" + c }, h("i"), t))),
+          h("p", { class: "at-cap", "data-at": "per" })),
+        h("div", { class: "at-cell at-flow" }, tab("ATLAS.ROUTE", h("span", { "data-at": "flowname" })),
           cv("cv-flow", "Requests flowing through the route"), h("div", { class: "at-nodes", "data-at": "nodes" }),
-          h("p", { class: "at-note", "data-at": "latency" })),
-        h("div", { class: "at-cell at-hist" }, h("div", { class: "at-t pix" }, "ATLAS.CONFIDENCE", h("span", { class: "grow" }), h("span", { class: "at-sub" }, "● on its own ○ to a person")), cv("cv-hist", "How sure the model was, as columns of dots"),
+          h("p", { class: "at-cap", "data-at": "latency" })),
+        h("div", { class: "at-cell at-hist" }, tab("ATLAS.CONFIDENCE", h("span", { class: "at-sub" }, "■ on its own □ to a person")), cv("cv-hist", "How sure the model was, as columns of squares"),
           h("div", { class: "at-axis pix" }, h("span", {}, "0%"), h("span", {}, "50%"), h("span", {}, "100%"))),
-        h("div", { class: "at-cell at-saved" }, h("div", { class: "at-t pix" }, "ATLAS.SAVED"), cv("cv-saved", "A sphere of dots filled to the share of money saved"),
+        h("div", { class: "at-cell at-saved" }, tab("ATLAS.SAVED"), cv("cv-saved", "A cube filled to the share of money saved"),
           h("div", { class: "at-big" }, h("b", { class: "pix", "data-at": "saved" }, "$0"), h("span", { "data-at": "savedsub" }, ""))),
-        h("div", { class: "at-cell at-trend" }, h("div", { class: "at-t pix" }, "ATLAS.TREND", h("span", { class: "grow" }), "14 DAYS"), h("div", { class: "at-svg", "data-at": "trend" }))));
-    const S = atlas = { el, d: null, last: 0, visible: true, ry: 0, rx: -0.38, drag: null, vel: 0.18, parts: [], spawn: 0, t0: performance.now(), hover: null, proj: [],
-      globe: el.querySelector(".cv-globe"), flow: el.querySelector(".cv-flow"), hist: el.querySelector(".cv-hist"), saved: el.querySelector(".cv-saved"), tip: el.querySelector(".at-tip"), shp: {}, bufs: {},
-      dust: Array.from({ length: 120 }, (_, i) => [hashUnit(i + 3), hashUnit(i + 211), hashUnit(i + 419)]) };
-    S.globe.addEventListener("pointerdown", (e) => { S.drag = { x: e.clientX, ry: S.ry, t: performance.now() }; S.globe.setPointerCapture(e.pointerId); });
-    S.globe.addEventListener("pointerup", () => { S.drag = null; });
-    S.globe.addEventListener("pointermove", (e) => {
-      const r = S.globe.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
-      if (S.drag) { const nry = S.drag.ry + (e.clientX - S.drag.x) / 120; S.vel = (nry - S.ry) * 10; S.ry = nry; }
-      let best = null, bd = 64;
-      for (const p of S.proj) { const dd = (p.x - mx) ** 2 + (p.y - my) ** 2; if (dd < bd) { bd = dd; best = p; } }
-      S.hover = best ? best.p : null;
-      if (best) {
-        const p = best.p, what = ["answered on its own", "waiting for a person", "a spot check", "reviewed: the model was right", "reviewed: a person corrected it", "failed"][p.code];
-        S.tip.hidden = false; S.tip.style.left = `${Math.min(r.width - 190, best.x + 12)}px`; S.tip.style.top = `${best.y + 12}px`;
-        S.tip.replaceChildren(h("b", {}, setName(p.set)), h("span", {}, `${ago(p.at)} · ${pct(p.c)} sure`), h("span", {}, what));
-      } else S.tip.hidden = true;
+        h("div", { class: "at-cell at-trend" }, tab("ATLAS.TREND", h("span", {}, "14 DAYS")), h("div", { class: "at-svg", "data-at": "trend" }))));
+    const S = atlas = { el, d: null, last: 0, visible: true, t0: performance.now(), bufs: {}, parts: [], spawn: 0, towers: [], hover: -1,
+      mark: el.querySelector(".cv-mark"), week: el.querySelector(".cv-week"), flow: el.querySelector(".cv-flow"), hist: el.querySelector(".cv-hist"), saved: el.querySelector(".cv-saved"), tip: el.querySelector(".at-tip"),
+      zy: -0.35, zx: -0.3, zv: 0.42, wy: 0, drag: null };
+    // drag either shape to turn it; it eases back into its own spin after
+    const dragTo = (cv, key) => {
+      cv.addEventListener("pointerdown", (e) => { S.drag = { cv, key, x: e.clientX, from: S[key] }; cv.setPointerCapture(e.pointerId); });
+      cv.addEventListener("pointerup", () => { S.drag = null; });
+      cv.addEventListener("pointermove", (e) => { if (S.drag?.cv === cv) { S[key] = S.drag.from + (e.clientX - S.drag.x) / 110; if (reduceMotion) atlasDraw(0, performance.now() / 1000); } });
+    };
+    dragTo(S.mark, "zy"); dragTo(S.week, "wy");
+    S.week.addEventListener("pointermove", (e) => {
+      const r = S.week.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+      const i = S.towers.findIndex((b) => mx >= b.x0 - 6 && mx <= b.x1 + 6 && my >= b.y0 - 24 && my <= b.y1 + 24);
+      S.hover = i;
+      const x = i >= 0 ? S.d.days[i] : null;
+      if (!x) { S.tip.hidden = true; return; }
+      const parts = AT_CODES.filter(([c]) => x.by[c]).map(([c, t]) => `${fmtN(x.by[c])} ${t}`);
+      S.tip.hidden = false; S.tip.style.left = `${Math.min(r.width - 200, mx + 14)}px`; S.tip.style.top = `${Math.max(30, my - 10)}px`;
+      S.tip.replaceChildren(h("b", {}, x.date), h("span", {}, `${fmtN(x.n)} request${x.n === 1 ? "" : "s"}`), ...parts.map((t) => h("span", {}, t)));
     });
-    S.globe.addEventListener("pointerleave", () => { S.hover = null; S.tip.hidden = true; });
+    S.week.addEventListener("pointerleave", () => { S.hover = -1; S.tip.hidden = true; });
     new IntersectionObserver(([en]) => { S.visible = en.isIntersecting; }, { rootMargin: "120px" }).observe(el);
     fillAtlas();
     requestAnimationFrame(atlasLoop);
@@ -3697,6 +3851,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const d = S.d = atlasData(), q = (k) => S.el.querySelector(`[data-at="${k}"]`);
     q("count").textContent = `${fmtN(d.pts.length)} REQUESTS`;
     q("empty").hidden = d.pts.length > 0;
+    q("fill").textContent = d.pts.length ? `Filled to ${pct(d.autoShare)}, the share of this week's requests answered without a person. Drag it to turn it.` : "It fills up with the share of requests answered without a person. Drag it to turn it.";
+    q("per").textContent = d.pts.length ? (d.per > 1 ? `One block is about ${fmtN(d.per)} requests.` : "One block is one request.") + " Point at a day for its numbers." : "";
     q("flowname").textContent = d.flowName.toUpperCase();
     const n = d.stages.length;
     q("nodes").replaceChildren(...d.stages.map((st, i) => h("div", { class: "at-node" + (st.person ? " person" : ""), style: `left:${atNodeX(i, n) * 100}%` },
@@ -3710,14 +3866,15 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     if (reduceMotion) atlasDraw(0, performance.now() / 1000);
   }
   const atNodeX = (i, n) => 0.16 + (i / Math.max(1, n - 1)) * 0.74;
-  // drawn at the width it is shown at, so the dots and labels keep their size
+  // drawn at the width it is shown at, so the squares and labels keep their size
   function trendSvg(days, width) {
     const W = Math.max(320, Math.round(width)), H = 150, L = 6, R = 6, T = 14, B = 22, n = Math.max(1, days.length);
     const x = (i) => L + (i / Math.max(1, n - 1)) * (W - L - R), y = (v) => T + (1 - v) * (H - T - B);
     const ns = "http://www.w3.org/2000/svg", el = (tag, a, txt) => { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(a)) e.setAttribute(k, v); if (txt != null) e.textContent = txt; return e; };
     const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, class: "at-trend-svg", role: "img", "aria-label": "Requests, accuracy and agreement per day" });
+    for (let j = 0; j <= 4; j++) svg.append(el("line", { x1: L, x2: W - R, y1: y(j / 4), y2: y(j / 4), class: "grid" }));
     const max = Math.max(1, ...days.map((d) => d.req));
-    days.forEach((d, i) => { const k = Math.round((d.req / max) * 9); for (let j = 0; j < k; j++) svg.append(el("circle", { cx: x(i), cy: H - B - 4 - j * 8, r: 2, class: "vol" })); });
+    days.forEach((d, i) => { const k = Math.round((d.req / max) * 9); for (let j = 0; j < k; j++) svg.append(el("rect", { x: x(i) - 2, y: H - B - 6 - j * 8, width: 4, height: 4, class: "vol" })); });
     const line = (key, cls) => {
       const pts = days.map((d, i) => [i, d[key[0]] ? d[key[1]] / d[key[0]] : null]).filter(([, v]) => v != null);
       if (pts.length > 1) svg.append(el("path", { d: pts.map(([i, v], j) => `${j ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(""), class: cls }));
@@ -3725,8 +3882,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     };
     line(["ac", "ag"], "acc"); line(["rc", "ra"], "agr");
     if (days.length) { svg.append(el("text", { x: L, y: H - 4, class: "lab" }, days[0].day.slice(5)), el("text", { x: W - R, y: H - 4, class: "lab", "text-anchor": "end" }, "today")); }
-    const wrap = h("div", {}, svg, h("div", { class: "at-key" }, h("span", { class: "acc" }, "right when on its own"), h("span", { class: "agr" }, "agreed with reviewers"), h("span", { class: "vol" }, "requests")));
-    return wrap;
+    return h("div", {}, svg, h("div", { class: "at-key" }, h("span", { class: "acc" }, "right when on its own"), h("span", { class: "agr" }, "agreed with reviewers"), h("span", { class: "vol" }, "requests")));
   }
   function atlasLoop(now) {
     const S = atlas;
@@ -3737,54 +3893,88 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     S.last = now;
     atlasDraw(dt, now / 1000);
   }
+  const pixFont = (px) => `${px}px ${getComputedStyle(document.documentElement).getPropertyValue("--pix").trim() || "monospace"}`;
   function atlasDraw(dt, t) {
     const S = atlas, d = S?.d;
     if (!d) return;
-    // ---- globe: a lit sphere of dots, as on the desk, with a square for each request
-    const g = fitCanvas(S.globe);
-    if (g) {
-      const { ctx, w, h: hh } = g, R = Math.min(w * 0.43, hh * 0.42), cx = w / 2, cy = hh / 2 + 4;
-      if (!S.drag) { S.vel += (0.16 - S.vel) * Math.min(1, dt * 0.8); S.ry += S.vel * dt; }
-      const L = atlasBuf(S, "globe", g), D = L.dpr;
-      for (const [x, y, k] of S.dust) if ((k * 10 + t * 0.5) % 1 < 0.6) pixDot(L, x * L.cw, y * L.ch, ATI.dust);
-      // the shape's y runs down the screen and the requests' up, so it tips the other way
-      stipple(L, atlasShape(S, "globe", "globe", R), cx * D, cy * D, R * D, S.ry, -S.rx, ATI.body, true);
+    // ---- the Z: a wireframe turning behind the title, filled to the share answered on its own
+    const mk = fitCanvas(S.mark);
+    if (mk) {
+      const { ctx, w, h: hh } = mk, L = atlasBuf(S, "mark", mk), D = L.dpr, s = Math.min(hh / 3.7, w / 3.4);
+      if (S.drag?.key !== "zy" && !reduceMotion) S.zy += S.zv * dt * (1 - 0.82 * Math.cos(2 * S.zy));
+      const ay = S.zy, ax = S.zx + Math.sin(t * 0.3) * 0.08;
+      drawFill(L, Z_FILL, -1.5, 1.5, d.pts.length ? d.autoShare : 0, (w / 2) * D, (hh / 2) * D, s * D, ay, ax, t, (y) => zSpans(y + 1.5).map(([a, b]) => [a - 1.2, b - 1.2]));
+      drawWire(L, ZWIRE, (w / 2) * D, (hh / 2) * D, s * D, ay, ax);
       ctx.putImageData(L.img, 0, 0);
-      const cY = Math.cos(S.ry), sY = Math.sin(S.ry), cX = Math.cos(S.rx), sX = Math.sin(S.rx);
-      const proj = (lat, lon) => {
-        const x = Math.cos(lat) * Math.sin(lon), y = Math.sin(lat), z = Math.cos(lat) * Math.cos(lon);
-        const x1 = x * cY + z * sY, z1 = -x * sY + z * cY, y2 = y * cX - z1 * sX, z2 = y * sX + z1 * cX;
-        return [cx + x1 * R, cy - y2 * R, z2];
-      };
-      const ring = (thr - 0.5) * Math.PI * 0.94;
-      for (let k = 0; k < 140; k++) {
-        const [x, y, z] = proj(ring, (k / 140) * Math.PI * 2 + t * 0.05), r = z > 0 ? 1.5 : 1;
-        ctx.fillStyle = z > 0 ? AT.mint : AT.ringBack; ctx.fillRect(x - r, y - r, r * 2, r * 2);
-      }
-      const colors = [AT.pink, AT.white, AT.mint, AT.white, AT.butter, AT.coral], front = [];
-      for (const p of d.pts) { const [x, y, z] = proj(p.lat, p.lon); if (z > 0) front.push({ x, y, z, p }); }
-      front.sort((a, b) => a.z - b.z);
-      for (const f of front) {
-        // a dark edge keeps each square apart from the dots behind it; nearer is bigger
-        const r = 1.8 + f.z * 1.7 + (S.hover === f.p ? 2.5 : 0);
-        ctx.fillStyle = AT.bg; ctx.fillRect(f.x - r - 1.5, f.y - r - 1.5, r * 2 + 3, r * 2 + 3);
-        if (f.p.code === 1) { ctx.strokeStyle = AT.white; ctx.lineWidth = 1.3; ctx.strokeRect(f.x - r + 0.65, f.y - r + 0.65, r * 2 - 1.3, r * 2 - 1.3); }
-        else { ctx.fillStyle = colors[f.p.code]; ctx.fillRect(f.x - r, f.y - r, r * 2, r * 2); }
-      }
-      S.proj = front;
     }
-    // ---- route: each stage a turning dot shape, as on the desk (a globe for a model, a ring for
-    // the person), sized by its share, and requests flowing to the stage that finished them
+    // ---- the week: a tower per day, a block per request (or per few), stacked by outcome
+    const wk = fitCanvas(S.week);
+    if (wk) {
+      const { ctx, w, h: hh } = wk, L = atlasBuf(S, "week", wk), D = L.dpr, k = d.k, u = 0.8 / k, G = 1.5, top = d.layers * u;
+      if (S.drag?.key !== "wy" && !reduceMotion) S.wy += (0 - S.wy) * Math.min(1, dt * 0.6);
+      // the row of days runs into the distance at a slant, swaying a little
+      const ay0 = -0.6, ax = -0.42, ay = ay0 + Math.sin(t * 0.2) * 0.16 + S.wy;
+      // sized so the scene at its resting angle fills the canvas, leaving room for the labels
+      const ext = [[-3.5 * G, 0, -0.6], [3.5 * G, 0, -0.6], [3.5 * G, 0, 0.6], [-3.5 * G, 0, 0.6], [-3.5 * G, -top, 0], [3.5 * G, -top, 0], [-3.5 * G, 0.5, 0.9], [3.5 * G, 0.5, 0.9]].map(([x, y, z]) => turn(x, y + top / 2, z, ay0, ax));
+      const bw = Math.max(...ext.map((p) => p[0])) - Math.min(...ext.map((p) => p[0])), bh = Math.max(...ext.map((p) => p[1])) - Math.min(...ext.map((p) => p[1]));
+      const s = Math.min((w - 40) / bw, (hh - 50) / bh), sD = s * D;
+      const ox = (w / 2) * D - ((Math.max(...ext.map((p) => p[0])) + Math.min(...ext.map((p) => p[0]))) / 2) * sD;
+      const oy = (hh / 2) * D - ((Math.max(...ext.map((p) => p[1])) + Math.min(...ext.map((p) => p[1]))) / 2) * sD;
+      const P = (x, y, z) => { const p = turn(x, y + top / 2, z, ay, ax); return [ox + p[0] * sD, oy + p[1] * sD, p[2]]; };
+      const blocks = [];
+      S.towers = d.days.map((x, i) => {
+        const cx = (i - 3) * G, layers = Math.ceil(x.blocks.length / (k * k)), hgt = Math.max(layers * u, 0.02);
+        x.blocks.forEach((code, j) => {
+          const layer = Math.floor(j / (k * k)), q = j % (k * k);
+          blocks.push([...P(cx - 0.4 + u * ((q % k) + 0.5), -(layer + 0.5) * u, -0.4 + u * (Math.floor(q / k) + 0.5)), code]);
+        });
+        const c = [P(cx - 0.4, 0, -0.4), P(cx + 0.4, 0, -0.4), P(cx - 0.4, -hgt, 0.4), P(cx + 0.4, -hgt, 0.4), P(cx - 0.4, 0, 0.4), P(cx + 0.4, 0, 0.4), P(cx - 0.4, -hgt, -0.4), P(cx + 0.4, -hgt, -0.4)];
+        return { cx, hgt, x0: Math.min(...c.map((p) => p[0])) / D, x1: Math.max(...c.map((p) => p[0])) / D, y0: Math.min(...c.map((p) => p[1])) / D, y1: Math.max(...c.map((p) => p[1])) / D };
+      });
+      // the ground under all seven, in grey dots
+      const g = [[-3.5 * G, -0.6], [3.5 * G, -0.6], [3.5 * G, 0.6], [-3.5 * G, 0.6]].map(([x, z]) => P(x, 0, z));
+      for (let i = 0; i < 4; i++) { const a = g[i], b = g[(i + 1) % 4]; pixLine(L, a[0], a[1], b[0], b[1], ATI.line, 1, 2); }
+      // each tower's box, then its blocks from back to front, then the box's near edges over them
+      const towerWire = (b, i, nearOnly) => {
+        const m = boxWire(b.cx - 0.4, b.cx + 0.4, -b.hgt, 0, -0.4, 0.4), p = m.v.map(([x, y, z]) => P(x, y, z)), hot = S.hover === i;
+        for (const [a, c] of m.e.map(([i0, j0]) => [p[i0], p[j0]])) {
+          const near = a[2] + c[2] > 0;
+          if (near !== nearOnly) continue;
+          pixLine(L, a[0], a[1], c[0], c[1], hot ? ATI.pink : near ? ATI.white : ATI.grey, near ? 4 : 1, 2);
+        }
+      };
+      S.towers.forEach((b, i) => towerWire(b, i, false));
+      blocks.sort((a, b) => a[2] - b[2]);
+      const bs = Math.max(L.lw * 2, Math.round(u * sD * 0.62)), o = L.lw;
+      for (const [x, y, , code] of blocks) {
+        const X = Math.round(x - bs / 2), Y = Math.round(y - bs / 2);
+        pixSq(L, X - o, Y - o, bs + o * 2, ATI.bg);
+        const col = { 0: ATI.pink, 2: ATI.mint, 3: ATI.white, 4: ATI.butter, 5: ATI.coral }[code];
+        if (col) pixSq(L, X, Y, bs, col);
+        else { pixSq(L, X, Y, bs, ATI.white); pixSq(L, X + o, Y + o, bs - o * 2, ATI.bg); }
+      }
+      S.towers.forEach((b, i) => towerWire(b, i, true));
+      ctx.putImageData(L.img, 0, 0);
+      // the day under each tower and its count above
+      ctx.textAlign = "center"; ctx.font = pixFont(16);
+      d.days.forEach((x, i) => {
+        const b = S.towers[i], f = P(b.cx, 0, 0.75), tp = P(b.cx, -b.hgt - 0.12, 0);
+        ctx.fillStyle = S.hover === i ? AT.pink : i === 6 ? AT.white : AT.dim; ctx.fillText(x.name, f[0] / D, f[1] / D + 12);
+        if (x.n) { ctx.fillStyle = S.hover === i ? AT.pink : AT.white; ctx.fillText(fmtN(x.n), tp[0] / D, tp[1] / D - 12); }
+      });
+    }
+    // ---- route: each stage a turning wireframe (a cube for a model, an octahedron for the
+    // person), sized by its share, and requests flowing to the stage that finished them
     const fl = fitCanvas(S.flow);
     if (fl) {
-      const { ctx, w, h: hh } = fl, n = d.stages.length, y0 = hh * 0.42, srcX = w * 0.04;
+      const { ctx, w, h: hh } = fl, n = d.stages.length, y0 = hh * 0.44, srcX = w * 0.04;
       const xs = d.stages.map((_, i) => atNodeX(i, n) * w), r = Math.min(hh * 0.3, (w * 0.74) / Math.max(1, n - 1) * 0.3);
       const L = atlasBuf(S, "flow", fl), D = L.dpr;
-      for (let x = srcX; x < xs[n - 1]; x += 7) pixDot(L, x * D, y0 * D, ATI.line);
+      pixLine(L, srcX * D, y0 * D, xs[n - 1] * D, y0 * D, ATI.line, 1, 3);
       d.stages.forEach((st, i) => {
-        const rr = r * (0.62 + 0.38 * Math.sqrt(st.share || 0)), y = y0 + Math.sin(t * 0.9 + i * 1.7) * 3;
-        if (st.person) stipple(L, atlasShape(S, "stage" + i, "ring", rr), xs[i] * D, y * D, rr * D, t * 0.55, 0.55 + Math.sin(t * 0.4) * 0.15, ATI.cream, true);
-        else stipple(L, atlasShape(S, "stage" + i, "globe", rr), xs[i] * D, y * D, rr * D, t * 0.45 * (i % 2 ? -1 : 1), 0.42, ATI.pink, true);
+        const rr = r * (0.5 + 0.5 * Math.sqrt(st.share || 0)), y = y0 + Math.sin(t * 0.9 + i * 1.7) * 3;
+        if (st.person) drawWire(L, OCTA, xs[i] * D, y * D, rr * 1.25 * D, t * 0.5, -0.35);
+        else drawWire(L, CUBE, xs[i] * D, y * D, rr * 0.72 * D, t * 0.45 * (i % 2 ? -1 : 1) + i, -0.42, ATI.pink);
       });
       ctx.putImageData(L.img, 0, 0);
       if (!reduceMotion && d.pts.length) {
@@ -3801,37 +3991,37 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         const tx = xs[p.target];
         if (p.x < tx) p.x = Math.min(tx, p.x + p.v * dt); else p.life -= dt * 2.2;
         // a request shrinks away as it reaches its stage
-        const near = Math.max(0, 1 - Math.abs(p.x - tx) / 40), y = y0 + p.dy * (1 - near), r = 2 * Math.max(0, Math.min(1, p.life));
+        const near = Math.max(0, 1 - Math.abs(p.x - tx) / 40), y = y0 + p.dy * (1 - near), sz = 2 * Math.max(0, Math.min(1, p.life));
         ctx.fillStyle = d.stages[p.target].person ? AT.white : AT.pink;
-        ctx.fillRect(p.x - r, y - r, r * 2, r * 2);
+        ctx.fillRect(Math.round(p.x - sz), Math.round(y - sz), sz * 2, sz * 2);
       }
     }
-    // ---- confidence: columns of dots
+    // ---- confidence: columns of squares, filled when handled on its own, hollow when a person
+    // got it, and the AUTO line in mint dashes
     const hi = fitCanvas(S.hist);
     if (hi) {
-      // each column stacks the requests whose weakest answer had that confidence:
-      // filled pink were handled on their own, hollow went to a person
       const { ctx, w, h: hh } = hi, max = Math.max(1, ...d.bins.map((b) => b.auto + b.other)), cols = d.bins.length, cw = w / cols, grow = reduceMotion ? 1 : Math.min(1, (performance.now() - S.t0) / 1400);
-      const step = (hh - 16) / 11;
+      const step = (hh - 26) / 11, sq = Math.max(4, Math.min(8, Math.round(cw * 0.5), Math.round(step - 3)));
       d.bins.forEach((b, i) => {
-        const ka = Math.round((b.auto / max) * 11 * grow), ko = Math.round((b.other / max) * 11 * grow), x = i * cw + cw / 2;
+        const ka = Math.round((b.auto / max) * 11 * grow), ko = Math.round((b.other / max) * 11 * grow), x = Math.round(i * cw + cw / 2 - sq / 2);
         for (let j = 0; j < ka + ko; j++) {
-          const y = hh - 8 - j * step;
-          if (j < ka) { ctx.fillStyle = AT.pink; ctx.beginPath(); ctx.arc(x, y, Math.min(4, cw * 0.28), 0, Math.PI * 2); ctx.fill(); }
-          else { ctx.strokeStyle = AT.white; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y, Math.min(3.4, cw * 0.24), 0, Math.PI * 2); ctx.stroke(); }
+          const y = Math.round(hh - 8 - sq - j * step);
+          if (j < ka) { ctx.fillStyle = AT.pink; ctx.fillRect(x, y, sq, sq); }
+          else { ctx.fillStyle = AT.white; ctx.fillRect(x, y, sq, sq); ctx.fillStyle = AT.bg; ctx.fillRect(x + 1.5, y + 1.5, sq - 3, sq - 3); }
         }
-        if (!ka && !ko) { ctx.fillStyle = AT.tick; ctx.fillRect(x - 1, hh - 9, 2, 2); }
+        if (!ka && !ko) { ctx.fillStyle = AT.line; ctx.fillRect(x + sq / 2 - 1, hh - 9, 2, 2); }
       });
+      const ax = Math.round(thr * w);
+      ctx.fillStyle = AT.mint;
+      for (let y = 18; y < hh - 6; y += 6) ctx.fillRect(ax - 1, y, 2, 3);
+      ctx.font = pixFont(15); const rt = thr > 0.6; ctx.textAlign = rt ? "right" : "left"; ctx.fillText(`AUTO ≥ ${pct(thr)}`, ax + (rt ? -6 : 6), 14);
     }
-    // ---- saved: a lit sphere of dots, filled to the share of money saved. The fill is shaded
-    // like the desk's shapes, densest on the shadow side, so it sits in the sphere like liquid.
+    // ---- saved: a turning wireframe cube, filled to the share of money saved
     const sv = fitCanvas(S.saved);
     if (sv) {
-      const { ctx, w, h: hh } = sv, R = Math.min(w, hh) * 0.43, cx = w / 2, cy = hh / 2;
-      const L = atlasBuf(S, "saved", sv), D = L.dpr, share = S.savedShare || 0, level = 1 - 2 * share, pts = atlasShape(S, "saved", "globe", R);
-      const wet = (x, y) => share > 0 && y > level + Math.sin(x * 5 + t * 1.8) * 0.04;
-      stipple(L, pts, cx * D, cy * D, R * D, t * 0.4, 0.3, (x, y) => (wet(x, y) ? 0 : ATI.dim), true);
-      stipple(L, pts, cx * D, cy * D, R * D, t * 0.4, 0.3, (x, y) => (wet(x, y) ? ATI.pink : 0));
+      const { ctx, w, h: hh } = sv, R = Math.min(w, hh) * 0.27, L = atlasBuf(S, "saved", sv), D = L.dpr, ay = t * 0.35, ax = -0.45;
+      drawFill(L, CUBE_FILL, -0.96, 0.96, S.savedShare || 0, (w / 2) * D, (hh / 2) * D, R * D, ay, ax, t, () => [[-0.96, 0.96]]);
+      drawWire(L, CUBE, (w / 2) * D, (hh / 2) * D, R * D, ay, ax);
       ctx.putImageData(L.img, 0, 0);
     }
   }
@@ -3946,7 +4136,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
 
   function paintLive() {
-    if (hmStatsEl?.isConnected) { const n = statsCard(); n.classList.add("quiet"); hmStatsEl.replaceWith(n); hmStatsEl = n; }
+    if (hmStatsEl?.isConnected) { const n = statsCard(); n.classList.add("quiet"); hmStatsEl.replaceWith(n); hmStatsEl = n; settle(n); }
     paintBrief(); fillAtlas();
   }
 
@@ -4117,7 +4307,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
 
   // ---------------------------------------------------------------- boot
-  applyTheme(); applyLayout(); renderState(); renderQuestions(); applyRoute(); runSplash(bootConns()); loadApi();
+  applyTheme(); applyLayout(); renderState(); renderQuestions(); applyRoute({ intro: true }); runSplash(bootConns()); loadApi();
   if (qs.has("run")) relayReady.then(() => setTimeout(run, 200));
 })();
 </script>
