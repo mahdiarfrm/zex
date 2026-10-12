@@ -41,6 +41,7 @@ func newHandler(site fs.FS, port int) http.Handler {
 		fmt.Sprintf("http://localhost:%d", port): true,
 	}
 	files := http.FileServer(http.FS(site))
+	startHooks()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-store")
 		switch {
@@ -62,6 +63,12 @@ func newHandler(site fs.FS, port int) http.Handler {
 			handlePoints(w, r, origins)
 		case r.URL.Path == "/zex/catalog":
 			handleCatalog(w, r, origins)
+		case r.URL.Path == "/zex/hooks":
+			handleHooks(w, r, origins)
+		case r.URL.Path == "/zex/hooks/test" && r.Method == http.MethodPost:
+			handleHookSend(w, r, origins, true)
+		case r.URL.Path == "/zex/hooks/retry" && r.Method == http.MethodPost:
+			handleHookSend(w, r, origins, false)
 		case r.URL.Path == "/api" || strings.HasPrefix(r.URL.Path, "/api/"):
 			handleAPI(w, r)
 		case r.Method == http.MethodGet || r.Method == http.MethodHead:

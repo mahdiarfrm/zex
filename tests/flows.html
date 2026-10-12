@@ -294,6 +294,61 @@ async function goRoute(w, d, r) {
     d.querySelector(".hm-atlas .cv-week").height = 4000; await sleep(60);
     ok("ATLAS-4 the week canvas's pixel size never stretches its cell", Math.abs(gCell.getBoundingClientRect().height - gH) < 2, `${gH} → ${gCell.getBoundingClientRect().height}`);
     ok("REVIEW-8 the sidebar counts what is waiting", Number(d.querySelector("#reviewBadge")?.textContent || 0) >= 1 && !d.querySelector("#reviewBadge").hidden);
+
+    // results sent back: a set's webhook gets the answers a person gives, signed with the secret
+    const run = "run-" + Date.now();
+    const calls = async () => ((await (await fetch("/tests/fake-hook")).json()).calls || []).filter((c) => c.path.includes(run));
+    const until = async (fn, ms = 8000) => { const t = Date.now(); while (Date.now() - t < ms) { const v = await fn(); if (v) return v; await sleep(150); } return null; };
+    const withHook = JSON.parse(w.localStorage.getItem("zex.sets"));
+    withHook.push({ id: "s-hookcheck", name: "Hook check", slug: "hook-check", note: "", version: 1, updatedAt: Date.now(), thresholds: { refund: 1.01, team: 1.01 },
+      questions: { refund: { type: "noul", instructions: "Is the customer asking for money back?" }, team: { type: "choice", instructions: "Which team should handle this?", criteria: { billing: "Charges and refunds", technical: "Bugs and errors" } } } });
+    w.localStorage.setItem("zex.sets", JSON.stringify(withHook));
+    w = await load("/?theme=light&hooks=1#/api"); d = w.document;
+    const hookRow = () => [...d.querySelectorAll(".hk-row")].find((r) => r.querySelector(".hk-name")?.textContent === "Hook check");
+    await waitFor(() => hookRow(), 10000);
+    const setHookUrl = async (u) => { const i = hookRow().querySelector("input"); i.value = u; i.dispatchEvent(new w.Event("change")); await sleep(700); };
+    await setHookUrl(location.origin + "/tests/fake-hook/" + run);
+    hookRow().querySelector(".btn").click();
+    await waitFor(() => hookRow()?.querySelector(".dtag.d-sent"), 8000);
+    const ping = (await until(async () => (await calls()).find((c) => c.event === "ping")));
+    ok("HOOK-1 a set's webhook can be tested from the page, and each delivery is signed", !!ping && /^t=\d+,v1=[0-9a-f]{64}$/.test(ping.signature || "") && ping.body.set === "hook-check" && !!hookRow()?.querySelector(".dtag.d-sent"), JSON.stringify(ping || {}).slice(0, 140));
+    const hcfg = await (await w.fetch("/zex/api-config", { headers: page })).json();
+    const rq = await (await w.fetch("/api/sets/hook-check", { method: "POST", headers: { Authorization: "Bearer " + hcfg.token, "Content-Type": "application/json" }, body: JSON.stringify({ text: "Please refund the double charge on my card.", ref: "ticket-42" }) })).json();
+    ok("HOOK-2 an unsure answer waits, with no final answer yet", rq.status === "review" && rq.final === null && rq.ref === "ticket-42" && rq.webhook === true, JSON.stringify(rq).slice(0, 140));
+    await goRoute(w, d, "review");
+    [...d.querySelectorAll(".rv-tabs button")].find((b) => /Waiting/.test(b.textContent)).click(); await sleep(200);
+    const rvSel = d.querySelector(".rv-bar select"); rvSel.value = "hook-check"; rvSel.dispatchEvent(new w.Event("change"));
+    await waitFor(() => d.querySelectorAll(".rv-row").length && [...d.querySelectorAll(".rv-row .set")].every((x) => x.textContent === "Hook check") && /refund the double charge/.test(d.querySelector(".rv-item .rv-text")?.textContent || ""), 8000);
+    await sleep(200);
+    const opt = (k, label) => [...[...d.querySelectorAll(".rv-q")].find((q) => q.querySelector(".k")?.textContent === k).querySelectorAll(".rv-opt")].find((o) => o.querySelector(".l").textContent === label);
+    opt("refund", "true").click(); await sleep(50); opt("team", "technical").click(); await sleep(50);
+    [...d.querySelectorAll(".rv-acts .btn")].find((b) => b.classList.contains("solid")).click();
+    const rev = await until(async () => (await calls()).find((c) => c.event === "answer.reviewed"));
+    ok("HOOK-3 a person's review goes to the webhook, with typed final answers and the caller's ref", rev?.body.id === rq.id && rev.body.ref === "ticket-42" && rev.body.final?.refund === true && rev.body.final?.team === "technical" && rev.body.by === "person", JSON.stringify(rev?.body || {}).slice(0, 160));
+    const looked = await (await w.fetch("/api/requests/" + rq.id, { headers: { Authorization: "Bearer " + hcfg.token } })).json();
+    ok("HOOK-4 the request can be looked up with its final answers", looked.status === "reviewed" && looked.final?.team === "technical" && looked.final?.refund === true, JSON.stringify(looked).slice(0, 140));
+    await goRoute(w, d, "api");
+    await waitFor(() => hookRow(), 5000);
+    await setHookUrl(location.origin + "/tests/fake-hook/down-" + run);
+    hookRow().querySelector(".btn").click();
+    await waitFor(() => hookRow()?.querySelector(".dtag.d-failed"), 8000);
+    ok("HOOK-5 a receiver that is down shows as failed, with a way to send again", !!hookRow()?.querySelector(".dtag.d-failed") && [...d.querySelectorAll(".hk-d")].some((r) => /FAILED/.test(r.textContent) && [...r.querySelectorAll("button")].some((b) => b.textContent === "Send again")));
+    const pick = d.querySelector(".pg-band .api-code select"); pick.value = "hook-check"; pick.dispatchEvent(new w.Event("change")); await sleep(300);
+    const codeTab = (name) => { [...d.querySelectorAll(".pg-band .code-tabs [role=tab]")].find((b) => b.textContent === name).click(); return d.querySelector(".pg-band .api-gen").textContent; };
+    const pyCode = codeTab("Python"), tsCode = codeTab("TypeScript"), mdCode = codeTab("Spec");
+    ok("CLIENT-1 the Python client is typed from the set's questions", /class Final\(TypedDict\):\n    refund: bool  # Is the customer asking for money back\?\n    team: Team/.test(pyCode) && /Team = Literal\["billing", "technical"\]/.test(pyCode) && /SET = "hook-check"/.test(pyCode) && /def verify_webhook/.test(pyCode), pyCode.slice(0, 80));
+    ok("CLIENT-2 so is the TypeScript client", /export type Team = "billing" \| "technical";/.test(tsCode) && /  refund: boolean;/.test(tsCode) && /export async function verifyWebhook/.test(tsCode));
+    ok("CLIENT-3 the spec lists each question with its answers, the endpoint and the signature", /\| `refund` \| noul \| `true` or `false` \|/.test(mdCode) && /POST .*\/api\/sets\/hook-check/.test(mdCode) && /X-Zex-Signature/.test(mdCode));
+    const lit2 = (sel) => { const cv = d.querySelector(sel); if (!cv || !cv.width) return 0; const px = cv.getContext("2d").getImageData(0, 0, cv.width, cv.height).data; let n = 0; for (let i = 3; i < px.length; i += 4) if (px[i]) n++; return n; };
+    ok("CLIENT-4 the code sits in a dark band under a wireframe of the API's mark", d.querySelector(".pg-band .at-title")?.textContent === "Clients" && lit2(".pg-band canvas.cv-mark") > 200, lit2(".pg-band canvas.cv-mark") + " pixels");
+    const shells = [];
+    for (const [r, title] of [["sets", "Question Sets"], ["review", "Review"], ["api", "Local API"], ["connections", "Connections"], ["models", "Models"]]) {
+      await goRoute(w, d, r); await sleep(200);
+      shells.push([r, d.querySelector(".pg-sky .hm-status")?.textContent.trim() === title && /Home/.test(d.querySelector(".pg-crumb")?.textContent || "") && lit2(".pg-sky canvas.hero3d") > 500 && !!d.querySelector(".pg-desk canvas.hm-dots") && !!d.querySelector(".pg-sky .hm-kpis")]);
+    }
+    ok("PAGE-1 every page has Home's sky (title, numbers and its own 3D mark) and its desk", shells.every((x) => x[1]), shells.filter((x) => !x[1]).map((x) => x[0]).join(", "));
+    await waitFor(() => d.querySelector(".pg-band .lib-fam"), 8000);
+    ok("PAGE-2 Models keeps its library in a dark band, under a wireframe of its mark", d.querySelector(".pg-band .at-title")?.textContent === "Library" && !!d.querySelector(".pg-band .lib-fam") && lit2(".pg-band canvas.cv-mark") > 200, lit2(".pg-band canvas.cv-mark") + " pixels");
     await w.fetch("/zex/log/clear", { method: "POST", headers: page, body: "{}" });
     await goRoute(w, d, "api");
     if (d.querySelector(".switch.on")) d.querySelector(".switch").click();
@@ -352,10 +407,10 @@ async function goRoute(w, d, r) {
 
     // clicking a button that re-renders the page keeps the scroll and replays nothing
     await goRoute(w, d, "sets");
-    d.querySelector("#page").scrollTop = 260; await sleep(50);
-    const before2 = d.querySelector("#page").scrollTop;
     const routeBtn = [...triCard().querySelectorAll(".route .text-btn")].find((b) => /route/i.test(b.textContent));
-    routeBtn.focus(); routeBtn.click(); await sleep(80);
+    d.querySelector("#page").scrollTop = 260; routeBtn.focus(); await sleep(50);
+    const before2 = d.querySelector("#page").scrollTop;
+    routeBtn.click(); await sleep(80);
     const entering = () => d.getAnimations().filter((a) => ["rise", "wordUp", "winIn"].includes(a.animationName) && d.querySelector("#page").contains(a.effect?.target)).length;
     ok("UI-5 a click re-renders quietly: scroll kept, no entrance animation, transitions held", before2 > 0 && Math.abs(d.querySelector("#page").scrollTop - before2) < 4 && entering() === 0 && d.querySelector("#page").classList.contains("settle"), `${before2} → ${d.querySelector("#page").scrollTop}, ${entering()} entering`);
     const save = [...triCard().querySelectorAll(".route .btn")].find((b) => b.textContent === "+ Add a stage");

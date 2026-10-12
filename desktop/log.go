@@ -46,6 +46,7 @@ type logItem struct {
 	Baseline  float64         `json:"baseline,omitempty"`
 	Ms        int64           `json:"ms,omitempty"`
 	RouteLen  int             `json:"route_len,omitempty"` // stages in the set's route when it ran
+	Ref       string          `json:"ref,omitempty"`       // the caller's own id for it
 }
 
 // status says where an item is: waiting for a person, set aside as a spot check, reviewed,
@@ -255,8 +256,10 @@ func handleReview(w http.ResponseWriter, r *http.Request, origins map[string]boo
 		writeJSON(w, 404, map[string]any{"error": "Zex: no request with that id"})
 		return
 	}
+	before := it.Review
 	it.Review = &logReview{At: time.Now().UnixMilli(), Labels: in.Labels, Checked: in.Checked, Agreed: in.Agreed}
 	appendLine(logPath("reviews.jsonl"), map[string]any{"id": it.ID, "review": it.Review})
+	afterReview(it, before)
 	writeJSON(w, 200, map[string]any{"ok": true, "item": it})
 }
 

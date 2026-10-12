@@ -37,7 +37,10 @@ Chat models answer in sentences you have to parse. Typed-decision models answer 
 
 ### Question sets
 
-<img alt="Question sets: saved groups of typed questions, each with its route" src="docs/screenshots/sets-route.png">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/sets-dark.png">
+  <img alt="Question sets: saved groups of typed questions, each with its route, on the pink desk under the sky band" src="docs/screenshots/sets-route.png">
+</picture>
 
 Save the questions you write as a **set**: a named, versioned group you can reuse in the Playground, in Batch, from Home and through the local API. A set can give each question its own AUTO threshold and its own route. Export a set as a `.zex.json` file to share it or keep it next to your code, and drop one onto the Sets page to import it.
 
@@ -88,34 +91,70 @@ Change a question's wording, an option or a model, and **Replay** runs the edit 
 
 ### A local API for every set
 
-<img alt="The local API page: status, token, a live request and code to copy" src="docs/screenshots/api.png">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/api-dark.png">
+  <img alt="The local API page: its status, the token, how many requests came in, and a request to try" src="docs/screenshots/api.png">
+</picture>
 
 Turn on the **local API** and every set becomes an endpoint on your computer, ready for scripts, n8n, Zapier or anything else that can send an HTTP request:
 
 ```sh
 curl -s http://127.0.0.1:18765/api/sets/support-triage \
   -H "Authorization: Bearer $ZEX_TOKEN" \
-  -d '{"text": "I was charged twice this month."}'
+  -d '{"text": "I was charged twice this month.", "ref": "ticket-1041"}'
 ```
 
 ```json
 {
   "id": "r_mgl2x4k1c9e0a7f3b2d1",
+  "ref": "ticket-1041",
   "set": "support-triage",
   "status": "auto",
+  "final": { "refund_requested": true, "team": "billing", "frustration": 1, "churn_risk": false },
   "decisions": {
-    "team": { "answer": "billing", "confidence": 0.952, "verdict": "auto", "threshold": 0.8 },
-    "refund_requested": { "answer": "true", "confidence": 0.836, "verdict": "auto", "threshold": 0.8 }
+    "team": { "answer": "billing", "confidence": 0.952, "verdict": "auto", "threshold": 0.6 },
+    "refund_requested": { "answer": "true", "confidence": 0.836, "verdict": "auto", "threshold": 0.7 }
   },
   "all_auto": true
 }
 ```
 
-Requests use the set's route (or your active connection) and the thresholds saved in the set, so `all_auto` tells your workflow when to act on its own and when to hand the item to a person. With a route, responses also say which stage answered (`answered_by`) and what the request cost (`cost`). Send `{"items": [...]}` for up to 100 texts at once. `GET /api/sets` lists your sets.
+Requests use the set's route (or your active connection) and the thresholds saved in the set. With `"status": "auto"`, `final` holds the answers as typed values (true or false, the option, the level) and your workflow can act on its own. With `"status": "review"`, `final` is `null` and the request waits for a person. `ref` is your own id for the request, sent back with the answer. With a route, responses also say which stage answered (`answered_by`) and what the request cost (`cost`). Send `{"items": [...]}` for up to 100 texts at once. `GET /api/sets` lists your sets, and `GET /api/sets/<set>` gives one with every question's options.
+
+### Answers sent back
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/hooks-dark.png">
+  <img alt="Webhooks: a URL for each set, what it sends, the signing secret and the recent deliveries" src="docs/screenshots/hooks.png">
+</picture>
+
+When a request waits for review, the person's answers come back to your system on their own. Give a set a **webhook** URL, under Local API, and Zex posts each final answer to it as JSON: after a person reviews it, or every answer, the ones the model was sure of included. A spot check that finds the model wrong, or a second review that changes an answer, is sent as a correction. **Test** sends a ping to check the URL.
+
+Each delivery is signed in `X-Zex-Signature` with a secret only you and Zex have, and one that fails is tried again for about nine hours. To fetch answers instead, `GET /api/requests/<id>` returns a request with its final answers once it has them, and `GET /api/requests?set=&status=reviewed&since=` lists them.
+
+### A typed client for each set
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/clients-dark.png">
+  <img alt="Clients: the Python client for a set, generated from its questions, under a wireframe of angle brackets" src="docs/screenshots/clients.png">
+</picture>
+
+Zex writes a client for each set, in **Python** or **TypeScript**, from its questions: each option is a type, so `final["team"]` can only be `"billing"`, `"technical"` or `"account"`. Neither needs anything installed. Each one asks the set, waits for or looks up the answers a person gave, and checks webhook signatures. The **Spec** tab describes the same set in Markdown, to keep next to your code or to give to a coding assistant.
+
+```python
+from zex_support_triage import decide, verify_webhook
+
+r = decide("I was charged twice this month.", ref="ticket-1041")
+if r["status"] == "auto":
+    route_to(r["final"]["team"])
+```
 
 ### Review what the model isn't sure about
 
-<img alt="The review queue: an unsure answer, every option with its probability, and one-key review" src="docs/screenshots/review.png">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/review-dark.png">
+  <img alt="The review queue: an unsure answer, every option with its probability, and one-key review" src="docs/screenshots/review.png">
+</picture>
 
 Every answer the local API gives is kept on your computer. Answers below their threshold wait in **Review** for a person, and a small share of the sure ones (5% by default) come as **spot checks**. Review from the keyboard: a number picks an option, **Enter** confirms, **S** skips.
 
@@ -139,7 +178,7 @@ Last 7 Days counts the requests sent to the local API, so one request is enough 
 <table>
   <tr>
     <td width="50%"><img alt="Compare: two models racing on one request" src="docs/screenshots/compare-light.png"></td>
-    <td width="50%"><img alt="Connections: model servers and their status" src="docs/screenshots/connections-light.png"></td>
+    <td width="50%"><img alt="Connections: model servers and their status, under a plug" src="docs/screenshots/connections-light.png"></td>
   </tr>
   <tr>
     <td><sub><b>Compare.</b> Race two models on the same request, even from two different servers, and see where they agree.</sub></td>
@@ -203,6 +242,7 @@ Get them from the [latest release](https://github.com/mahdiarfrm/zex/releases/la
 - A cloud GPU runs on a machine you start. Its requests reach it through a Cloudflare quick tunnel, and a random key, which only its pairing code carries, keeps everyone else out.
 - The local API is off until you turn it on, answers on `127.0.0.1` only, and needs a token that you can replace at any time. Turning it off removes your sets and connection from its settings file.
 - Requests to the local API are logged on your computer only, so you can review them. Turn the log off or clear it on the Local API page.
+- Webhooks go only to the URLs you give your sets, and each delivery is signed with a secret you can replace at any time.
 
 ## How it works
 
@@ -210,6 +250,7 @@ Get them from the [latest release](https://github.com/mahdiarfrm/zex/releases/la
 flowchart LR
   UI["Zex UI<br/>(native window)"] -->|same origin| R["Local server<br/>127.0.0.1"]
   S["Your scripts<br/>n8n · Zapier"] -->|token| A["Local API<br/>/api/sets/…"]
+  A -->|signed webhooks| S
   A --- R
   UI -->|direct, when CORS allows| L["Local model<br/>Ollaya · Laya"]
   R --> L

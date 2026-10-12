@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import argparse
 import datetime
+import hashlib
 import hmac
 import http.server
 import json
@@ -43,6 +44,7 @@ ALLOWED_PATH = re.compile(r"/(v1/(systemone|decisions|models)|api/(decide|tags|p
 CATALOG_URL = os.environ.get("ZEX_CATALOG_URL") or "https://ollaya.dev/search.json"
 _catalog = {"at": 0.0, "data": b""}
 LOOPBACK = {"localhost", "127.0.0.1", "::1"}
+VERSION = "0.5.0"
 
 # Local model servers never go through a system HTTP proxy; remote ones may need it.
 DIRECT = urllib.request.build_opener(urllib.request.ProxyHandler({}))
@@ -265,6 +267,223 @@ def new_id() -> str:
     return "r_" + format(int(time.time() * 1000), "x") + secrets.token_hex(6)
 
 
+# ---------------------------------------------------------------- results sent back
+# A set can have a webhook: Zex posts each final answer to it, right away when the model was
+# sure, and after a person reviews it otherwise. A delivery that fails is tried again later.
+HOOK_FILE = os.path.join(os.path.dirname(API_FILE), "deliveries.json")
+HOOK_KEEP = 300
+HOOK_LOCK = threading.Lock()
+HOOK_WAKE = threading.Event()
+HOOK_DELAYS = [10, 60, 300, 1800, 7200, 21600]  # seconds between tries: seven over about nine hours
+_hooks: list | None = None
+_hook_thread: threading.Thread | None = None
+
+
+def valid_hook_url(u: str) -> bool:
+    t = urllib.parse.urlparse(u or "")
+    return t.scheme in ("http", "https") and bool(t.netloc)
+
+
+def hook_list() -> list:
+    """The deliveries, loaded once. Call with HOOK_LOCK held."""
+    global _hooks
+    if _hooks is None:
+        try:
+            with open(HOOK_FILE, encoding="utf-8") as f:
+                _hooks = json.load(f) or []
+        except (OSError, ValueError):
+            _hooks = []
+    return _hooks
+
+
+def save_hooks() -> None:
+    global _hooks
+    _hooks = _hooks[-HOOK_KEEP:]
+    os.makedirs(os.path.dirname(HOOK_FILE), mode=0o700, exist_ok=True)
+    fd = os.open(HOOK_FILE + ".tmp", os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        json.dump([{k: v for k, v in d.items() if k != "busy"} for d in _hooks], f)
+    os.replace(HOOK_FILE + ".tmp", HOOK_FILE)
+
+
+def start_hooks() -> None:
+    global _hook_thread
+    if _hook_thread is None:
+        _hook_thread = threading.Thread(target=hook_loop, daemon=True)
+        _hook_thread.start()
+
+
+def queue_hook(s: dict, event: str, item: str, payload: dict, state: str = "pending") -> dict:
+    """Adds a delivery: "pending" for the sender to send, or "sending" when the caller sends it."""
+    d = {"id": "d_" + new_id()[2:], "event": event, "item": item, "set": s["slug"], "url": s.get("webhook", ""),
+         "at": int(time.time() * 1000), "tries": 0, "state": state}
+    d["body"] = {**payload, "event": event, "delivery": d["id"]}
+    with HOOK_LOCK:
+        hook_list().append(d)
+        save_hooks()
+    start_hooks()
+    HOOK_WAKE.set()
+    return d
+
+
+def hook_loop() -> None:
+    while True:
+        now, wait, due = time.time() * 1000, 30.0, []
+        with HOOK_LOCK:
+            for d in hook_list():
+                if d.get("state") != "pending" or d.get("busy"):
+                    continue
+                if d.get("next", 0) <= now:
+                    due.append(d)
+                else:
+                    wait = min(wait, (d["next"] - now) / 1000)
+        for d in due:
+            send_hook(d, True)
+        if due:
+            continue
+        HOOK_WAKE.wait(wait)
+        HOOK_WAKE.clear()
+
+
+def sign(secret: str, t: int, body: bytes) -> str:
+    """The X-Zex-Signature header: t=<unix seconds>,v1=<hex HMAC-SHA256 of "<t>.<body>">."""
+    mac = hmac.new(secret.encode(), f"{t}.".encode() + body, hashlib.sha256).hexdigest()
+    return f"t={t},v1={mac}"
+
+
+def send_hook(d: dict, retry: bool) -> None:
+    """One try. With retry, a failure that may pass is tried again later."""
+    with HOOK_LOCK:
+        if d.get("busy"):
+            return
+        d["busy"] = True
+    with API_LOCK:
+        secret = api_config().get("hook_secret", "")
+    body = json.dumps(d["body"]).encode()
+    code, err = 0, ""
+    req = urllib.request.Request(d["url"], data=body, method="POST")
+    req.add_header("Content-Type", "application/json")
+    req.add_header("User-Agent", "Zex/" + VERSION)
+    req.add_header("X-Zex-Event", d["event"])
+    req.add_header("X-Zex-Delivery", d["id"])
+    req.add_header("X-Zex-Signature", sign(secret, int(time.time()), body))
+    opener = DIRECT if urllib.parse.urlparse(d["url"]).hostname in LOOPBACK else DEFAULT
+    try:
+        with opener.open(req, timeout=15) as r:
+            code = r.status
+    except urllib.error.HTTPError as e:
+        code = e.code
+    except Exception as e:  # unreachable host, timeout, TLS, DNS
+        err = str(e)
+    with HOOK_LOCK:
+        d["busy"] = False
+        d["tries"] += 1
+        d.update(code=code, error=err, last=int(time.time() * 1000), next=0)
+        if 200 <= code < 300:
+            d.update(state="sent", error="")
+        elif 400 <= code < 500 and code not in (408, 429):
+            d.update(state="failed", error=f"the receiver answered HTTP {code}")
+        elif retry and d["tries"] <= len(HOOK_DELAYS):
+            d.update(state="pending", next=int((time.time() + HOOK_DELAYS[d["tries"] - 1]) * 1000))
+            if code:
+                d["error"] = f"the receiver answered HTTP {code}"
+        else:
+            d["state"] = "failed"
+            if code:
+                d["error"] = f"the receiver answered HTTP {code}"
+        save_hooks()
+
+
+def model_label(a: dict) -> str:
+    """The model's top option as a label: "true" or "false", the option, or the level."""
+    t = a.get("type")
+    if t == "noul":
+        return "true" if float(a.get("noul") or 0) >= 0.5 else "false"
+    if t == "choice":
+        return str(a.get("choice"))
+    probs = a.get("probabilities") or {}
+    if t == "score" and probs:
+        return max(sorted(probs), key=lambda k: probs[k])
+    return ""
+
+
+def typed(kind, label: str):
+    """A label as its value: true or false for noul, the level number for score."""
+    if kind == "noul":
+        return str(label).lower() == "true"
+    if kind == "score":
+        try:
+            return int(label)
+        except (TypeError, ValueError):
+            pass
+    return label
+
+
+def iso(ms) -> str:
+    return datetime.datetime.fromtimestamp(ms / 1000, datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def public_status(it: dict) -> str:
+    st = item_status(it)
+    return {"waiting": "review", "spot": "auto"}.get(st, st)
+
+
+def public_item(it: dict) -> dict:
+    """A logged request as the API shows it, with its final answers once it has them."""
+    st = public_status(it)
+    out = {"id": it["id"], "set": it.get("set"), "status": st, "state": it.get("state"), "model": it.get("model", ""),
+           "created_at": iso(it.get("at", 0)), "updated_at": iso(it.get("at", 0))}
+    if it.get("ref"):
+        out["ref"] = it["ref"]
+    if it.get("error"):
+        out["error"] = it["error"]
+        return out
+    out["decisions"] = it.get("decisions") or {}
+    rv = it.get("review") or {}
+    final, changed = {}, []
+    for k in sorted(it.get("answers") or {}):
+        a = it["answers"][k] or {}
+        label = model_label(a)
+        if rv and k in (rv.get("labels") or {}):
+            if str(rv["labels"][k]).lower() != label.lower():
+                changed.append(k)
+            label = rv["labels"][k]
+        final[k] = typed(a.get("type"), label)
+    if st == "review":
+        out["final"] = None
+    elif st == "auto":
+        out.update(final=final, by="model")
+        if it.get("audit"):
+            out["spot_check"] = True
+    elif st == "reviewed":
+        out.update(final=final, by="person", changed=changed, reviewed_at=iso(rv["at"]), updated_at=iso(rv["at"]))
+    return out
+
+
+def hook_for(slug: str) -> dict | None:
+    with API_LOCK:
+        cfg = api_config()
+        if not cfg.get("enabled"):
+            return None
+        return next((dict(x) for x in cfg.get("sets") or [] if x.get("slug") == slug and valid_hook_url(x.get("webhook", ""))), None)
+
+
+def after_review(it: dict, before: dict | None) -> None:
+    """Sends what a review changed: the final answer for a request that was waiting, or a
+    correction for one whose answer was already out."""
+    s = hook_for(it.get("set"))
+    if not s:
+        return
+    p = public_item(it)
+    if not before and not it.get("all_auto"):
+        queue_hook(s, "answer.reviewed", it["id"], p)
+    elif not before:
+        if p.get("changed"):
+            queue_hook(s, "answer.corrected", it["id"], p)
+    elif {k: str(v).lower() for k, v in (before.get("labels") or {}).items()} != {k: str(v).lower() for k, v in it["review"]["labels"].items()}:
+        queue_hook(s, "answer.corrected", it["id"], p)
+
+
 def call_model(conn: dict, model: str, state, questions) -> dict:
     """One request to the connection: Ollaya first tries /api/decide, then /v1/systemone."""
     body = json.dumps({"model": model, "state": state, "questions": questions}).encode()
@@ -275,7 +494,7 @@ def call_model(conn: dict, model: str, state, questions) -> dict:
         req = urllib.request.Request(base + path, data=body, method="POST")
         req.add_header("Content-Type", "application/json")
         req.add_header("Accept", "application/json")
-        req.add_header("User-Agent", "Zex/0.3")
+        req.add_header("User-Agent", "Zex/" + VERSION)
         if conn.get("key"):
             req.add_header("Authorization", "Bearer " + conn["key"])
         opener = DIRECT if urllib.parse.urlparse(base).hostname in LOOPBACK else DEFAULT
@@ -300,7 +519,7 @@ def call_model(conn: dict, model: str, state, questions) -> dict:
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
-    server_version = "Zex/0.3"
+    server_version = "Zex/" + VERSION
     allowed_origins: set[str] = set()
 
     def log_message(self, fmt, *args):
@@ -340,7 +559,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         req = urllib.request.Request(target, data=body, method=self.command)
         req.add_header("Content-Type", self.headers.get("Content-Type", "application/json"))
         req.add_header("Accept", "application/json")
-        req.add_header("User-Agent", "Zex/0.3")
+        req.add_header("User-Agent", "Zex/" + VERSION)
         key = self.headers.get("X-Zex-Key")
         if key:
             req.add_header("Authorization", "Bearer " + key)
@@ -400,12 +619,27 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._json(200, {})
         return self._json(404, {"error": "not found"})
 
+    # A stand-in webhook receiver for tests/flows.html: it keeps what it gets, and answers 503
+    # on paths with "/down" in them. GET /tests/fake-hook lists what came in.
+    _fake_hook_calls: list = []
+
+    def _fake_hook(self) -> None:
+        if self.command == "GET":
+            return self._json(200, {"calls": Handler._fake_hook_calls[-200:]})
+        path = urllib.parse.urlparse(self.path).path
+        try:
+            body = json.loads(self._raw or b"{}")
+        except ValueError:
+            body = {}
+        Handler._fake_hook_calls.append({"path": path, "event": self.headers.get("X-Zex-Event"), "signature": self.headers.get("X-Zex-Signature"), "body": body})
+        return self._json(503 if "/down" in path else 200, {})
+
     def _catalog(self) -> None:
         if not self._from_page():
             return
         if not _catalog["data"] or time.time() - _catalog["at"] > 3600:
             try:
-                with DEFAULT.open(urllib.request.Request(CATALOG_URL, headers={"User-Agent": "Zex/0.3"}), timeout=20) as r:
+                with DEFAULT.open(urllib.request.Request(CATALOG_URL, headers={"User-Agent": "Zex/" + VERSION}), timeout=20) as r:
                     _catalog.update(at=time.time(), data=r.read())
             except Exception as e:
                 if not _catalog["data"]:
@@ -439,6 +673,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 cfg["enabled"] = bool(body.get("enabled"))
                 if not cfg.get("token") or body.get("regenerate"):
                     cfg["token"] = "zex_" + secrets.token_hex(16)
+                if not cfg.get("hook_secret") or body.get("regenerate_secret"):
+                    cfg["hook_secret"] = "zexwh_" + secrets.token_hex(24)
                 for k in ("model", "thr", "connection", "sets", "log", "audit"):
                     if cfg["enabled"] and body.get(k) is not None:
                         cfg[k] = body.get(k)
@@ -448,7 +684,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     api_save(cfg)
                 except OSError as e:
                     return self._json(500, {"error": f"Zex could not save its API settings: {e}"})
-            return self._json(200, {"enabled": bool(cfg.get("enabled")), "token": cfg.get("token", ""),
+            return self._json(200, {"enabled": bool(cfg.get("enabled")), "token": cfg.get("token", ""), "hook_secret": cfg.get("hook_secret", ""),
                                     "log": log_on(cfg), "audit": audit_rate(cfg)})
 
     def _api(self) -> None:
@@ -463,12 +699,29 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         path = urllib.parse.urlparse(self.path).path.rstrip("/")
         sets = cfg.get("sets") or []
         if path == "/api" and self.command == "GET":
-            return self._json(200, {"ok": True, "app": "zex", "version": "0.4.0", "sets": len(sets)})
+            return self._json(200, {"ok": True, "app": "zex", "version": VERSION, "sets": len(sets)})
         if path == "/api/sets" and self.command == "GET":
             return self._json(200, {"sets": [{"slug": s["slug"], "name": s["name"], "endpoint": "/api/sets/" + s["slug"],
                                               "questions": {k: (v or {}).get("type") for k, v in (s.get("questions") or {}).items()}} for s in sets]})
+        if path.startswith("/api/sets/") and self.command == "GET":
+            slug = urllib.parse.unquote(path[len("/api/sets/"):])
+            s = next((x for x in sets if x.get("slug") == slug), None)
+            if not s:
+                return self._json(404, {"error": f'No set called "{slug}". GET /api/sets lists them.'})
+            return self._json(200, {"slug": s["slug"], "name": s["name"], "questions": s.get("questions") or {}, "thresholds": s.get("thresholds") or {},
+                                    "threshold": cfg.get("thr") or 0.8, "endpoint": "/api/sets/" + s["slug"], "webhook": bool(s.get("webhook"))})
+        if path == "/api/requests" and self.command == "GET":
+            return self._requests()
+        if path.startswith("/api/requests/") and self.command == "GET":
+            rid = urllib.parse.unquote(path[len("/api/requests/"):])
+            with LOG_LOCK:
+                log_items()
+                it = _log_by_id.get(rid)
+                if it:
+                    return self._json(200, public_item(it))
+            return self._json(404, {"error": f'No request with the id "{rid}". Zex keeps requests only while "keep requests for review" is on.'})
         if not (path.startswith("/api/sets/") and self.command == "POST"):
-            return self._json(404, {"error": 'Not found. POST /api/sets/<set> with {"text": "..."}, or GET /api/sets.'})
+            return self._json(404, {"error": 'Not found. POST /api/sets/<set> with {"text": "..."}, GET /api/sets, or GET /api/requests/<id>.'})
         slug = urllib.parse.unquote(path[len("/api/sets/"):])
         s = next((x for x in sets if x.get("slug") == slug), None)
         if not s:
@@ -487,9 +740,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             body = {"text": raw.decode("utf-8", "replace")}
         model = body.get("model") or cfg.get("model") or ""
 
-        def one(state):
+        def one(state, ref=""):
             item = {"id": new_id(), "at": int(time.time() * 1000), "set": slug, "model": model, "state": state,
                     "all_auto": False, "audit_rate": audit_rate(cfg)}
+            if ref:
+                item["ref"] = str(ref)[:200]
             rr = run_route(cfg, s, model, state)
             item.update(stages=rr["stages"], by=rr["by"], cost=rr["cost"], baseline=rr["baseline"], ms=rr["ms"], route_len=len(s.get("route") or []))
             if "error" in rr:
@@ -501,7 +756,13 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 if all_auto and log_on(cfg) and secrets.randbelow(1_000_000) < item["audit_rate"] * 1_000_000:
                     item["audit"] = True
                 res = {"id": item["id"], "set": slug, "model": item["model"], "status": "auto" if all_auto else "review",
-                       "decisions": rr["decisions"], "all_auto": all_auto, "answers": rr["answers"]}
+                       "decisions": rr["decisions"], "all_auto": all_auto, "answers": rr["answers"], "final": public_item(item).get("final")}
+                if item.get("ref"):
+                    res["ref"] = item["ref"]
+                if s.get("webhook"):
+                    res["webhook"] = True
+                    if all_auto and s.get("events") == "all" and valid_hook_url(s["webhook"]):
+                        queue_hook(s, "answer.auto", item["id"], public_item(item))
                 if len(s.get("route") or []) > 1:
                     by = rr["stages"][rr["by"]] if rr["by"] >= 0 else None
                     res.update(route=rr["stages"], answered_by=f"{by['name']} · {by['model']}" if by else "person", cost=rr["cost"])
@@ -512,13 +773,82 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if body.get("items"):
             if len(body["items"]) > 100:
                 return self._json(400, {"error": "Send at most 100 items at once."})
-            return self._json(200, {"set": slug, "results": [{**one(it), "state": it} for it in body["items"]]})
+            refs = body.get("refs") or []
+            return self._json(200, {"set": slug, "results": [{**one(it, refs[i] if i < len(refs) else ""), "state": it} for i, it in enumerate(body["items"])]})
         if "text" in body or "state" in body:
-            res = one(body["text"] if "text" in body else body["state"])
+            res = one(body["text"] if "text" in body else body["state"], body.get("ref") or "")
             return self._json(502 if "error" in res else 200, {"id": res["id"], "error": res["error"]} if "error" in res else res)
         return self._json(400, {"error": 'Send {"text": "..."}, {"state": ...} or {"items": [...]}.'})
 
     _raw = b""
+
+    def _requests(self) -> None:
+        """GET /api/requests?set=&status=&since=&limit=, newest first. since is a time (unix
+        milliseconds or RFC 3339); only requests that changed after it are listed."""
+        q = urllib.parse.parse_qs(urllib.parse.urlparse(self.path).query)
+        get = lambda k: (q.get(k) or [""])[0]
+        try:
+            limit = max(1, min(500, int(get("limit") or 50)))
+        except ValueError:
+            limit = 50
+        since = 0
+        if get("since"):
+            v = get("since")
+            try:
+                since = int(v)
+            except ValueError:
+                try:
+                    since = int(datetime.datetime.fromisoformat(v.replace("Z", "+00:00")).timestamp() * 1000)
+                except ValueError:
+                    return self._json(400, {"error": "since is a time: unix milliseconds or RFC 3339, like 2026-01-31T09:00:00Z."})
+        out = []
+        with LOG_LOCK:
+            for it in reversed(log_items()):
+                if len(out) >= limit:
+                    break
+                if get("set") and it.get("set") != get("set"):
+                    continue
+                if get("status") and public_status(it) != get("status"):
+                    continue
+                changed = (it.get("review") or {}).get("at") or it.get("at", 0)
+                if since and changed <= since:
+                    continue
+                out.append(public_item(it))
+        return self._json(200, {"requests": out})
+
+    def _hooks(self) -> None:
+        if not self._from_page():
+            return
+        with HOOK_LOCK:
+            items = [{k: v for k, v in d.items() if k != "busy"} for d in reversed(hook_list()[-50:])]
+        return self._json(200, {"deliveries": items})
+
+    def _hook_send(self, test: bool) -> None:
+        """Sends now and reports how it went: a ping to a set's webhook, or a delivery again."""
+        if not self._from_page():
+            return
+        try:
+            body = json.loads(self._raw or b"{}")
+        except ValueError:
+            body = {}
+        if test:
+            s = hook_for(body.get("set") or "")
+            if not s:
+                return self._json(400, {"error": "Zex: that set has no webhook URL"})
+            d = queue_hook(s, "ping", "", {"set": s["slug"], "name": s.get("name", "")}, "sending")
+        else:
+            with HOOK_LOCK:
+                d = next((x for x in hook_list() if x["id"] == body.get("id")), None)
+                busy = bool(d) and (d.get("busy") or d.get("state") == "sending")
+                if d and not busy:
+                    d["state"] = "sending"
+            if not d:
+                return self._json(404, {"error": "Zex: no delivery with that id"})
+            if busy:
+                return self._json(409, {"error": "Zex: that delivery is being sent now"})
+        send_hook(d, False)
+        with HOOK_LOCK:
+            return self._json(200, {"delivery": {k: v for k, v in d.items() if k != "busy"}})
 
     def _log(self) -> None:
         if not self._from_page():
@@ -556,9 +886,11 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             it = _log_by_id.get(body["id"])
             if not it:
                 return self._json(404, {"error": "Zex: no request with that id"})
+            before = it.get("review")
             it["review"] = {"at": int(time.time() * 1000), "labels": body["labels"],
                             "checked": int(body.get("checked") or 0), "agreed": int(body.get("agreed") or 0)}
             _append(REVIEW_FILE, {"id": it["id"], "review": it["review"]})
+            after_review(it, before)
             return self._json(200, {"ok": True, "item": it})
 
     def _stats(self) -> None:
@@ -667,8 +999,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._points()
         if self.path.startswith("/zex/catalog"):
             return self._catalog()
+        if self.path.startswith("/zex/hooks"):
+            return self._hooks()
         if self.path.startswith("/tests/fake-ollaya/"):
             return self._fake_ollaya()
+        if self.path.startswith("/tests/fake-hook"):
+            return self._fake_hook()
         if self.path == "/api" or self.path.startswith("/api/") or self.path.startswith("/api?"):
             return self._api()
         return super().do_GET()
@@ -689,12 +1025,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._relay()
         if self.path.startswith("/tests/fake-ollaya/"):
             return self._fake_ollaya()
+        if self.path.startswith("/tests/fake-hook"):
+            return self._fake_hook()
         if self.path.startswith("/zex/api-config"):
             return self._api_config()
         if self.path.startswith("/zex/log/clear"):
             return self._log_clear()
         if self.path.startswith("/zex/review"):
             return self._review()
+        if self.path.startswith("/zex/hooks/test"):
+            return self._hook_send(True)
+        if self.path.startswith("/zex/hooks/retry"):
+            return self._hook_send(False)
         if self.path == "/api" or self.path.startswith("/api/"):
             return self._api()
         return self._json(405, {"error": "method not allowed"})
@@ -707,6 +1049,7 @@ def main() -> None:
     args = ap.parse_args()
     Handler.allowed_origins = {f"http://127.0.0.1:{args.port}", f"http://localhost:{args.port}"}
     server = http.server.ThreadingHTTPServer(("127.0.0.1", args.port), partial(Handler, directory=WEB))
+    start_hooks()
     url = f"http://127.0.0.1:{args.port}/#/home"
     print(f"Zex on {url}  (Ctrl+C to stop)", flush=True)
     if args.open:

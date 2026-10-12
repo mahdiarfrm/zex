@@ -432,6 +432,37 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .hm-desk .win-title { background: var(--desk-ink); color: var(--desk); }
 .hm-desk .qr textarea { background: var(--bg); }
 .hm-below { padding: 0 28px; }
+
+/* ---------- the other pages, built like Home ---------- */
+.conns.pg { padding: 0 0 40px; }
+.pg-sky { min-height: 0; padding-bottom: 34px; }
+.pg-crumb { display: flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 600; }
+.pg-crumb a { color: var(--text-muted); font-weight: 500; } .pg-crumb a:hover { color: var(--text); text-decoration: underline; }
+.pg-crumb > span:first-of-type { color: var(--text-faint); font-weight: 400; }
+.pg-sky .hm-brief .hm-status { margin-bottom: 0; }
+.pg-lede { max-width: 720px; margin: 14px 0 0; font-size: 15px; line-height: 1.5; color: var(--text-muted); }
+.pg-lede.small { margin-top: 6px; font-size: 12.5px; }
+.pg-acts { margin-top: 18px; align-items: center; } .pg-acts .meta { margin-left: 6px; }
+.pg-note { margin: 18px 28px 0; max-width: 760px; font-size: 12.5px; color: var(--text-muted); }
+.hm-kpi.still:hover { background: color-mix(in srgb, var(--bg) 55%, transparent); } .hm-kpi.still:hover b { color: inherit; }
+.pg-desk { min-height: 480px; }
+.pg-desk .pg-grid { position: relative; z-index: 1; display: grid; gap: 24px; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+.pg-desk.side .pg-grid { max-width: 64%; }
+.pg-desk.one .pg-grid { grid-template-columns: minmax(0, 1fr); }
+.pg-desk.foot { padding-bottom: 250px; }
+.pg-desk.foot .pg-grid { grid-template-columns: minmax(0, 1fr); }
+.pg-grid > .wide { grid-column: 1 / -1; }
+.pg-desk .win-body :is(input:not([type="checkbox"]), textarea, select, .fld, .tok), .pg-desk .chip-select { background: var(--bg); }
+.pg-desk .rv-bar { background: var(--winbody); border: 1.5px solid var(--desk-ink); box-shadow: 6px 6px 0 var(--desk-ink); padding: 8px 10px 0; }
+.pg-desk .rv-tabs { border-bottom: 0; }
+.pg-band { --bg: #1e1e1e; --surface: #181818; --surface-2: #2a2828; --active: #333131; --border: #3a3838; --border-strong: #4d4a48; --border-input: #77726f;
+  --text: #f4f1ee; --text-muted: #b5b0aa; --text-faint: #9b9792; --accent: #f38aa2; --on-accent: #1e1e1e; --run: #f4f1ee; --on-run: #1e1e1e;
+  --syn-key: #f38aa2; --syn-string: #e8e4df; --syn-number: #f2cf6e; --syn-type: #9fd8c4; --syn-punct: #8a8580; color-scheme: dark; }
+.pg-hero { height: clamp(260px, 26vw, 380px); }
+.pg-band .at-title { font-size: clamp(56px, 8.5vw, 132px); }
+.pg-band-body { position: relative; }
+.pg-band .win { border-color: var(--at-line); box-shadow: none; background: var(--at-bg); }
+.pg-band .win-title { background: var(--at-ink); color: var(--at-bg); }
 .hm-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
 .qr textarea { display: block; width: 100%; min-height: 108px; resize: vertical; border: 1px solid var(--border-strong); background: var(--surface); padding: 10px 12px; font: 15px/1.45 var(--sans); color: var(--text); outline: none; }
 .qr textarea:focus { border-color: var(--text); }
@@ -529,6 +560,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   .h-prims { grid-template-columns: minmax(0, 1fr); } .spec { border-left: 0; border-top: 1px solid color-mix(in srgb, var(--bg) 25%, transparent); }
   .opt-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .hm-desk .hm-grid { max-width: none; } .hm-desk { padding-bottom: 260px; }
+  .pg-desk.side .pg-grid { max-width: none; }
 }
 @media (max-width: 900px) {
   .page { grid-column: 1 / -1; }
@@ -538,6 +570,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   .hm-mark { width: 120px; height: 120px; top: 44px; right: 8px; }
   .hm-leader { margin-top: 26px; max-width: calc(100% - 120px); } .hm-status { max-width: none; font-size: 44px; }
   .hm-desk-wrap { padding: 12px; } .hm-desk { padding: 38px 12px 200px; min-height: 0; } .hm-desk .hm-grid { grid-template-columns: minmax(0, 1fr); }
+  .pg-desk .pg-grid { grid-template-columns: minmax(0, 1fr); } .pg-desk.foot { padding-bottom: 200px; } .pg-band { padding: 22px 16px 28px; }
   .hm-recent .hist-item { grid-template-columns: 64px minmax(0, 1fr); } .hm-recent .hist-item .ans { grid-column: 2; }
   .nav-item span, .nav-item .ext { display: none; }
 }
@@ -576,8 +609,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .hm-sky::before { animation: skyDrift 22s ease-in-out infinite; }
 .intro .hm-leader { animation: fadeIn .8s .1s both; } .intro .hm-leader .dl { animation: growX .9s var(--ease-out) .25s both; transform-origin: left; }
 .intro .hm-mark { animation: winIn .9s var(--ease-spring) .2s backwards; }
-.hm-desk .win { transition: box-shadow .25s var(--ease-out), transform .25s var(--ease-out); }
-.hm-desk .win:hover { box-shadow: 9px 9px 0 var(--desk-ink); transform: translate(-2px, -2px); }
+.home .hm-desk .win { transition: box-shadow .25s var(--ease-out), transform .25s var(--ease-out); }
+.home .hm-desk .win:hover { box-shadow: 9px 9px 0 var(--desk-ink); transform: translate(-2px, -2px); }
 .intro .hm-recent .hist-item { animation: rise .45s var(--ease-out) backwards; animation-delay: calc(var(--j, 0) * 60ms + 320ms); }
 .qr textarea { transition: border-color .2s, box-shadow .25s var(--ease-out); } .qr textarea:focus { box-shadow: 4px 4px 0 var(--text); }
 .qr .run { transition: background .25s, color .25s, transform .12s; }
@@ -775,7 +808,31 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .end code { font: 12.5px var(--mono); }
 .end .verb { font-size: 16px; line-height: 18px; text-align: center; border: 1px solid var(--text); padding: 0 4px; }
 .end .verb.post { background: var(--text); color: var(--bg); }
-@media (max-width: 1100px) { .api-grid { grid-template-columns: minmax(0, 1fr); } .end { grid-template-columns: 52px minmax(0, 1fr) auto; } .end .muted { display: none; } }
+.hk { display: flex; flex-direction: column; gap: 10px; }
+.hk-lede { margin: 0; font-size: 13px; color: var(--text-muted); }
+.hk-rows { display: flex; flex-direction: column; }
+.hk-row { display: grid; grid-template-columns: 130px minmax(0, 1fr) auto auto; grid-template-areas: "name url ev test" ". last last last"; gap: 4px 8px; align-items: center; padding: 9px 0; border-bottom: 1px dotted var(--border-strong); }
+.hk-name { grid-area: name; font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hk-row .fld { grid-area: url; padding: 6px 8px; font-size: 12px; min-width: 0; } .hk-row select { grid-area: ev; } .hk-row .btn { grid-area: test; height: 30px; padding: 0 12px; }
+.hk-last { grid-area: last; font-size: 12px; color: var(--text-muted); } .hk-last:empty { display: none; }
+.hk-secret { border-bottom: 0; padding-bottom: 0; }
+.hk .note { margin: 0; font-size: 12px; color: var(--text-muted); }
+.dtag { display: inline-block; font-size: 15px; line-height: 16px; padding: 0 5px; border: 1px solid currentColor; }
+.dtag.d-sent { color: var(--success); } .dtag.d-pending, .dtag.d-sending { color: var(--warn); } .dtag.d-failed { color: var(--danger); }
+.hk-log { border-top: 1.5px solid var(--text); padding-top: 8px; }
+.hk-log-h { font-size: 16px; color: var(--text-muted); margin-bottom: 2px; }
+.hk-d { display: grid; grid-template-columns: 84px minmax(0, 1fr) minmax(0, 1.2fr) 70px auto; gap: 8px; align-items: center; padding: 6px 0; border-bottom: 1px dotted var(--border-strong); font-size: 12.5px; }
+.hk-d .dtag { justify-self: start; }
+.hk-ev { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hk-note { color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hk-when { color: var(--text-muted); font-size: 15px; text-align: right; }
+.hk-none { margin: 4px 0 0; font-size: 12.5px; color: var(--text-muted); }
+.pg-band .api-code { margin-top: 0; }
+.pg-band .code-tabs { align-items: center; gap: 4px; flex-wrap: wrap; }
+.pg-band .code-tabs .chip-select { margin-right: 6px; }
+.api-gen { max-height: 560px; overflow: auto; margin: 0; }
+@media (max-width: 1100px) { .api-grid { grid-template-columns: minmax(0, 1fr); } .end { grid-template-columns: 52px minmax(0, 1fr) auto; } .end .muted { display: none; }
+  .hk-row { grid-template-columns: minmax(0, 1fr) auto auto; grid-template-areas: "name name name" "url ev test" "last last last"; } .hk-d { grid-template-columns: 84px minmax(0, 1fr) auto; } .hk-note, .hk-when { display: none; } }
 
 /* ---------- review queue and live numbers ---------- */
 .nav-badge { margin-left: auto; background: var(--text); color: var(--bg); font-size: 15px; font-weight: 400; line-height: 16px; padding: 0 5px; min-width: 18px; text-align: center; }
@@ -873,8 +930,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 /* ---------- routes and replay ---------- */
 .route { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 10px; padding: 8px 0; border-top: 1px dotted var(--border-strong); }
 .route .rk, .route.editing .rk { font-family: var(--pix); font-size: 16px; color: var(--text-muted); text-transform: uppercase; }
-.rchips { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; flex: 1; min-width: 0; }
-.rchip { display: inline-flex; align-items: center; gap: 5px; font: 11.5px var(--mono); padding: 2px 6px; border: 1px solid var(--text); background: var(--bg); }
+.rchips { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; flex: 1; max-width: 100%; }
+.rchip { display: inline-flex; align-items: center; gap: 5px; font: 11.5px var(--mono); padding: 2px 6px; border: 1px solid var(--text); background: var(--bg); white-space: nowrap; max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 .rchip b { font-size: 14px; font-weight: 400; background: var(--text); color: var(--bg); padding: 0 3px; line-height: 14px; }
 .rchip small { color: var(--text-muted); font-size: 10.5px; }
 .rchip.person { border-style: dashed; color: var(--text-muted); }
@@ -1005,7 +1062,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     <div class="sp-mark"><div class="halftone"></div></div>
     <div class="sp-name"><span style="--i:0">Z</span><span style="--i:1">e</span><span style="--i:2">x</span></div>
     <div class="win sp-log">
-      <div class="win-title">Zex.OS 0.4<span class="grow"></span>boot</div>
+      <div class="win-title">Zex.OS 0.5<span class="grow"></span>boot</div>
       <div class="win-body">
         <div class="sp-line" style="--d:0"><span>loading workbench</span><i></i><b class="ok">ok</b></div>
         <div class="sp-line" style="--d:1"><span>starting relay</span><i></i><b id="spRelay"></b></div>
@@ -1335,6 +1392,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
   let curSetId = store.get("zex.curSet", null);
   let setChipEl = null;
+  const ZEX_VERSION = "0.5.0";
   let apiCfg = { available: false, enabled: false, token: "" };
   let apiTimer = 0;
 
@@ -1670,6 +1728,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     document.querySelectorAll("[data-cerr]").forEach((el) => { el.textContent = statusLine(el.dataset.cerr).error || ""; });
     document.querySelectorAll("[data-cmodels]").forEach((el) => el.replaceChildren(...modelChips(el.dataset.cmodels)));
     document.querySelectorAll("[data-coff]").forEach((el) => { el.hidden = cstat[el.dataset.coff]?.state !== "bad"; });
+    paintSkyKpis();
     paintBrief();
   }
 
@@ -1923,7 +1982,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("div", { class: "vstrip", "aria-hidden": "true" }, STRIP),
       h("div", { class: "ex-hero" },
         h("div", {},
-          h("span", { class: "tagline" }, "Zex.OS 0.4"),
+          h("span", { class: "tagline" }, "Zex.OS 0.5"),
           h("div", { class: "eyebrow" }, "Start here"),
           h("div", { class: "corners", style: "display:inline-block;margin-top:14px" }, h("i", { class: "tl" }), h("i", { class: "tr" }), h("i", { class: "bl" }), h("i", { class: "br" }),
             h("h2", {}, "Ask a model something"))),
@@ -1973,7 +2032,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const f = Z2D.map(([x, y]) => [x - 1.2, y - 1.5, 0.5]);
     const b = Z2D.map(([x, y]) => [x - 1.2, y - 1.5, -0.5]);
     const faces = [{ v: f, front: true }, { v: b.slice().reverse() }];
-    for (let i = 0; i < Z2D.length; i++) { const j = (i + 1) % Z2D.length; faces.push({ v: [f[i], f[j], b[j], b[i]] }); }
+    for (let i = 0; i < Z2D.length; i++) { const j = (i + 1) % Z2D.length; faces.push({ v: [f[j], f[i], b[i], b[j]] }); }
     return faces;
   }
   function rot([x, y, z], rx, ry) {
@@ -1981,16 +2040,52 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     c = Math.cos(rx); s = Math.sin(rx); [y, z] = [y * c - z * s, y * s + z * c];
     return [x, y, z];
   }
-  function sortedFaces(rx, ry) {
-    return zFaces().map((fc) => {
-      const v = fc.v.map((p) => rot(p, rx, ry));
-      const a = v[0], b = v[1], c = v[2];
-      const n = [(b[1] - a[1]) * (c[2] - a[2]) - (b[2] - a[2]) * (c[1] - a[1]), (b[2] - a[2]) * (c[0] - a[0]) - (b[0] - a[0]) * (c[2] - a[2]), (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0])];
-      const len = Math.hypot(...n) || 1;
-      return { v, n: n.map((x) => x / len), z: v.reduce((sum, p) => sum + p[2], 0) / v.length, front: fc.front };
-    }).sort((p, q) => p.z - q.z);
+  // Faces turned and sorted back to front: whole solids first, by their middles, then the faces
+  // within each. A face's normal comes from all its corners, so concave outlines work too.
+  function sortedFaces(rx, ry, faces = zFaces()) {
+    const mid = {};
+    const out = faces.map((fc) => {
+      const v = fc.v.map((p) => rot(p, rx, ry)), n = [0, 0, 0];
+      v.forEach((a, i) => { const b = v[(i + 1) % v.length]; n[0] += (a[1] - b[1]) * (a[2] + b[2]); n[1] += (a[2] - b[2]) * (a[0] + b[0]); n[2] += (a[0] - b[0]) * (a[1] + b[1]); });
+      const len = Math.hypot(...n) || 1, z = v.reduce((sum, p) => sum + p[2], 0) / v.length, body = fc.body || 0;
+      (mid[body] ||= []).push(z);
+      return { v, n: n.map((x) => x / len), z, front: fc.front, body };
+    });
+    const bz = Object.fromEntries(Object.entries(mid).map(([k, zs]) => [k, zs.reduce((a, b) => a + b, 0) / zs.length]));
+    return out.sort((p, q) => bz[p.body] - bz[q.body] || p.z - q.z);
+  }
+  // Each page has its own mark: outlines (y down) pushed out into solids d deep on each side,
+  // centred and sized like the Z.
+  const GLYPHS = (() => {
+    const area = (p) => p.reduce((sum, [x, y], i) => { const [x1, y1] = p[(i + 1) % p.length]; return sum + x * y1 - x1 * y; }, 0);
+    const zTurn = area(Z2D) > 0;
+    const make = (d, polys) => {
+      const pts = polys.flat(), xs = pts.map((q) => q[0]), ys = pts.map((q) => q[1]);
+      const cx = (Math.min(...xs) + Math.max(...xs)) / 2, cy = (Math.min(...ys) + Math.max(...ys)) / 2;
+      const k = 1.98 / Math.max(...pts.map(([x, y]) => Math.hypot(x - cx, y - cy, d)));
+      return { d: d * k, polys: polys.map((q) => { const r = q.map(([x, y]) => [(x - cx) * k, (y - cy) * k]); return area(r) > 0 === zTurn ? r : r.reverse(); }) };
+    };
+    const slab = (y) => [[0, y], [2.6, y], [2.6, y + 0.42], [0, y + 0.42]];
+    return {
+      sets: make(1.15, [slab(0), slab(0.86), slab(1.72)]),
+      review: make(0.5, [[[0, 1.6], [0.5, 1.1], [1.05, 1.65], [2.5, 0.2], [3, 0.7], [1.05, 2.65]]]),
+      api: make(0.45, [[[0.85, 0], [1.35, 0], [0.55, 1.5], [1.35, 3], [0.85, 3], [0.05, 1.5]], [[2.35, 0], [2.8, 0], [1.95, 3], [1.5, 3]], [[2.95, 0], [3.45, 0], [4.25, 1.5], [3.45, 3], [2.95, 3], [3.75, 1.5]]]),
+      link: make(0.5, [[[0.55, 0], [0.9, 0], [0.9, 1], [1.5, 1], [1.5, 0], [1.85, 0], [1.85, 1], [2.2, 1], [2.2, 2], [1.6, 2.6], [1.4, 2.6], [1.4, 3.3], [1, 3.3], [1, 2.6], [0.8, 2.6], [0.2, 2], [0.2, 1], [0.55, 1]]]),
+      models: make(1.1, [[[0, 0], [2.2, 0], [2.2, 2.2], [0, 2.2]]]),
+    };
+  })();
+  const GLYPH_LABEL = { sets: "three stacked layers", review: "a check mark", api: "angle brackets around a slash", link: "a plug", models: "a cube" };
+  function glyphFaces(g) {
+    return g.polys.flatMap((p, body) => {
+      const f = p.map(([x, y]) => [x, y, g.d]), b = p.map(([x, y]) => [x, y, -g.d]);
+      // sides wound so their normals face out, like the caps', and back faces drop out
+      return [{ v: f, front: true, body }, { v: b.slice().reverse(), body }, ...p.map((_, i) => { const j = (i + 1) % p.length; return { v: [f[j], f[i], b[i], b[j]], body }; })];
+    });
   }
   const ISO = { rx: -0.6155, ry: -0.7854 };
+  // One clock for every animation, and each mark's angle kept by name, so a page drawn again
+  // after a click carries on where it was instead of starting over.
+  const T0 = performance.now(), turns = {};
   function markSVG() {
     const faces = sortedFaces(ISO.rx, ISO.ry);
     const pts = faces.flatMap((f) => f.v);
@@ -2002,12 +2097,14 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
   $("#mark").innerHTML = markSVG();
 
-  function heroCanvas(spin = 0.006) {
-    const cv = h("canvas", { class: "hero3d", role: "img", "aria-label": "A 3D Z, the Zex mark. Drag to turn it." });
+  // The colour mark in a sky band: the Z on Home, or a page's own glyph.
+  function heroCanvas(spin = 0.006, glyph = null, key = glyph || "z") {
+    const faces = glyph ? glyphFaces(GLYPHS[glyph]) : zFaces(), st = (turns["hero." + key] ||= { rx: ISO.rx, ry: ISO.ry });
+    const cv = h("canvas", { class: "hero3d", role: "img", "aria-label": glyph ? `A 3D mark, ${GLYPH_LABEL[glyph]}. Drag to turn it.` : "A 3D Z, the Zex mark. Drag to turn it." });
     const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let rx = ISO.rx, ry = ISO.ry, drag = null, t0 = performance.now();
-    cv.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, rx, ry }; cv.setPointerCapture(e.pointerId); });
-    cv.addEventListener("pointermove", (e) => { if (!drag) return; ry = drag.ry + (e.clientX - drag.x) / 70; rx = Math.max(-1.4, Math.min(1.4, drag.rx - (e.clientY - drag.y) / 70)); if (reduce) frame(); });
+    let drag = null;
+    cv.addEventListener("pointerdown", (e) => { drag = { x: e.clientX, y: e.clientY, rx: st.rx, ry: st.ry }; cv.setPointerCapture(e.pointerId); });
+    cv.addEventListener("pointermove", (e) => { if (!drag) return; st.ry = drag.ry + (e.clientX - drag.x) / 70; st.rx = Math.max(-1.4, Math.min(1.4, drag.rx - (e.clientY - drag.y) / 70)); if (reduce) frame(); });
     cv.addEventListener("pointerup", () => { drag = null; });
     function frame(now = performance.now()) {
       if (!cv.isConnected) return;
@@ -2016,15 +2113,15 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       if (cv.width !== Math.round(W * dpr)) { cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); }
       const ctx = cv.getContext("2d");
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-      const t = (now - t0) / 1000;
-      if (!drag && !reduce) ry += spin;
+      const t = (now - T0) / 1000;
+      if (!drag && !reduce) st.ry += spin;
       const css = getComputedStyle(document.documentElement);
       const ink = css.getPropertyValue("--text").trim() || "#111";
       const s = Math.min(W, H) / 4.1, cx = W / 2, cy = H / 2 + 4;
       // ground shadow
       ctx.fillStyle = ink; ctx.globalAlpha = 0.12;
       ctx.beginPath(); ctx.ellipse(cx + 6, cy + s * 1.85, s * 1.25, s * 0.22, 0, 0, Math.PI * 2); ctx.fill(); ctx.globalAlpha = 1;
-      for (const f of sortedFaces(rx, ry)) {
+      for (const f of sortedFaces(st.rx, st.ry, faces)) {
         if (f.n[2] < -0.02 && !f.front) continue;
         const hue = (Math.atan2(f.n[1], f.n[0]) * 57.3 + f.n[2] * 140 + t * 40) % 360;
         const g = ctx.createLinearGradient(cx - s * 1.5, cy - s * 1.5, cx + s * 1.5, cy + s * 1.5);
@@ -2037,6 +2134,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       if (!reduce) requestAnimationFrame(frame);
     }
     requestAnimationFrame(frame);
+    // with reduced motion it is drawn once; a timer does it too, for views that paint no frames
+    if (reduce) setTimeout(() => frame(), 0);
     return cv;
   }
 
@@ -3123,17 +3222,22 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
           del)), "set-win" + (x.id === curSetId ? " current" : ""));
     };
     const onImport = async (f) => { try { const a = await importSets(f); rerender(); toast(importedMsg(a)); } catch (err) { toast(err.message); } };
-    return dropTarget(h("div", { class: "conns sets" },
-      h("section", { class: "c-head" },
-        h("span", { class: "tagline" }, "Zex.Sets 0.1"),
-        h("h1", { class: "giant sm" }, words("Question Sets")),
-        h("p", {}, "A set is a named group of typed questions you can reuse in the Playground, in Batch, on Home and through the local API. Sets live on this computer. Export one to share it or keep it next to your code."),
-        h("div", { class: "btn-row" },
+    return dropTarget(h("div", { class: "conns pg sets" },
+      pageSky({ name: "Sets", title: "Question Sets", mark: "sets",
+        lede: "A set is a named group of typed questions you can reuse in the Playground, in Batch, on Home and through the local API. Sets live on this computer. Export one to share it or keep it next to your code.",
+        acts: [
           h("button", { class: "btn solid", type: "button", onclick: () => { curSetId = null; questionsText = ""; saveAll(); store.set("zex.curSet", null); renderQuestions(); mode = "response"; go("playground"); } }, "New set"),
           h("button", { class: "btn", type: "button", onclick: () => pickFile(".json", onImport) }, "Import…"),
           h("button", { class: "btn", type: "button", disabled: !sets.length || undefined, onclick: exportAllSets }, "Export all"),
-          h("span", { class: "meta" }, "or drop a .zex.json file anywhere on this page"))),
-      sets.length ? h("div", { class: "c-grid" }, sets.map(card)) : h("div", { class: "empty-hint" }, "No sets yet. Write questions in the Playground and save them as a set.")), onImport);
+          h("span", { class: "meta" }, "or drop a .zex.json file anywhere on this page")],
+        kpis: () => {
+          const L = liveSummary(), called = L ? L.per.filter((p) => p.req > 0 && sets.some((x) => x.slug === p.slug)).length : null;
+          return [["saved sets", fmtN(sets.length)], ["questions in them", fmtN(sets.reduce((m, x) => m + qCount(x.questions), 0))],
+            ["with their own route", fmtN(sets.filter((x) => x.route?.length).length)],
+            ["called this week", called == null ? "–" : fmtN(called), () => go(apiCfg.enabled ? "review" : "api")]];
+        } }),
+      pageDesk("Zex.Sets", "side", sets.length ? sets.map(card)
+        : win("Zex.Sets", "empty", h("p", {}, "No sets yet. Write questions in the Playground and save them as a set."), "wide"))), onImport);
   }
 
   // ---------------------------------------------------------------- routes
@@ -3196,8 +3300,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   // the desk: two globes and a tumbling torus that drift and lean toward the pointer
   function withDeskDots(desk) {
     const cv = h("canvas", { class: "hm-dots", "aria-hidden": "true" });
-    let W = 0, H = 0, shapes = [], dust = [], px = 0, py = 0, last = -1e9, visible = true, img = null, buf = null;
-    const t0 = performance.now();
+    let W = 0, H = 0, shapes = [], dust = [], last = -1e9, visible = true, img = null, buf = null;
+    const t0 = T0, lean = (turns.desk ||= { px: 0, py: 0 }); // where the pointer leans the shapes, kept across redraws
     let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
     const globe = (n) => dotGlobe(n, rnd), torus = (n) => dotTorus(n, rnd);
     const build = () => {
@@ -3205,7 +3309,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       const dpr = Math.min(2, devicePixelRatio || 1);
       cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
       img = null; seed = 11;
-      const grid = desk.querySelector(".hm-grid"), wide = !!grid && grid.offsetWidth < W * 0.8, m = Math.min(W, H * 1.5);
+      const grid = desk.querySelector(".hm-grid, .pg-grid"), wide = !!grid && grid.offsetWidth < W * 0.8, m = Math.min(W, H * 1.5);
       const spec = wide
         ? [{ k: "globe", x: 0.83, y: 0.3, r: 0.16, spin: 0.45, tilt: 0.42 }, { k: "torus", x: 0.82, y: 0.74, r: 0.17, spin: 0.55, tilt: 1.0, tumble: 1 },
            { k: "globe", x: 0.03, y: 0.97, r: 0.13, spin: -0.35, tilt: 0.3 }, { k: "globe", x: 0.6, y: 1.04, r: 0.1, spin: 0.6, tilt: 0.5 }]
@@ -3230,18 +3334,98 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       buf.fill(0);
       const L = { buf, cw, ch, ds: Math.max(2, Math.round(1.6 * dpr)) }, ink = inkOf(), t = (now - t0) / 1000;
       for (const sh of shapes) {
-        const ay = t * sh.spin + px * 1.2, ax = sh.tilt + (sh.tumble ? t * sh.spin * 0.7 : 0) + py * 0.8;
+        const { px, py } = lean, ay = t * sh.spin + px * 1.2, ax = sh.tilt + (sh.tumble ? t * sh.spin * 0.7 : 0) + py * 0.8;
         const ox = (sh.x * W + Math.sin(t * 0.45 + sh.ph) * 12 + px * 26) * dpr, oy = (sh.y * H + Math.cos(t * 0.38 + sh.ph) * 10 + py * 18) * dpr;
         stipple(L, sh.pts, ox, oy, sh.R * dpr, ay, ax, ink);
       }
       for (const [x, y, k] of dust) if ((k * 10 + t * 0.5) % 1 < 0.6) pixDot(L, x * dpr, y * dpr, ink);
       ctx.putImageData(img, 0, 0);
     };
-    desk.addEventListener("pointermove", (e) => { const r = desk.getBoundingClientRect(); px = (e.clientX - r.left) / r.width - 0.5; py = (e.clientY - r.top) / r.height - 0.5; });
+    desk.addEventListener("pointermove", (e) => { const r = desk.getBoundingClientRect(); lean.px = (e.clientX - r.left) / r.width - 0.5; lean.py = (e.clientY - r.top) / r.height - 0.5; });
     new IntersectionObserver(([en]) => { visible = en.isIntersecting; }).observe(desk);
     desk.prepend(cv);
     requestAnimationFrame(draw);
     return desk;
+  }
+
+  // ---------------------------------------------------------------- page shell
+  // Every page is built like Home: a sky band on top (clock, a status line, the title, its
+  // numbers and the page's own 3D mark), the work on the pink desk, and, where a page has
+  // one, a dark band like Last 7 Days.
+  function connLeader() {
+    const c = activeConn(), sl = statusLine(c.id);
+    return h("p", { class: "hm-leader" }, h("span", { class: sl.cls, "data-cdot": c.id }), h("b", {}, c.name), h("span", { class: "dl", "aria-hidden": "true" }),
+      h("span", { class: "u" }, `${model} · `, h("span", { "data-ctext": c.id }, sl.short)));
+  }
+  // kpis: [label, value, onclick?]
+  const kpiCells = (kpis) => h("div", { class: "hm-kpis" }, kpis.map(([label, value, onclick]) => onclick
+    ? h("button", { type: "button", class: "hm-kpi", onclick }, h("b", {}, value), h("span", {}, label))
+    : h("div", { class: "hm-kpi still" }, h("b", {}, value), h("span", {}, label))));
+  // numbers made by a function are drawn again whenever their data comes in
+  function liveKpis(fn) { const el = kpiCells(fn()); el.dataset.live = ""; el.kpiFn = fn; return el; }
+  function paintSkyKpis() { document.querySelectorAll(".hm-kpis[data-live]").forEach((el) => el.replaceWith(liveKpis(el.kpiFn))); }
+  function pageSky({ name, title, lede, kpis, mark, leader, acts, extra }) {
+    return h("section", { class: "hm-sky pg-sky" },
+      h("div", { class: "hm-b64", "aria-hidden": "true" }, STRIP),
+      h("div", { class: "hm-top" },
+        h("span", { class: "tagline cursor" }, "Zex.OS 0.5"),
+        h("nav", { class: "pg-crumb", "aria-label": "Breadcrumb" }, h("a", { href: "#/home" }, "Home"), h("span", { "aria-hidden": "true" }, "/"), h("span", { "aria-current": "page" }, name)),
+        h("span", { class: "grow" }), h("span", { class: "zclock pix" }, `${fmtDate()} · ${fmtTime()}`)),
+      h("div", { class: "hm-brief" },
+        leader || connLeader(),
+        h("h1", { class: "giant hm-status" }, words(title)),
+        lede ? h("p", { class: "pg-lede" }, lede) : null,
+        acts ? h("div", { class: "btn-row pg-acts" }, acts) : null,
+        typeof kpis === "function" ? liveKpis(kpis) : kpis ? kpiCells(kpis) : null, extra),
+      h("div", { class: "hm-mark" }, h("div", { class: "halftone" }), heroCanvas(0.006, mark)));
+  }
+  // layout "side" keeps the work to the left two thirds, with the dot shapes on the right;
+  // "foot" uses the whole width and puts them along the bottom.
+  function pageDesk(tag, layout, ...kids) {
+    return h("div", { class: "hm-desk-wrap" }, withDeskDots(h("section", { class: `hm-desk pg-desk ${layout}`, "aria-label": "Workspace" },
+      h("span", { class: "tagline" }, tag), h("div", { class: "pg-grid" }, kids.flat(2)))));
+  }
+  function pageBand({ tag, title, mark, caps, body }) {
+    const cv = h("canvas", { class: "cv-mark", role: "img", "aria-label": `The page's mark, ${GLYPH_LABEL[mark]}, in dotted lines. Drag to turn it.` });
+    const corners = ["tl", "tr", "bl", "br"].map((c) => h("i", { class: "at-cn " + c, "aria-hidden": "true" }));
+    const el = h("section", { class: "hm-atlas pg-band", "aria-label": title },
+      h("div", { class: "at-hero pg-hero" }, cv, h("div", { class: "at-frame" }, corners, h("span", { class: "tagline" }, tag), h("h2", { class: "at-title" }, title))),
+      caps ? h("div", { class: "at-intro" }, caps.map(([k, t]) => h("div", {}, h("span", { class: "pix" }, k), h("p", {}, t)))) : null,
+      body);
+    spinWire(cv, mark);
+    return el;
+  }
+  // A glyph's outlines as a wireframe, turning on its own and by dragging, like the Z in Last 7 Days.
+  function spinWire(cv, mark) {
+    const g = GLYPHS[mark];
+    const dd = g.d * 1.1, v = [], e = [];
+    for (const p of g.polys) {
+      const n = p.length, o = v.length;
+      v.push(...p.map(([x, y]) => [x, y, dd]), ...p.map(([x, y]) => [x, y, -dd]));
+      for (let i = 0; i < n; i++) e.push([o + i, o + ((i + 1) % n)], [o + n + i, o + n + ((i + 1) % n)], [o + i, o + n + i]);
+    }
+    const wire = { v, e }, S = { bufs: {}, drag: null, last: 0, visible: true }, st = (turns["wire." + mark] ||= { ay: -0.35 });
+    const draw = (dt, t) => {
+      const mk = fitCanvas(cv);
+      if (!mk) return;
+      const { ctx, w, h: hh } = mk, L = atlasBuf(S, "m", mk), D = L.dpr, sc = Math.min(hh / 3.7, w / 3.4) * D;
+      if (!S.drag && !reduceMotion) st.ay += 0.42 * dt * (1 - 0.82 * Math.cos(2 * st.ay));
+      drawWire(L, wire, (w / 2) * D, (hh / 2) * D, sc, st.ay, -0.3 + Math.sin(t * 0.3) * 0.08);
+      ctx.putImageData(L.img, 0, 0);
+    };
+    cv.addEventListener("pointerdown", (ev) => { S.drag = { x: ev.clientX, from: st.ay }; cv.setPointerCapture(ev.pointerId); });
+    cv.addEventListener("pointermove", (ev) => { if (S.drag) { st.ay = S.drag.from + (ev.clientX - S.drag.x) / 110; if (reduceMotion) draw(0, 0); } });
+    cv.addEventListener("pointerup", () => { S.drag = null; });
+    new IntersectionObserver(([en]) => { S.visible = en.isIntersecting; if (S.visible && reduceMotion) draw(0, 0); }, { rootMargin: "120px" }).observe(cv);
+    const loop = (now) => {
+      if (!cv.isConnected) return;
+      if (!reduceMotion) requestAnimationFrame(loop);
+      if (!S.visible || document.hidden || now - S.last < 33) return;
+      const dt = S.last ? Math.min(0.1, (now - S.last) / 1000) : 0;
+      S.last = now; draw(dt, now / 1000);
+    };
+    requestAnimationFrame(loop);
+    if (reduceMotion) setTimeout(() => draw(0, 0), 0);
   }
 
   function animateHome(root, intro) {
@@ -3390,7 +3574,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("section", { class: "hm-sky" },
         h("div", { class: "hm-b64", "aria-hidden": "true" }, STRIP),
         h("div", { class: "hm-top" },
-          h("span", { class: "tagline cursor" }, "Zex.OS 0.4"), h("h1", {}, "Home"), h("span", { class: "grow" }),
+          h("span", { class: "tagline cursor" }, "Zex.OS 0.5"), h("h1", {}, "Home"), h("span", { class: "grow" }),
           h("span", { class: "zclock pix" }, `${fmtDate()} · ${fmtTime()}`)),
         (hmBriefEl = briefEl()),
         h("div", { class: "hm-mark" }, h("div", { class: "halftone" }), heroCanvas())),
@@ -3442,6 +3626,12 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
           h("div", {}, h("div", { class: "k" }, "returns"), "A LEVEL + AN EXPECTED VALUE")))));
   }
 
+  function connKpis() {
+    const up = conns.filter((c) => ["ok", "warn"].includes(cstat[c.id]?.state)), ms = cstat[activeId]?.ms;
+    return [["saved", fmtN(conns.length)], ["online now", fmtN(up.length)],
+      ["models to pick from", fmtN(new Set(up.flatMap((c) => cstat[c.id].models)).size), () => go("models")],
+      ["to the active one", ms != null ? `${Math.round(ms)} ms` : "–", () => checkConn(activeConn())]];
+  }
   function renderConnections() {
     const editor = (c) => {
       const kind = KINDS[c.kind] || KINDS.custom;
@@ -3467,18 +3657,19 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
             c.kind === "cloud" ? h("button", { class: "btn", type: "button", onclick: () => addConn("cloud") }, "New code") : null,
             conns.length > 1 ? h("button", { class: "btn", type: "button", onclick: () => removeConn(c.id) }, "Remove") : null)));
     };
-    return h("div", { class: "conns" },
-      h("section", { class: "c-head" },
-        h("span", { class: "tagline" }, "Zex.Link 0.1"),
-        h("h1", { class: "giant sm" }, words("Connections")),
-        h("p", {}, "Zex talks to any server that speaks the typed-decision API (POST /v1/systemone). The active one is used by the Playground, Batch and History. Compare can mix two."),
-        h("p", { class: "note" }, hasRelay
-          ? "Requests go through Zex's relay on 127.0.0.1, so cloud servers work too. Keys stay in this browser's storage and are sent only to the URL you set."
-          : "Zex's relay isn't running, so only servers that allow this page directly (like Ollaya) will work. Start Zex with python3 server.py to reach the rest.")),
-      h("div", { class: "c-grid" },
-        cloudSetup ? cloudSetupWin() : null,
+    const cloud = cloudSetup ? cloudSetupWin() : null;
+    cloud?.classList.add("wide");
+    return h("div", { class: "conns pg" },
+      pageSky({ name: "Connections", title: "Connections", mark: "link",
+        lede: "Zex talks to any server that speaks the typed-decision API (POST /v1/systemone). The active one is used by the Playground, Batch and History. Compare can mix two.",
+        kpis: connKpis }),
+      pageDesk("Zex.Link", "side",
+        cloud,
         conns.map(editor),
-        win("Zex.Link · add", "", h("div", { class: "preset-grid" }, Object.entries(KINDS).map(([k, v]) => h("button", { class: "preset", type: "button", onclick: () => addConn(k) }, h("b", {}, "+ " + v.label), h("span", {}, v.note)))))));
+        win("Zex.Link · add", "", h("div", { class: "preset-grid" }, Object.entries(KINDS).map(([k, v]) => h("button", { class: "preset", type: "button", onclick: () => addConn(k) }, h("b", {}, "+ " + v.label), h("span", {}, v.note)))))),
+      h("p", { class: "pg-note" }, hasRelay
+        ? "Requests go through Zex's relay on 127.0.0.1, so cloud servers work too. Keys stay in this browser's storage and are sent only to the URL you set."
+        : "Zex's relay isn't running, so only servers that allow this page directly (like Ollaya) will work. Start Zex with python3 server.py to reach the rest."));
   }
 
 
@@ -3617,7 +3808,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const key = c.id + "|" + tag;
     if (pulls.has(key)) return;
     const p = { c, tag, layers: {}, status: "", ctl: new AbortController() };
-    pulls.set(key, p); paintPull(key);
+    pulls.set(key, p); paintPull(key); paintSkyKpis();
     let raf = 0;
     const later = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; paintPull(key); }); };
     try {
@@ -3644,7 +3835,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     } catch (e) {
       if (e.name !== "AbortError") toast(`Couldn't download ${tag}: ${String(e.message || e).split("\n")[0]}`);
     }
-    cancelAnimationFrame(raf); pulls.delete(key);
+    cancelAnimationFrame(raf); pulls.delete(key); paintSkyKpis();
     await loadModels(); checkConn(c); paintPull(key);
   }
   async function removeModel(c, name, btn) {
@@ -3703,12 +3894,12 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const cs = ollayaConns();
     if (!cs.some((c) => c.id === ms.target)) ms.target = (cs.find((c) => c.id === activeId) || cs.find((c) => c.kind === "ollaya") || cs[0])?.id || null;
     const target = cs.find((c) => c.id === ms.target);
-    const head = h("section", { class: "c-head" },
-      h("span", { class: "tagline" }, "Zex.Models 0.1"),
-      h("h1", { class: "giant sm" }, words("Models")),
-      h("p", {}, "Models run in Ollaya, on this computer or on a cloud GPU. Download one here, then pick it in the Playground, in a set's route or in Compare."));
-    if (!cs.length) return h("div", { class: "conns models" }, head,
-      h("div", { class: "c-grid" }, win("Zex.Models", "", h("div", {},
+    const head = pageSky({ name: "Models", title: "Models", mark: "models",
+      lede: "Models run in Ollaya, on this computer or on a cloud GPU. Download one here, then pick it in the Playground, in a set's route or in Compare.",
+      kpis: () => [["places they run", fmtN(ollayaConns().length), () => go("connections")], ["installed", fmtN(ollayaConns().reduce((m, c) => m + (ms.list[c.id]?.models?.length || 0), 0))],
+        ["downloading now", fmtN(pulls.size)], ["families in the library", ms.catalog ? fmtN(ms.catalog.length) : "–"]] });
+    if (!cs.length) return h("div", { class: "conns pg models" }, head,
+      pageDesk("Zex.Models", "side one", win("Zex.Models", "", h("div", {},
         h("p", {}, "Models are downloaded into Ollaya. Add it on this computer, or start one on a cloud GPU."),
         h("div", { class: "btn-row" }, h("button", { class: "btn solid", type: "button", onclick: () => { addConn("ollaya"); go("models"); } }, "+ Ollaya on this computer"),
           h("button", { class: "btn", type: "button", onclick: () => { cloudSetup = { tab: "colab" }; go("connections"); } }, "+ Cloud GPU"))))));
@@ -3717,11 +3908,12 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       oninput: (e) => { ms.q = e.target.value; listEl.replaceChildren(ms.catalog ? libraryList(target) : ""); } });
     const toSel = cs.length > 1 ? h("label", { class: "lib-to" }, h("span", {}, "Download to"),
       h("select", { class: "chip-select", "aria-label": "Download to", onchange: (e) => { ms.target = e.target.value; rerender(); } }, cs.map((c) => h("option", { value: c.id, selected: c.id === ms.target || undefined }, c.name)))) : null;
-    return h("div", { class: "conns models" }, head,
-      h("div", { class: "c-grid" }, cs.map(installedWin)),
-      h("div", { class: "win shadow lib-win" },
-        h("div", { class: "win-title" }, "Zex.Library", h("span", { class: "grow" }), "FROM OLLAYA.DEV"),
-        h("div", { class: "win-body" }, h("div", { class: "lib-bar" }, search, toSel), listEl)));
+    return h("div", { class: "conns pg models" }, head,
+      pageDesk("Zex.Models", "side" + (cs.length === 1 ? " one" : ""), cs.map(installedWin)),
+      pageBand({ tag: "Zex.Library", title: "Library", mark: "models",
+        caps: [["THE CATALOG", "Ollaya's models, from ollaya.dev. Each family has its sizes and languages; a download shows its progress here."],
+          ["WHERE IT GOES", target ? `Downloads go to ${target.name}. A model that fits it is marked SUGGESTED.` : "Pick where downloads go."]],
+        body: h("div", { class: "pg-band-body lib-win" }, h("div", { class: "lib-bar" }, search, toSel), listEl) }));
   }
 
   // ---------------------------------------------------------------- review queue
@@ -3743,7 +3935,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       const [st, lg, pt] = await Promise.all([zexGet("/zex/stats?days=14"), zexGet("/zex/log?limit=0"), route === "home" ? zexGet("/zex/points?days=7") : Promise.resolve(live.points)]);
       live = { stats: st, counts: lg.counts, points: pt };
     } catch { return; }
-    paintReviewBadge();
+    paintReviewBadge(); paintSkyKpis();
     if (route === "home") paintLive();
   }
   setInterval(() => { if (!document.hidden) refreshLive(); }, 15000);
@@ -3774,16 +3966,25 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
   function renderReview() {
     rvBody = h("div", { class: "rv-body" });
+    rvKpis = h("div", { class: "hm-kpis" });
+    const el = h("div", { class: "conns pg review" },
+      pageSky({ name: "Review", title: "Review", mark: "review", extra: rvKpis,
+        lede: "Answers the model wasn't sure about wait here for a person, with a few sure ones as spot checks. Each answer you give is a label: Zex uses them to measure accuracy and tune thresholds." }),
+      pageDesk("Zex.Review", "foot", rvBody));
     paintReview(); loadReview();
-    return h("div", { class: "conns review" },
-      h("section", { class: "c-head" },
-        h("span", { class: "tagline" }, "Zex.Review 0.1"),
-        h("h1", { class: "giant sm" }, words("Review")),
-        h("p", {}, "Answers the model wasn't sure about wait here for a person, with a few sure ones as spot checks. Each answer you give is a label: Zex uses them to measure accuracy and tune thresholds.")),
-      rvBody);
+    return el;
+  }
+  // the sky's numbers follow the queue as you work through it
+  let rvKpis = null;
+  function paintRvKpis() {
+    if (!rvKpis?.parentNode) return;
+    const c = rv.counts || {}, tab = (t) => () => { rv.tab = t; rv.sel = null; rv.items = []; rv.evalItems = null; paintReview(); loadReview(); };
+    const n = apiCfg.available ? kpiCells([["waiting", fmtN(c.waiting || 0), tab("waiting")], ["spot checks", fmtN(c.spot || 0), tab("spot")], ["reviewed", fmtN(c.reviewed || 0), tab("reviewed")], ["requests kept", fmtN(c.all || 0), tab("all")]]) : h("div", { class: "hm-kpis", hidden: true });
+    rvKpis.replaceWith(n); rvKpis = n;
   }
   function paintReview() {
     if (!rvBody) return;
+    paintRvKpis();
     const rows = rvBody.querySelector(".rv-rows")?.scrollTop || 0, top = page.scrollTop;
     rvBody.replaceChildren(...reviewBody().filter(Boolean)); settle(rvBody);
     const nr = rvBody.querySelector(".rv-rows");
@@ -3892,9 +4093,13 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     try {
       await zexPost("/zex/review", { id: it.id, labels, checked: keys.length, agreed });
     } catch (e) { toast(e.message); return; }
-    const wasOpen = !it.review, before = itemStatus(it);
+    const wasOpen = !it.review, before = itemStatus(it), prev = it.review?.labels;
     it.review = { at: Date.now(), labels, checked: keys.length, agreed };
-    toast(agreed === keys.length ? "Confirmed" : `Saved ${keys.length - agreed} correction${keys.length - agreed === 1 ? "" : "s"}`);
+    // the server sends the final answer on when the set has a webhook: always after a first
+    // review of a waiting request, otherwise only when the answers changed
+    const hooked = apiCfg.enabled && okHookUrl(hookOf(sets.find((x) => x.slug === it.set) || {}).url);
+    const goes = hooked && (prev ? keys.some((k) => !sameLabel(prev[k], labels[k])) : !it.all_auto || agreed < keys.length);
+    toast((agreed === keys.length ? "Confirmed" : `Saved ${keys.length - agreed} correction${keys.length - agreed === 1 ? "" : "s"}`) + (goes ? " and sent to the webhook" : ""));
     if (wasOpen) { rv.counts[before] = Math.max(0, (rv.counts[before] || 0) - 1); rv.counts.reviewed = (rv.counts.reviewed || 0) + 1; }
     if (rv.tab === "waiting" || rv.tab === "spot") {
       const i = rv.items.indexOf(it);
@@ -4141,7 +4346,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         h("div", { class: "at-cell at-trend" }, tab("ATLAS.TREND", h("span", {}, "14 DAYS")), h("div", { class: "at-svg", "data-at": "trend" }))));
     const S = atlas = { el, d: null, last: 0, visible: true, t0: performance.now(), bufs: {}, parts: [], spawn: 0, towers: [], hover: -1,
       mark: el.querySelector(".cv-mark"), week: el.querySelector(".cv-week"), flow: el.querySelector(".cv-flow"), hist: el.querySelector(".cv-hist"), saved: el.querySelector(".cv-saved"), tip: el.querySelector(".at-tip"),
-      zy: -0.35, zx: -0.3, zv: 0.42, wy: 0, drag: null };
+      zy: turns.atlasZ ?? -0.35, zx: -0.3, zv: 0.42, wy: 0, drag: null };
     // drag either shape to turn it; it eases back into its own spin after
     const dragTo = (cv, key) => {
       cv.addEventListener("pointerdown", (e) => { S.drag = { cv, key, x: e.clientX, from: S[key] }; cv.setPointerCapture(e.pointerId); });
@@ -4225,6 +4430,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     if (mk) {
       const { ctx, w, h: hh } = mk, L = atlasBuf(S, "mark", mk), D = L.dpr, s = Math.min(hh / 3.7, w / 3.4);
       if (S.drag?.key !== "zy" && !reduceMotion) S.zy += S.zv * dt * (1 - 0.82 * Math.cos(2 * S.zy));
+      turns.atlasZ = S.zy;
       const ay = S.zy, ax = S.zx + Math.sin(t * 0.3) * 0.08;
       drawFill(L, Z_FILL, -1.5, 1.5, d.pts.length ? d.autoShare : 0, (w / 2) * D, (hh / 2) * D, s * D, ay, ax, t, (y) => zSpans(y + 1.5).map(([a, b]) => [a - 1.2, b - 1.2]));
       drawWire(L, ZWIRE, (w / 2) * D, (hh / 2) * D, s * D, ay, ax);
@@ -4444,10 +4650,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         cell("waiting for review", fmtN(L.waiting + L.spot), () => { rv.tab = L.waiting ? "waiting" : "spot"; go("review"); })) : null);
   }
   function briefEl() {
-    const c = activeConn(), sl = statusLine(c.id);
     return h("div", { class: "hm-brief" },
-      h("p", { class: "hm-leader" }, h("span", { class: sl.cls, "data-cdot": c.id }), h("b", {}, c.name), h("span", { class: "dl", "aria-hidden": "true" }),
-        h("span", { class: "u" }, `${model} · `, h("span", { "data-ctext": c.id }, sl.short))),
+      connLeader(),
       h("h2", { class: "giant hm-status" }, words("Overview")),
       reportEl());
   }
@@ -4467,14 +4671,19 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   // While Zex runs, every set is an HTTP endpoint on this computer. The page tells the local
   // server which sets and which connection to answer with; the server keeps them in its
   // config file only while the API is on.
-  let apiShowToken = false, apiTab = "curl";
+  let apiShowToken = false, apiShowSecret = false, apiTab = "python", deliveries = [], hooksEl = null;
   const apiTry = { slug: null, text: "I was charged twice this month. Please refund one of the payments.", out: "" };
+  // where each set's final answers go: set id → { url, events: "reviewed" or "all" }
+  let hooks = store.get("zex.hooks", {});
+  const hookOf = (x) => ({ url: "", events: "reviewed", ...(hooks[x.id] || {}) });
+  const okHookUrl = (u) => /^https?:\/\/[^\s/?#]+\S*$/i.test((u || "").trim());
+  function setHook(x, patch) { hooks = { ...hooks, [x.id]: { ...hookOf(x), ...patch } }; store.set("zex.hooks", hooks); return syncApi(true); }
   async function loadApi() {
     try {
       const r = await fetch("/zex/api-config", { headers: { "X-Zex": "1" } });
       if (!r.ok) throw new Error(String(r.status));
       const d = await r.json();
-      apiCfg = { available: true, enabled: !!d.enabled, token: d.token || "", log: d.log !== false, audit: d.audit ?? 0.05 };
+      apiCfg = { available: true, enabled: !!d.enabled, token: d.token || "", hookSecret: d.hook_secret || "", log: d.log !== false, audit: d.audit ?? 0.05 };
       if (apiCfg.enabled) syncApi(true);
       refreshLive();
     } catch { apiCfg = { available: false, enabled: false, token: "" }; }
@@ -4484,6 +4693,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const c = activeConn();
     return { enabled: apiCfg.enabled, model, thr, log: apiCfg.log !== false, audit: apiCfg.audit ?? 0.05, connection: { kind: c.kind, name: c.name, url: c.url, key: c.key || "" },
       sets: sets.map((x) => ({ slug: x.slug, name: x.name, questions: x.questions, thresholds: x.thresholds || {},
+        webhook: okHookUrl(hookOf(x).url) ? hookOf(x).url.trim() : "", events: hookOf(x).events === "all" ? "all" : "reviewed",
         route: (x.route || []).map((st) => { const sc = stageConn(st); return sc ? { connection: { kind: sc.kind, name: sc.name, url: sc.url, key: sc.key || "" }, model: st.model, cost: Number(st.cost) || 0 } : null; }).filter(Boolean) })) };
   }
   function syncApi(now = false, extra = {}) {
@@ -4495,7 +4705,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
           const { force, ...rest } = extra;
           const r = await fetch("/zex/api-config", { method: "POST", headers: { "X-Zex": "1", "Content-Type": "application/json" }, body: JSON.stringify({ ...apiPayload(), ...rest }) });
           const d = await r.json();
-          if (r.ok) { apiCfg.enabled = !!d.enabled; apiCfg.token = d.token || ""; }
+          if (r.ok) { apiCfg.enabled = !!d.enabled; apiCfg.token = d.token || ""; apiCfg.hookSecret = d.hook_secret || ""; }
         } catch { /* the next change syncs again */ }
         resolve();
       }, now === true ? 0 : 400);
@@ -4516,17 +4726,472 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     });
     return [logSw, h("span", { class: "muted" }, "keep requests for review"), spot, clear];
   }
-  async function setApiEnabled(on) { apiCfg.enabled = on; await syncApi(true, { force: true }); rerender(); toast(on ? "The local API is on" : "The local API is off"); }
+  async function setApiEnabled(on) { apiCfg.enabled = on; await syncApi(true, { force: true }); rerender(); toast(on ? "The local API is on" : "The local API is off"); if (on) loadDeliveries(); }
   async function newApiToken() { await syncApi(true, { force: true, regenerate: true }); apiShowToken = true; rerender(); toast("New token made. Update your scripts."); }
+  async function newHookSecret() { await syncApi(true, { force: true, regenerate_secret: true }); apiShowSecret = true; rerender(); toast("New secret made. Update your receivers."); }
+
+  // ---- results sent back: each set's webhook, and what Zex has sent
+  async function loadDeliveries() {
+    if (!apiCfg.available) return;
+    try { deliveries = (await zexGet("/zex/hooks")).deliveries || []; } catch { return; }
+    paintHooks();
+  }
+  function paintHooks() {
+    if (!hooksEl?.isConnected) return;
+    const n = hooksWin();
+    hooksEl.replaceWith(n); hooksEl = n; settle(n);
+    paintSkyKpis();
+  }
+  const D_TAG = { sent: "SENT", pending: "RETRYING", failed: "FAILED", sending: "SENDING" };
+  const D_EVENT = { "answer.auto": "answered on its own", "answer.reviewed": "reviewed", "answer.corrected": "corrected", ping: "test" };
+  function deliveryNote(d) {
+    if (d.state === "sent") return `HTTP ${d.code}${d.tries > 1 ? ` after ${d.tries} tries` : ""}`;
+    if (d.state === "pending") return `${d.error || "not reached"} · next try ${d.next ? "in " + untilText(d.next) : "soon"}`;
+    if (d.state === "failed") return `${d.error || "not reached"}${d.tries > 1 ? ` · gave up after ${d.tries} tries` : ""}`;
+    return "sending…";
+  }
+  const untilText = (t) => { const s = Math.max(1, Math.round((t - Date.now()) / 1000)); return s < 90 ? `${s} s` : s < 5400 ? `${Math.round(s / 60)} min` : `${Math.round(s / 3600)} h`; };
+  function hooksWin() {
+    const copyBtn = (text) => h("button", { class: "text-btn xs bordered", type: "button", onclick: async () => toast((await copyText(typeof text === "function" ? text() : text)) ? "Copied" : "Copy failed") }, "Copy");
+    const rows = sets.map((x) => {
+      const hk = hookOf(x), last = deliveries.find((d) => d.set === x.slug);
+      const url = h("input", { class: "fld mono", type: "url", placeholder: "https://…", value: hk.url, spellcheck: "false", "aria-label": `Webhook URL for ${x.name}` });
+      url.addEventListener("change", async () => {
+        const v = url.value.trim();
+        if (v && !okHookUrl(v)) { toast("A webhook URL starts with http:// or https://"); return; }
+        await setHook(x, { url: v }); paintHooks();
+        toast(v ? `${x.name} sends its answers to this URL` : `${x.name} sends nothing`);
+      });
+      const ev = h("select", { class: "chip-select", "aria-label": `What ${x.name} sends` }, h("option", { value: "reviewed" }, "after review"), h("option", { value: "all" }, "every answer"));
+      ev.value = hk.events;
+      ev.addEventListener("change", () => { setHook(x, { events: ev.value }); toast(ev.value === "all" ? "Sends every final answer" : "Sends answers a person gave"); });
+      const test = h("button", { class: "btn", type: "button", disabled: !okHookUrl(hk.url) || undefined }, "Test");
+      test.addEventListener("click", async () => {
+        test.disabled = true; test.textContent = "Sending…";
+        try {
+          await syncApi(true);
+          const { delivery: d } = await zexPost("/zex/hooks/test", { set: x.slug });
+          toast(d.state === "sent" ? `Reached it: HTTP ${d.code}` : `Didn't reach it: ${d.error || "HTTP " + d.code}`);
+        } catch (e) { toast(e.message); }
+        loadDeliveries();
+      });
+      return h("div", { class: "hk-row" },
+        h("b", { class: "hk-name" }, x.name), url, ev, test,
+        h("span", { class: "hk-last" }, last ? [h("span", { class: "dtag pix d-" + last.state }, D_TAG[last.state] || last.state), ` ${D_EVENT[last.event] || last.event} · ${ago(last.at)} · ${deliveryNote(last)}`] : okHookUrl(hk.url) ? "Nothing sent yet." : ""));
+    });
+    const masked = () => (apiCfg.hookSecret ? (apiShowSecret ? apiCfg.hookSecret : apiCfg.hookSecret.slice(0, 9) + "•".repeat(20)) : "made when you turn the API on");
+    const secEl = h("code", { class: "tok" }, masked());
+    const show = h("button", { class: "text-btn xs", type: "button" }, apiShowSecret ? "Hide" : "Show");
+    show.addEventListener("click", () => { apiShowSecret = !apiShowSecret; secEl.textContent = masked(); show.textContent = apiShowSecret ? "Hide" : "Show"; });
+    const log = deliveries.slice(0, 8);
+    const on = sets.filter((x) => okHookUrl(hookOf(x).url)).length;
+    return win("Zex.Hooks", on ? `${on} on` : "off", h("div", { class: "hk" },
+      h("p", { class: "hk-lede" }, "Zex posts each set's final answers to its URL as JSON: after a person reviews them, or every answer, the ones the model was sure of included. A failed delivery is tried again for about nine hours."),
+      h("div", { class: "hk-rows" }, rows),
+      h("div", { class: "kvr hk-secret" }, h("span", { class: "kk" }, "Secret"), h("div", { class: "kvv" }, secEl, show, apiCfg.hookSecret ? copyBtn(() => apiCfg.hookSecret) : null,
+        h("button", { class: "text-btn xs", type: "button", onclick: newHookSecret }, "New secret"))),
+      h("p", { class: "note" }, "Each delivery carries X-Zex-Signature: t=<time>,v1=<HMAC-SHA256 of \"<time>.<body>\" with this secret>. The clients below check it for you."),
+      h("div", { class: "hk-log", "aria-label": "Recent deliveries" },
+        h("div", { class: "hk-log-h pix" }, "RECENT DELIVERIES"),
+        log.length ? log.map((d) => h("div", { class: "hk-d" },
+          h("span", { class: "dtag pix d-" + d.state }, D_TAG[d.state] || d.state),
+          h("span", { class: "hk-ev" }, `${setName(d.set)} · ${D_EVENT[d.event] || d.event}`),
+          h("span", { class: "hk-note", title: d.url }, deliveryNote(d)),
+          h("span", { class: "hk-when pix" }, ago(d.at)),
+          d.state === "failed" || d.state === "pending" ? h("button", { class: "text-btn xs bordered", type: "button", onclick: async (e) => {
+            e.currentTarget.disabled = true;
+            try { const r = await zexPost("/zex/hooks/retry", { id: d.id }); toast(r.delivery.state === "sent" ? "Sent" : `Still not reached: ${r.delivery.error || "HTTP " + r.delivery.code}`); } catch (err) { toast(err.message); }
+            loadDeliveries();
+          } }, "Send again") : h("span"))) : h("p", { class: "hk-none" }, "Nothing sent yet. Add a URL to a set and press Test."))), "hooks-win");
+  }
+
+  // ---- generated clients: a typed client per set in Python or TypeScript, and a Markdown spec
+  function qInfo(x) {
+    return Object.entries(x.questions || {}).map(([k, q]) => {
+      const crit = q?.criteria, list = Array.isArray(crit) ? crit.map(String) : Object.keys(crit || {});
+      return { k, type: q?.type, ask: String(q?.instructions || "").replace(/\s+/g, " ").trim(),
+        opts: q?.type === "choice" ? list : [],
+        levels: q?.type === "score" ? (Array.isArray(crit) ? crit.map(String) : Object.values(crit || {}).map(String)) : [],
+        about: q?.type === "choice" && crit && !Array.isArray(crit) ? crit : {} };
+    });
+  }
+  const PY_RESERVED = new Set("False None True and as assert async await break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield".split(" "));
+  const TAKEN = new Set(["Final", "Decision", "Result", "Event", "ZexError", "Any", "Dict", "List", "Literal", "Optional", "TypedDict", "Union", "Opts", "Base", "Status"]);
+  function typeNames(Q) {
+    const used = new Set(TAKEN), out = {};
+    for (const q of Q) {
+      let n = q.k.replace(/(^|[^A-Za-z0-9]+)([A-Za-z0-9])/g, (_, __, c) => c.toUpperCase()).replace(/[^A-Za-z0-9]/g, "").replace(/^[0-9]+/, "") || "Answer";
+      if (used.has(n)) n += "Answer";
+      for (let i = 2; used.has(n); i++) n = n.replace(/\d*$/, String(i));
+      used.add(n); out[q.k] = n;
+    }
+    return out;
+  }
+  const levelNote = (q) => q.levels.map((l, i) => `${i} ${l}`).join(", ");
+  const clientName = (x, lang) => (lang === "python" ? `zex_${x.slug.replace(/-/g, "_")}.py` : lang === "ts" ? `zex-${x.slug}.ts` : `zex-${x.slug}.md`);
+  function pyClient(x) {
+    const Q = qInfo(x), N = typeNames(Q), J = JSON.stringify, base = `${location.origin}/api`;
+    const ty = (q) => (q.type === "noul" ? "bool" : q.type === "choice" ? (q.opts.length ? N[q.k] : "str") : q.type === "score" ? (q.levels.length ? N[q.k] : "int") : "Any");
+    const aliases = Q.filter((q) => (q.type === "choice" && q.opts.length) || (q.type === "score" && q.levels.length)).map((q) => q.type === "choice"
+      ? `${N[q.k]} = Literal[${q.opts.map((o) => J(o)).join(", ")}]`
+      : `${N[q.k]} = Literal[${q.levels.map((_, i) => i).join(", ")}]  # ${levelNote(q)}`);
+    const plain = Q.every((q) => /^[A-Za-z_][A-Za-z0-9_]*$/.test(q.k) && !PY_RESERVED.has(q.k));
+    const final = !Q.length ? "class Final(TypedDict):\n    pass"
+      : plain ? "class Final(TypedDict):\n" + Q.map((q) => `    ${q.k}: ${ty(q)}${q.ask ? `  # ${q.ask}` : ""}`).join("\n")
+      : 'Final = TypedDict("Final", {\n' + Q.map((q) => `    ${J(q.k)}: ${ty(q)},${q.ask ? `  # ${q.ask}` : ""}`).join("\n") + "\n})";
+    const ex = Q.find((q) => q.type === "choice") || Q[0];
+    return `"""Zex client for the ${J(x.name)} set, made by Zex ${ZEX_VERSION}.
+
+Needs Python 3.9 or newer and nothing else. Zex has to be open with its local API on.
+Set ZEX_TOKEN to the token from Zex (Local API), and ZEX_WEBHOOK_SECRET to its webhook
+secret if you receive webhooks.
+
+    from ${clientName(x, "python").slice(0, -3)} import decide
+    r = decide("I was charged twice this month.", ref="ticket-123")
+    if r["status"] == "auto":
+        print(r["final"]${ex ? `[${J(ex.k)}]` : ""})
+"""
+from __future__ import annotations
+
+import hashlib
+import hmac
+import json
+import os
+import time
+import urllib.error
+import urllib.parse
+import urllib.request
+from typing import Any, Dict, List, Literal, Optional, TypedDict, Union, cast
+
+BASE_URL = os.environ.get("ZEX_URL", ${J(base)})
+SET = ${J(x.slug)}
+${aliases.length ? "\n" + aliases.join("\n") + "\n" : ""}
+
+${final}
+
+
+class Decision(TypedDict, total=False):
+    answer: str
+    confidence: float
+    verdict: Literal["auto", "review"]
+    threshold: float
+    by: str
+
+
+class Result(TypedDict, total=False):
+    id: str
+    ref: str
+    set: str
+    status: Literal["auto", "review", "reviewed", "error"]
+    final: Optional[Final]  # None while it waits for a person
+    by: Literal["model", "person"]
+    changed: List[str]  # questions where the person changed the model's answer
+    decisions: Dict[str, Decision]
+    error: str
+
+
+class Event(Result, total=False):
+    event: Literal["answer.auto", "answer.reviewed", "answer.corrected", "ping"]
+    delivery: str
+
+
+class ZexError(Exception):
+    def __init__(self, status: int, message: str):
+        super().__init__(f"Zex answered HTTP {status}: {message}")
+        self.status = status
+
+
+def _call(method: str, path: str, body: Any = None) -> Any:
+    req = urllib.request.Request(
+        BASE_URL.rstrip("/") + path,
+        data=None if body is None else json.dumps(body).encode(),
+        method=method,
+        headers={"Authorization": "Bearer " + os.environ.get("ZEX_TOKEN", ""), "Content-Type": "application/json"},
+    )
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # Zex runs on this computer
+    try:
+        with opener.open(req, timeout=200) as res:
+            return json.loads(res.read())
+    except urllib.error.HTTPError as e:
+        try:
+            message = json.loads(e.read()).get("error", "")
+        except ValueError:
+            message = ""
+        raise ZexError(e.code, message) from None
+
+
+def decide(text: Union[str, Dict[str, Any]], ref: Optional[str] = None) -> Result:
+    """Asks the set about a text, or a JSON state. With status "auto", final has the answers.
+    With status "review", a person answers it in Zex first: see wait() and verify_webhook()."""
+    body: Dict[str, Any] = {"text": text} if isinstance(text, str) else {"state": text}
+    if ref:
+        body["ref"] = ref
+    return cast(Result, _call("POST", "/sets/" + SET, body))
+
+
+def decide_many(items: List[Union[str, Dict[str, Any]]], refs: Optional[List[str]] = None) -> List[Result]:
+    """Up to 100 at once. The results come back in the same order."""
+    body: Dict[str, Any] = {"items": items}
+    if refs:
+        body["refs"] = refs
+    return cast(List[Result], _call("POST", "/sets/" + SET, body)["results"])
+
+
+def get(request_id: str) -> Result:
+    """A request as it is now, with its final answers once it has them."""
+    return cast(Result, _call("GET", "/requests/" + urllib.parse.quote(request_id)))
+
+
+def wait(request_id: str, every: float = 10, timeout: Optional[float] = None) -> Result:
+    """Checks every few seconds until the request has its final answers, then returns it."""
+    start = time.monotonic()
+    while True:
+        r = get(request_id)
+        if r["status"] != "review":
+            return r
+        if timeout is not None and time.monotonic() - start > timeout:
+            raise TimeoutError(request_id + " is still waiting for review")
+        time.sleep(every)
+
+
+def verify_webhook(body: bytes, signature: str, secret: Optional[str] = None, tolerance: int = 300) -> Event:
+    """Checks a delivery's X-Zex-Signature header against its raw body and returns the event.
+    Raises ValueError when the signature doesn't match or it is older than tolerance seconds."""
+    key = secret if secret is not None else os.environ.get("ZEX_WEBHOOK_SECRET", "")
+    parts = dict(p.split("=", 1) for p in signature.split(",") if "=" in p)
+    t, v1 = parts.get("t", ""), parts.get("v1", "")
+    want = hmac.new(key.encode(), t.encode() + b"." + body, hashlib.sha256).hexdigest()
+    if not key or not t.isdigit() or not hmac.compare_digest(want, v1):
+        raise ValueError("the webhook signature doesn't match")
+    if abs(time.time() - int(t)) > tolerance:
+        raise ValueError("the webhook delivery is too old")
+    return cast(Event, json.loads(body))
+`;
+  }
+  function tsClient(x) {
+    const Q = qInfo(x), N = typeNames(Q), J = JSON.stringify, base = `${location.origin}/api`;
+    const key = (k) => (/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(k) ? k : J(k));
+    const ty = (q) => (q.type === "noul" ? "boolean" : q.type === "choice" ? (q.opts.length ? N[q.k] : "string") : q.type === "score" ? (q.levels.length ? N[q.k] : "number") : "unknown");
+    const aliases = Q.filter((q) => (q.type === "choice" && q.opts.length) || (q.type === "score" && q.levels.length)).map((q) => q.type === "choice"
+      ? `export type ${N[q.k]} = ${q.opts.map((o) => J(o)).join(" | ")};`
+      : `/** ${levelNote(q)} */\nexport type ${N[q.k]} = ${q.levels.map((_, i) => i).join(" | ")};`);
+    const ex = Q.find((q) => q.type === "choice") || Q[0];
+    return `// Zex client for the ${J(x.name)} set, made by Zex ${ZEX_VERSION}.
+//
+// Uses fetch and Web Crypto, and only types that can be stripped, so it runs as it is on
+// Node 22.6 or newer, Deno and Bun, or compiled with tsc for anywhere else.
+// Zex has to be open with its local API on. Set ZEX_TOKEN to the token from Zex (Local API),
+// or pass { token }, and ZEX_WEBHOOK_SECRET to its webhook secret if you receive webhooks.
+//
+//   import { decide } from "./${clientName(x, "ts").slice(0, -3)}";
+//   const r = await decide("I was charged twice this month.", { ref: "ticket-123" });
+//   if (r.status === "auto") console.log(r.final${ex ? (/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(ex.k) ? "." + ex.k : `[${J(ex.k)}]`) : ""});
+
+const env = (name: string): string | undefined => (globalThis as any).process?.env?.[name];
+export const BASE_URL = env("ZEX_URL") ?? ${J(base)};
+export const SET = ${J(x.slug)};
+${aliases.length ? "\n" + aliases.join("\n") + "\n" : ""}
+export interface Final {
+${Q.map((q) => (q.ask ? `  /** ${q.ask.replace(/\*\//g, "* /")} */\n` : "") + `  ${key(q.k)}: ${ty(q)};`).join("\n")}
+}
+
+export interface Decision {
+  answer: string;
+  confidence: number;
+  verdict: "auto" | "review";
+  threshold: number;
+  by?: string;
+}
+
+interface Base {
+  id: string;
+  set: string;
+  ref?: string;
+  model?: string;
+  decisions: Record<keyof Final, Decision>;
+}
+export type Result =
+  | (Base & { status: "auto"; final: Final; by: "model"; spot_check?: boolean })
+  | (Base & { status: "review"; final: null })
+  | (Base & { status: "reviewed"; final: Final; by: "person"; changed: (keyof Final)[]; reviewed_at: string })
+  | { id: string; set: string; ref?: string; status: "error"; error: string };
+export type Event =
+  | (Result & { event: "answer.auto" | "answer.reviewed" | "answer.corrected"; delivery: string })
+  | { event: "ping"; delivery: string; set: string; name: string };
+
+export class ZexError extends Error {
+  status: number;
+  constructor(status: number, message: string) {
+    super("Zex answered HTTP " + status + ": " + message);
+    this.status = status;
+  }
+}
+
+export interface Opts {
+  token?: string;
+  baseUrl?: string;
+}
+
+async function call<T>(method: string, path: string, body: unknown, o: Opts): Promise<T> {
+  const res = await fetch((o.baseUrl ?? BASE_URL).replace(/\\/$/, "") + path, {
+    method,
+    headers: { Authorization: "Bearer " + (o.token ?? env("ZEX_TOKEN") ?? ""), "Content-Type": "application/json" },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new ZexError(res.status, data.error ?? "");
+  return data as T;
+}
+
+/** Asks the set about a text, or a JSON state. With status "auto", final has the answers.
+ *  With status "review", a person answers it in Zex first: see waitForReview and verifyWebhook. */
+export function decide(input: string | Record<string, unknown>, o: Opts & { ref?: string } = {}): Promise<Result> {
+  const body: Record<string, unknown> = typeof input === "string" ? { text: input } : { state: input };
+  if (o.ref) body.ref = o.ref;
+  return call("POST", "/sets/" + SET, body, o);
+}
+
+/** Up to 100 at once. The results come back in the same order. */
+export async function decideMany(items: (string | Record<string, unknown>)[], o: Opts & { refs?: string[] } = {}): Promise<Result[]> {
+  const r = await call<{ results: Result[] }>("POST", "/sets/" + SET, { items, refs: o.refs }, o);
+  return r.results;
+}
+
+/** A request as it is now, with its final answers once it has them. */
+export function getResult(id: string, o: Opts = {}): Promise<Result> {
+  return call("GET", "/requests/" + encodeURIComponent(id), undefined, o);
+}
+
+/** Checks every few seconds until the request has its final answers, then returns it. */
+export async function waitForReview(id: string, o: Opts & { everyMs?: number; timeoutMs?: number } = {}): Promise<Result> {
+  const start = Date.now();
+  for (;;) {
+    const r = await getResult(id, o);
+    if (r.status !== "review") return r;
+    if (o.timeoutMs !== undefined && Date.now() - start > o.timeoutMs) throw new Error(id + " is still waiting for review");
+    await new Promise((done) => setTimeout(done, o.everyMs ?? 10000));
+  }
+}
+
+/** Checks a delivery's X-Zex-Signature header against its raw body and returns the event.
+ *  Throws when the signature doesn't match or it is older than toleranceSec. */
+export async function verifyWebhook(body: string, signature: string, secret = env("ZEX_WEBHOOK_SECRET") ?? "", toleranceSec = 300): Promise<Event> {
+  const parts: Record<string, string> = {};
+  for (const p of signature.split(",")) {
+    const i = p.indexOf("=");
+    if (i > 0) parts[p.slice(0, i)] = p.slice(i + 1);
+  }
+  const enc = new TextEncoder();
+  const k = await crypto.subtle.importKey("raw", enc.encode(secret), { name: "HMAC", hash: "SHA-256" }, false, ["sign"]);
+  const mac = new Uint8Array(await crypto.subtle.sign("HMAC", k, enc.encode(parts.t + "." + body)));
+  const want = Array.from(mac, (b) => b.toString(16).padStart(2, "0")).join("");
+  let diff = want.length ^ (parts.v1 ?? "").length;
+  for (let i = 0; i < want.length; i++) diff |= want.charCodeAt(i) ^ (parts.v1 ?? "").charCodeAt(i);
+  if (!secret || !/^\\d+$/.test(parts.t ?? "") || diff) throw new Error("the webhook signature doesn't match");
+  if (Math.abs(Date.now() / 1000 - Number(parts.t)) > toleranceSec) throw new Error("the webhook delivery is too old");
+  return JSON.parse(body) as Event;
+}
+`;
+  }
+  function specDoc(x) {
+    const Q = qInfo(x), base = `${location.origin}/api`, F = "```", hk = hookOf(x), on = okHookUrl(hk.url);
+    const val = (q) => (q.type === "noul" ? "`true` or `false`" : q.type === "choice" ? (q.opts.length ? "one of " + q.opts.map((o) => "`" + JSON.stringify(o) + "`").join(", ") : "a string")
+      : q.type === "score" ? (q.levels.length ? `\`0\`–\`${q.levels.length - 1}\`: ${levelNote(q)}` : "an integer") : "–");
+    const sample = Object.fromEntries(Q.map((q) => [q.k, q.type === "noul" ? false : q.type === "choice" ? q.opts[0] ?? "" : q.type === "score" ? Math.min(1, Math.max(0, q.levels.length - 1)) : null]));
+    const thrOf = (q) => Math.round((x.thresholds?.[q.k] ?? thr) * 100) + "%";
+    const exResp = { id: "r_mg2k8x1f0a9b3c4d5e6f", ref: "ticket-123", set: x.slug, model, status: "auto", final: sample, by: "model",
+      decisions: Object.fromEntries(Q.slice(0, 1).map((q) => [q.k, { answer: String(sample[q.k]), confidence: 0.94, verdict: "auto", threshold: x.thresholds?.[q.k] ?? thr }])) };
+    return [
+      `# Zex: ${x.name}`,
+      "",
+      `Zex answers typed questions about a text with a decision model, on this computer. The Zex app serves this set over HTTP while it is open and its local API is on.`,
+      "",
+      `- Endpoint: \`POST ${base}/sets/${x.slug}\``,
+      "- Auth: `Authorization: Bearer <token>`. The token is in Zex, under Local API; keep it in `ZEX_TOKEN`.",
+      `- Webhook: ${on ? `on. Zex posts ${hk.events === "all" ? "every final answer" : "answers a person gave"} to the set's URL (see below).` : "none yet. It can be set in Zex, under Local API."}`,
+      "",
+      "## Questions",
+      "",
+      "| key | type | final answer | asks | AUTO at |",
+      "|---|---|---|---|---|",
+      ...Q.map((q) => `| \`${q.k}\` | ${q.type} | ${val(q)} | ${q.ask.replace(/\|/g, "\\|") || "–"} | ${thrOf(q)} |`),
+      "",
+      "Each answer is AUTO when the model's confidence reaches its threshold, and REVIEW otherwise. A request is `auto` only when every answer is.",
+      "",
+      "## Request",
+      "",
+      F + "json",
+      JSON.stringify({ text: "I was charged twice this month.", ref: "ticket-123" }),
+      F,
+      "",
+      "- `text`: the message. Send `{\"state\": {...}}` instead for structured input.",
+      "- `ref` (optional): your own id for it, sent back with the answer and in webhooks.",
+      "- Up to 100 at once: `{\"items\": [...], \"refs\": [...]}` returns `{\"results\": [...]}` in the same order.",
+      "",
+      "## Response",
+      "",
+      F + "json",
+      JSON.stringify(exResp, null, 2),
+      F,
+      "",
+      "- `status: \"auto\"`: `final` has the typed answers. Act on them.",
+      "- `status: \"review\"`: `final` is `null`. A person answers it in Zex (Review); the final answers come later, by webhook or from `GET /api/requests/<id>`.",
+      "- `decisions.<key>`: the model's `answer`, its `confidence` (0 to 1), `verdict` (`auto` or `review`) and the `threshold` it was held to.",
+      "- `id`: Zex's id for the request.",
+      "",
+      "## Final answers later",
+      "",
+      `- \`GET ${base}/requests/<id>\` returns the request in the same shape. After a review, \`status\` is \`"reviewed"\`, \`by\` is \`"person"\`, and \`changed\` lists the questions where the person changed the model's answer.`,
+      `- \`GET ${base}/requests?set=${x.slug}&status=reviewed&since=<time>\` lists requests, newest first. \`since\` is unix milliseconds or RFC 3339 in UTC, like \`2026-01-31T09:00:00Z\`.`,
+      "",
+      "## Webhook",
+      "",
+      "Zex POSTs JSON to the set's URL. The body is the request in the same shape, plus `event` and `delivery`:",
+      "",
+      "- `answer.reviewed`: a person answered a request that waited for review.",
+      "- `answer.corrected`: a person changed an answer that was already final (a spot check that found the model wrong, or a second review).",
+      "- `answer.auto`: the model answered on its own. Sent only when the set sends every answer.",
+      "- `ping`: a test from Zex.",
+      "",
+      "Headers: `X-Zex-Event`, `X-Zex-Delivery`, and `X-Zex-Signature: t=<unix seconds>,v1=<hex>`. To check one, compute HMAC-SHA256 over `<t>.<raw body>` with the webhook secret (in Zex, under Local API; keep it in `ZEX_WEBHOOK_SECRET`), compare it with `v1` in constant time, and refuse it when `t` is more than 5 minutes off.",
+      "",
+      "Answer with any 2xx within 15 seconds. Zex tries a delivery again for about nine hours after a 5xx, 408, 429 or no answer; other 4xx answers aren't tried again. A delivery can arrive twice: use `delivery` to skip repeats.",
+      "",
+      "## Errors",
+      "",
+      "Errors come as `{\"error\": \"...\"}`. 401: missing or wrong token. 403: the local API is off. 404: no such set or request. 502: the model couldn't be reached. 503: Zex has no connection to answer with.",
+      "",
+      "## Types",
+      "",
+      F + "ts",
+      "interface Final {",
+      ...Q.map((q) => `  ${/^[A-Za-z_$][A-Za-z0-9_$]*$/.test(q.k) ? q.k : JSON.stringify(q.k)}: ${q.type === "noul" ? "boolean" : q.type === "choice" ? (q.opts.length ? q.opts.map((o) => JSON.stringify(o)).join(" | ") : "string") : q.type === "score" ? (q.levels.length ? q.levels.map((_, i) => i).join(" | ") : "number") : "unknown"};`),
+      "}",
+      F,
+      "",
+    ].join("\n");
+  }
+  function snippetFor(x, tab) {
+    const base = `${location.origin}/api`, slug = x?.slug || "your-set", url = `${base}/sets/${slug}`;
+    if (tab === "python") return x ? pyClient(x) : "";
+    if (tab === "ts") return x ? tsClient(x) : "";
+    if (tab === "spec") return x ? specDoc(x) : "";
+    if (tab === "curl") return `curl -s ${url} \\\n  -H "Authorization: Bearer $ZEX_TOKEN" \\\n  -H "Content-Type: application/json" \\\n  -d '{"text": "I was charged twice this month.", "ref": "ticket-123"}'\n\n# later, the final answers of a request that went to review\ncurl -s ${base}/requests/<id> -H "Authorization: Bearer $ZEX_TOKEN"`;
+    if (tab === "n8n") return `Asking the set\n  HTTP Request node\n    Method          POST\n    URL             ${url}\n    Authentication  Generic credential type, Header Auth\n                    Name   Authorization\n                    Value  Bearer <your token>\n    Send Body       JSON\n                    { "text": "{{ $json.message }}", "ref": "{{ $json.id }}" }\n  Then branch on {{ $json.status }}: act when it is "auto".\n\nGetting the answers a person gave\n  Webhook node\n    HTTP Method  POST\n    Path         zex-${slug}\n  Put its production URL in Zex, under Local API, Zex.Hooks, for ${x?.name || "the set"}.\n  {{ $json.body.final }} has the answers, and {{ $json.body.ref }} your own id.`;
+    return `{\n  "id": "r_mg2k8x1f0a9b3c4d5e6f",\n  "ref": "ticket-123",\n  "set": "${slug}",\n  "model": "${model}",\n  "status": "auto",\n  "final": { "team": "billing" },\n  "decisions": {\n    "team": { "answer": "billing", "confidence": 0.952, "verdict": "auto", "threshold": 0.8 }\n  },\n  "answers": { "...": "the model's full answers" }\n}\n\nWith "status": "review", "final" is null until a person answers it.\nSend {"items": ["first text", "second text"]} for up to 100 at once.\nGET ${base}/sets lists your sets and their questions.`;
+  }
 
   function renderApi() {
     const base = `${location.origin}/api`;
-    const head = h("section", { class: "c-head" },
-      h("span", { class: "tagline" }, "Zex.API 0.1"),
-      h("h1", { class: "giant sm" }, words("Local API")),
-      h("p", {}, "Call your question sets from scripts, n8n, Zapier or anything that can send an HTTP request. Requests stay on this computer, and the API answers while Zex is open."));
+    const leader = h("p", { class: "hm-leader" }, h("span", { class: "dot" + (apiCfg.enabled ? " ok" : "") }), h("b", {}, "Zex.API"), h("span", { class: "dl", "aria-hidden": "true" }),
+      h("span", { class: "u" }, apiCfg.enabled ? `listening on ${base}` : apiCfg.available ? "off" : "not here"));
+    const sky = pageSky({ name: "Local API", title: "Local API", mark: "api", leader,
+      lede: "Call your question sets from scripts, n8n, Zapier or anything that can send an HTTP request, and get the answers a person gives sent back. Requests stay on this computer, and the API answers while Zex is open.",
+      kpis: apiCfg.enabled ? () => [["sets you can call", fmtN(sets.length)], ["requests this week", fmtN(liveSummary()?.tot.req || 0), () => { rv.tab = "all"; go("review"); }],
+        ["sets with a webhook", fmtN(sets.filter((x) => okHookUrl(hookOf(x).url)).length)],
+        ["deliveries failed", fmtN(deliveries.filter((d) => d.state === "failed").length), () => $(".hooks-win")?.scrollIntoView({ block: "start", behavior: reduceMotion ? "auto" : "smooth" })]] : null });
     if (!apiCfg.available) {
-      return h("div", { class: "conns api" }, head, h("div", { class: "banner warn", style: "margin:20px 0 0" }, "The local API comes with the Zex app, and with server.py when you run Zex from source. This page was opened another way, so the API isn't here."));
+      return h("div", { class: "conns pg api" }, sky, pageDesk("Zex.API", "side one", win("Zex.API", "", h("p", {}, "The local API comes with the Zex app, and with server.py when you run Zex from source. This page was opened another way, so the API isn't here."))));
     }
     const c = activeConn();
     const copyBtn = (text, label = "Copy") => h("button", { class: "text-btn xs bordered", type: "button", onclick: async () => toast((await copyText(typeof text === "function" ? text() : text)) ? "Copied" : "Copy failed") }, label);
@@ -4545,13 +5210,16 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("div", { class: "kvr" }, h("span", { class: "kk" }, "Answers with"), h("div", { class: "kvv" }, h("span", {}, `${c.name} · ${model}`), h("span", { class: "muted" }, "your active connection and model"))),
       apiCfg.enabled ? h("div", { class: "kvr" }, h("span", { class: "kk" }, "Review"), h("div", { class: "kvv" }, reviewControls())) : null,
       h("p", { class: "note" }, "Send the token in an Authorization header. Anyone who has it can use your sets, and the key of your active connection, from this computer. Make a new token to cut off old scripts.")), "api-status");
-    if (!apiCfg.enabled) return h("div", { class: "conns api" }, head, h("div", { class: "api-grid" }, status));
+    if (!apiCfg.enabled) return h("div", { class: "conns pg api" }, sky, pageDesk("Zex.API", "side one", status));
 
     if (!sets.some((x) => x.slug === apiTry.slug)) apiTry.slug = sets[0]?.slug || null;
-    const slug = apiTry.slug || "your-set", url = `${base}/sets/${slug}`;
-    const trySel = h("select", { class: "chip-select", "aria-label": "Set to call" }, sets.map((x) => h("option", { value: x.slug }, x.name)));
-    trySel.value = apiTry.slug || "";
-    trySel.addEventListener("change", () => { apiTry.slug = trySel.value; apiTry.out = ""; rerender(); });
+    const cur = sets.find((x) => x.slug === apiTry.slug) || null, slug = apiTry.slug || "your-set";
+    const setSel = (label) => {
+      const sel = h("select", { class: "chip-select", "aria-label": label }, sets.map((x) => h("option", { value: x.slug }, x.name)));
+      sel.value = apiTry.slug || "";
+      sel.addEventListener("change", () => { apiTry.slug = sel.value; apiTry.out = ""; rerender(); });
+      return sel;
+    };
     const tryTa = h("textarea", { class: "api-try-in", dir: "auto", "aria-label": "Text to send" });
     tryTa.value = apiTry.text;
     tryTa.addEventListener("input", () => { apiTry.text = tryTa.value; });
@@ -4564,32 +5232,39 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         apiTry.out = `HTTP ${r.status}\n` + pretty(await r.json());
       } catch (e) { apiTry.out = String(e.message || e); }
       send.disabled = false; send.textContent = "Send"; out.textContent = apiTry.out;
+      if (okHookUrl(hookOf(cur || {}).url)) setTimeout(loadDeliveries, 600);
     });
     const tryWin = win("Zex.API · try it", "POST", h("div", { class: "api-try" },
-      h("div", { class: "api-try-head" }, h("span", { class: "muted" }, "Set"), trySel, h("code", { class: "tok" }, `/api/sets/${slug}`)),
+      h("div", { class: "api-try-head" }, h("span", { class: "muted" }, "Set"), setSel("Set to call"), h("code", { class: "tok" }, `/api/sets/${slug}`)),
       tryTa, h("div", { class: "btn-row" }, send), out), "api-trywin");
+    hooksEl = hooksWin();
+    const ends = win("Zex.API · endpoints", `${sets.length + 4}`, h("div", { class: "api-ends" },
+      h("div", { class: "end" }, h("span", { class: "verb pix" }, "GET"), h("code", {}, "/api/sets"), h("span", { class: "muted" }, "your sets and their questions"), copyBtn(`${base}/sets`, "Copy URL")),
+      sets.map((x) => h("div", { class: "end" }, h("span", { class: "verb pix post" }, "POST"), h("code", {}, `/api/sets/${x.slug}`), h("span", { class: "muted" }, x.name), copyBtn(`${base}/sets/${x.slug}`, "Copy URL"))),
+      h("div", { class: "end" }, h("span", { class: "verb pix" }, "GET"), h("code", {}, "/api/sets/<set>"), h("span", { class: "muted" }, "one set, with each question's options"), copyBtn(`${base}/sets/${slug}`, "Copy URL")),
+      h("div", { class: "end" }, h("span", { class: "verb pix" }, "GET"), h("code", {}, "/api/requests/<id>"), h("span", { class: "muted" }, "a request, with its final answers once it has them"), copyBtn(`${base}/requests/`, "Copy URL")),
+      h("div", { class: "end" }, h("span", { class: "verb pix" }, "GET"), h("code", {}, "/api/requests?set=&status=&since="), h("span", { class: "muted" }, "requests by set, status and time"), copyBtn(`${base}/requests?set=${slug}&status=reviewed`, "Copy URL"))));
 
-    const snip = {
-      curl: `curl -s ${url} \\\n  -H "Authorization: Bearer $ZEX_TOKEN" \\\n  -H "Content-Type: application/json" \\\n  -d '{"text": "I was charged twice this month."}'`,
-      python: `import os, requests\n\nr = requests.post(\n    "${url}",\n    headers={"Authorization": "Bearer " + os.environ["ZEX_TOKEN"]},\n    json={"text": "I was charged twice this month."},\n)\nfor key, d in r.json()["decisions"].items():\n    print(key, d["answer"], d["confidence"], d["verdict"])`,
-      js: 'const r = await fetch("' + url + '", {\n  method: "POST",\n  headers: {\n    Authorization: "Bearer " + process.env.ZEX_TOKEN,\n    "Content-Type": "application/json",\n  },\n  body: JSON.stringify({ text: "I was charged twice this month." }),\n});\nconst { decisions, all_auto } = await r.json();',
-      n8n: `HTTP Request node\n  Method          POST\n  URL             ${url}\n  Authentication  Generic credential type, Header Auth\n                  Name   Authorization\n                  Value  Bearer <your token>\n  Send Body       JSON\n                  { "text": "{{ $json.message }}" }\n\nThen branch on {{ $json.all_auto }}: act when it is true,\nand send the item to a person when it is false.`,
-      response: `{\n  "set": "${slug}",\n  "model": "${model}",\n  "decisions": {\n    "team": { "answer": "billing", "confidence": 0.952, "verdict": "auto", "threshold": 0.8 }\n  },\n  "all_auto": true,\n  "answers": { "...": "the model's full answers" }\n}\n\nSend {"items": ["first text", "second text"]} for up to 100 at once.\nGET ${base}/sets lists your sets and their questions.`,
-    };
-    const tabs = [["curl", "cURL"], ["python", "Python"], ["js", "JavaScript"], ["n8n", "n8n"], ["response", "Response"]];
-    const pre = h("pre", { class: "code", dir: "ltr" }, snip[apiTab]), lab = h("span", {}, tabs.find((t) => t[0] === apiTab)[1]);
+    // the code, in a dark band: a typed client for the chosen set, its spec, and snippets
+    const tabs = [["python", "Python"], ["ts", "TypeScript"], ["spec", "Spec"], ["curl", "cURL"], ["n8n", "n8n"], ["response", "Response"]];
+    if (!tabs.some((t) => t[0] === apiTab)) apiTab = "python";
+    const file = () => (["python", "ts", "spec"].includes(apiTab) && cur ? clientName(cur, apiTab) : "");
+    const text = () => snippetFor(cur, apiTab);
+    const pre = h("pre", { class: "code api-gen", dir: "ltr" }, text()), lab = h("span", {}, file() || tabs.find((t) => t[0] === apiTab)[1]);
+    const dl = h("button", { class: "text-btn xs bordered", type: "button", hidden: !file() || undefined, onclick: () => { download(file(), text(), apiTab === "spec" ? "text/markdown" : "text/plain"); toast(`Saved ${file()}`); } }, "Download");
     const tabBtns = tabs.map(([id, l]) => {
       const b = h("button", { role: "tab", type: "button", "aria-selected": String(apiTab === id) }, l);
-      b.addEventListener("click", () => { apiTab = id; pre.textContent = snip[id]; lab.textContent = l; tabBtns.forEach((x) => x.setAttribute("aria-selected", String(x === b))); });
+      b.addEventListener("click", () => { apiTab = id; pre.textContent = text(); pre.scrollTop = 0; lab.textContent = file() || l; dl.hidden = !file(); tabBtns.forEach((x) => x.setAttribute("aria-selected", String(x === b))); });
       return b;
     });
-    const codeWin = h("div", { class: "api-code" },
-      h("div", { class: "code-tabs", role: "tablist" }, tabBtns, h("span", { style: "flex:1" }), copyBtn(() => snip[apiTab])),
-      h("div", { class: "win shadow" }, h("div", { class: "win-title" }, "Zex.Terminal", h("span", { class: "grow" }), lab), pre));
-    const ends = win("Zex.API · endpoints", `${sets.length}`, h("div", { class: "api-ends" },
-      h("div", { class: "end" }, h("span", { class: "verb pix" }, "GET"), h("code", {}, "/api/sets"), h("span", { class: "muted" }, "your sets and their questions"), copyBtn(`${base}/sets`, "Copy URL")),
-      sets.map((x) => h("div", { class: "end" }, h("span", { class: "verb pix post" }, "POST"), h("code", {}, `/api/sets/${x.slug}`), h("span", { class: "muted" }, x.name), copyBtn(`${base}/sets/${x.slug}`, "Copy URL")))));
-    return h("div", { class: "conns api" }, head, h("div", { class: "api-grid" }, status, tryWin), codeWin, ends);
+    const band = pageBand({ tag: "Zex.Clients", title: "Clients", mark: "api",
+      caps: [["THE CLIENTS", "A typed client for each set, in Python or TypeScript, with nothing to install. Each one asks the set, looks up answers a person gave, and checks webhook signatures."],
+        ["THE SPEC", "The same set described in Markdown: its questions and their options, the requests and answers, and the webhook. Keep it next to your code, or give it to a coding assistant."]],
+      body: h("div", { class: "pg-band-body api-code" },
+        h("div", { class: "code-tabs", role: "tablist" }, tabBtns, h("span", { style: "flex:1" }), setSel("Set the code is for"), copyBtn(text), dl),
+        h("div", { class: "win" }, h("div", { class: "win-title" }, "Zex.Terminal", h("span", { class: "grow" }), lab), pre)) });
+    loadDeliveries();
+    return h("div", { class: "conns pg api" }, sky, pageDesk("Zex.API", "side one", status, tryWin, hooksEl, ends), band);
   }
 
   // ---------------------------------------------------------------- load body (share link)
@@ -4613,7 +5288,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     try { again = !!sessionStorage.getItem("zex.booted"); sessionStorage.setItem("zex.booted", "1"); } catch {}
     const wait = (ms) => new Promise((r) => setTimeout(r, ms));
     const mark = (el, text, ok) => { el.textContent = text; el.className = ok ? "ok" : "warn"; };
-    sp.querySelector(".sp-mark").append(heroCanvas(0.035));
+    sp.querySelector(".sp-mark").append(heroCanvas(0.035, null, "splash"));
     app.classList.add("booting");
     relayReady.then(() => mark($("#spRelay"), hasRelay ? "ok" : "off", hasRelay));
     const checked = Promise.race([booted, wait(3200)]).then(() => {

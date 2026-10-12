@@ -46,6 +46,9 @@ func setup(t *testing.T) http.Handler {
 	logMu.Lock()
 	logItems, logByID, logLoaded = nil, map[string]*logItem{}, false
 	logMu.Unlock()
+	hookMu.Lock()
+	hookList, hookLoaded = nil, false
+	hookMu.Unlock()
 	return newHandler(web.FS, 18765)
 }
 

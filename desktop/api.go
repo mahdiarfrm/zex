@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -30,6 +31,8 @@ type apiSet struct {
 	Questions  json.RawMessage    `json:"questions"`
 	Thresholds map[string]float64 `json:"thresholds,omitempty"`
 	Route      []apiStage         `json:"route,omitempty"`
+	Webhook    string             `json:"webhook,omitempty"`
+	Events     string             `json:"events,omitempty"` // "all" sends AUTO answers too; otherwise only what a person answered
 }
 
 type apiConn struct {
@@ -42,6 +45,7 @@ type apiConn struct {
 type apiConfig struct {
 	Enabled    bool     `json:"enabled"`
 	Token      string   `json:"token,omitempty"`
+	HookSecret string   `json:"hook_secret,omitempty"` // signs webhook deliveries
 	Model      string   `json:"model,omitempty"`
 	Thr        float64  `json:"thr,omitempty"`
 	Connection *apiConn `json:"connection,omitempty"`
@@ -109,6 +113,12 @@ func newToken() string {
 	return "zex_" + hex.EncodeToString(b)
 }
 
+func newSecret() string {
+	b := make([]byte, 24)
+	rand.Read(b)
+	return "zexwh_" + hex.EncodeToString(b)
+}
+
 // handleAPIConfig is how the page turns the API on or off and keeps it current. It has the
 // same guards as the relay: a custom header (so other sites can't send it without a CORS
 // preflight, which this server never grants) and, when present, this page's origin.
@@ -135,7 +145,8 @@ func handleAPIConfig(w http.ResponseWriter, r *http.Request, origins map[string]
 	if r.Method == http.MethodPost {
 		var in struct {
 			apiConfig
-			Regenerate bool `json:"regenerate"`
+			Regenerate       bool `json:"regenerate"`
+			RegenerateSecret bool `json:"regenerate_secret"`
 		}
 		if err := json.NewDecoder(io.LimitReader(r.Body, 8<<20)).Decode(&in); err != nil {
 			writeJSON(w, 400, map[string]any{"error": "Zex: bad JSON"})
@@ -144,6 +155,9 @@ func handleAPIConfig(w http.ResponseWriter, r *http.Request, origins map[string]
 		apiCfg.Enabled = in.Enabled
 		if apiCfg.Token == "" || in.Regenerate {
 			apiCfg.Token = newToken()
+		}
+		if apiCfg.HookSecret == "" || in.RegenerateSecret {
+			apiCfg.HookSecret = newSecret()
 		}
 		if in.Enabled {
 			apiCfg.Model, apiCfg.Thr, apiCfg.Connection, apiCfg.Sets = in.Model, in.Thr, in.Connection, in.Sets
@@ -156,7 +170,7 @@ func handleAPIConfig(w http.ResponseWriter, r *http.Request, origins map[string]
 			return
 		}
 	}
-	writeJSON(w, 200, map[string]any{"enabled": apiCfg.Enabled, "token": apiCfg.Token, "log": logOn(apiCfg), "audit": auditRate(apiCfg)})
+	writeJSON(w, 200, map[string]any{"enabled": apiCfg.Enabled, "token": apiCfg.Token, "hook_secret": apiCfg.HookSecret, "log": logOn(apiCfg), "audit": auditRate(apiCfg)})
 }
 
 func handleAPI(w http.ResponseWriter, r *http.Request) {
@@ -195,9 +209,88 @@ func handleAPI(w http.ResponseWriter, r *http.Request) {
 	case strings.HasPrefix(path, "sets/") && r.Method == http.MethodPost:
 		slug, _ := url.PathUnescape(strings.TrimPrefix(path, "sets/"))
 		runSet(w, r, cfg, slug)
+	case strings.HasPrefix(path, "sets/") && r.Method == http.MethodGet:
+		slug, _ := url.PathUnescape(strings.TrimPrefix(path, "sets/"))
+		for _, s := range cfg.Sets {
+			if s.Slug == slug {
+				th := s.Thresholds
+				if th == nil {
+					th = map[string]float64{}
+				}
+				writeJSON(w, 200, map[string]any{"slug": s.Slug, "name": s.Name, "questions": s.Questions, "thresholds": th, "threshold": thrOr(cfg.Thr), "endpoint": "/api/sets/" + s.Slug, "webhook": s.Webhook != ""})
+				return
+			}
+		}
+		writeJSON(w, 404, map[string]any{"error": fmt.Sprintf("No set called %q. GET /api/sets lists them.", slug)})
+	case path == "requests" && r.Method == http.MethodGet:
+		listRequests(w, r)
+	case strings.HasPrefix(path, "requests/") && r.Method == http.MethodGet:
+		id, _ := url.PathUnescape(strings.TrimPrefix(path, "requests/"))
+		logMu.Lock()
+		defer logMu.Unlock()
+		loadLog()
+		if it := logByID[id]; it != nil {
+			writeJSON(w, 200, publicItem(it))
+			return
+		}
+		writeJSON(w, 404, map[string]any{"error": fmt.Sprintf("No request with the id %q. Zex keeps requests only while \"keep requests for review\" is on.", id)})
 	default:
-		writeJSON(w, 404, map[string]any{"error": "Not found. POST /api/sets/<set> with {\"text\": \"...\"}, or GET /api/sets."})
+		writeJSON(w, 404, map[string]any{"error": "Not found. POST /api/sets/<set> with {\"text\": \"...\"}, GET /api/sets, or GET /api/requests/<id>."})
 	}
+}
+
+func thrOr(t float64) float64 {
+	if t <= 0 {
+		return 0.8
+	}
+	return t
+}
+
+// listRequests: GET /api/requests?set=&status=&since=&limit=, newest first. since is a time
+// (unix milliseconds or RFC 3339); only requests that changed after it are listed.
+func listRequests(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	set, status := q.Get("set"), q.Get("status")
+	limit, err := strconv.Atoi(q.Get("limit"))
+	if err != nil || limit <= 0 {
+		limit = 50
+	}
+	limit = min(limit, 500)
+	var since int64
+	if v := q.Get("since"); v != "" {
+		if n, err := strconv.ParseInt(v, 10, 64); err == nil {
+			since = n
+		} else if t, err := time.Parse(time.RFC3339, v); err == nil {
+			since = t.UnixMilli()
+		} else {
+			writeJSON(w, 400, map[string]any{"error": "since is a time: unix milliseconds or RFC 3339, like 2026-01-31T09:00:00Z."})
+			return
+		}
+	}
+	logMu.Lock()
+	defer logMu.Unlock()
+	loadLog()
+	out := []map[string]any{}
+	for i := len(logItems) - 1; i >= 0 && len(out) < limit; i-- {
+		it := logItems[i]
+		if set != "" && it.Set != set {
+			continue
+		}
+		if status != "" && publicStatus(it) != status {
+			continue
+		}
+		if since > 0 {
+			changed := it.At
+			if it.Review != nil {
+				changed = it.Review.At
+			}
+			if changed <= since {
+				continue
+			}
+		}
+		out = append(out, publicItem(it))
+	}
+	writeJSON(w, 200, map[string]any{"requests": out})
 }
 
 func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) {
@@ -221,6 +314,8 @@ func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) 
 		State json.RawMessage   `json:"state"`
 		Items []json.RawMessage `json:"items"`
 		Model string            `json:"model"`
+		Ref   string            `json:"ref"`  // the caller's own id, sent back with the answer
+		Refs  []string          `json:"refs"` // one per item
 	}
 	trimmed := bytes.TrimSpace(body)
 	if strings.HasPrefix(r.Header.Get("Content-Type"), "application/json") || (len(trimmed) > 0 && trimmed[0] == '{') {
@@ -237,8 +332,11 @@ func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) 
 		model = cfg.Model
 	}
 	// one answers a single state, through the set's route, and records it for the review queue
-	one := func(state json.RawMessage) map[string]any {
-		it := &logItem{ID: newID(), At: time.Now().UnixMilli(), Set: set.Slug, Model: model, State: state, AuditRate: auditRate(cfg)}
+	one := func(state json.RawMessage, ref string) map[string]any {
+		if len(ref) > 200 {
+			ref = ref[:200]
+		}
+		it := &logItem{ID: newID(), At: time.Now().UnixMilli(), Set: set.Slug, Model: model, State: state, AuditRate: auditRate(cfg), Ref: ref}
 		rr := runRoute(cfg, set, model, state)
 		it.Stages, it.By, it.Cost, it.Baseline, it.Ms, it.RouteLen = rr.Stages, rr.By, rr.Cost, rr.Baseline, rr.Ms, len(set.Route)
 		var res map[string]any
@@ -252,7 +350,16 @@ func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) 
 				status = "auto"
 				it.Audit = logOn(cfg) && chance(it.AuditRate)
 			}
-			res = map[string]any{"id": it.ID, "set": set.Slug, "model": rr.Model, "status": status, "decisions": rr.Decisions, "all_auto": rr.AllAuto, "answers": rr.Answers}
+			res = map[string]any{"id": it.ID, "set": set.Slug, "model": rr.Model, "status": status, "decisions": rr.Decisions, "all_auto": rr.AllAuto, "answers": rr.Answers, "final": publicItem(it)["final"]}
+			if ref != "" {
+				res["ref"] = ref
+			}
+			if set.Webhook != "" && validHookURL(set.Webhook) && (rr.AllAuto && set.Events == "all") {
+				queueHook(*set, "answer.auto", it.ID, publicItem(it), "pending")
+			}
+			if set.Webhook != "" {
+				res["webhook"] = true
+			}
 			if len(set.Route) > 1 {
 				by := "person"
 				if rr.By >= 0 {
@@ -273,8 +380,12 @@ func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) 
 			return
 		}
 		results := make([]map[string]any, 0, len(in.Items))
-		for _, it := range in.Items {
-			res := one(it)
+		for i, it := range in.Items {
+			ref := ""
+			if i < len(in.Refs) {
+				ref = in.Refs[i]
+			}
+			res := one(it, ref)
 			res["state"] = it
 			results = append(results, res)
 		}
@@ -284,7 +395,7 @@ func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) 
 		if in.Text != nil {
 			state, _ = json.Marshal(*in.Text)
 		}
-		res := one(state)
+		res := one(state, in.Ref)
 		if e, ok := res["error"]; ok {
 			writeJSON(w, 502, map[string]any{"id": res["id"], "error": e})
 			return
