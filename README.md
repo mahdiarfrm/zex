@@ -39,7 +39,7 @@ Chat models answer in sentences you have to parse. Typed-decision models answer 
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/sets-dark.png">
-  <img alt="Question sets: saved groups of typed questions, each with its route, on the pink desk under the sky band" src="docs/screenshots/sets-route.png">
+  <img alt="Question sets: saved groups of typed questions, each with its route, on a green desk under the sky band" src="docs/screenshots/sets-route.png">
 </picture>
 
 Save the questions you write as a **set**: a named, versioned group you can reuse in the Playground, in Batch, from Home and through the local API. A set can give each question its own AUTO threshold and its own route. Export a set as a `.zex.json` file to share it or keep it next to your code, and drop one onto the Sets page to import it.

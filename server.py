@@ -44,7 +44,7 @@ ALLOWED_PATH = re.compile(r"/(v1/(systemone|decisions|models)|api/(decide|tags|p
 CATALOG_URL = os.environ.get("ZEX_CATALOG_URL") or "https://ollaya.dev/search.json"
 _catalog = {"at": 0.0, "data": b""}
 LOOPBACK = {"localhost", "127.0.0.1", "::1"}
-VERSION = "0.5.0"
+VERSION = "0.5.1"
 
 # Local model servers never go through a system HTTP proxy; remote ones may need it.
 DIRECT = urllib.request.build_opener(urllib.request.ProxyHandler({}))

@@ -435,6 +435,13 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 
 /* ---------- the other pages, built like Home ---------- */
 .conns.pg { padding: 0 0 40px; }
+/* Each page has its own desk colour: Home's pink and its ink turned to another hue, at the
+   same lightness and colourfulness (OKLCH), so they all sit at the pink's tone. */
+.pg.sets { --desk: #6dc682; --desk-ink: #091507; }
+.pg.review { --desk: #c299f0; --desk-ink: #130e1f; }
+.pg.api { --desk: #75b1fe; --desk-ink: #05131f; }
+.pg.links { --desk: #ed9759; --desk-ink: #1e0c05; }
+.pg.models { --desk: #17c9b9; --desk-ink: #001611; }
 .pg-sky { min-height: 0; padding-bottom: 34px; }
 .pg-crumb { display: flex; align-items: center; gap: 7px; font-size: 15px; font-weight: 600; }
 .pg-crumb a { color: var(--text-muted); font-weight: 500; } .pg-crumb a:hover { color: var(--text); text-decoration: underline; }
@@ -462,6 +469,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .pg-band .at-title { font-size: clamp(56px, 8.5vw, 132px); }
 .pg-band-body { position: relative; }
 .pg-band .win { border-color: var(--at-line); box-shadow: none; background: var(--at-bg); }
+.hm-atlas.pg-band { --at-pink: var(--desk); --accent: var(--desk); --syn-key: var(--desk); }
 .pg-band .win-title { background: var(--at-ink); color: var(--at-bg); }
 .hm-grid { display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr); gap: 22px; align-items: stretch; }
 .qr textarea { display: block; width: 100%; min-height: 108px; resize: vertical; border: 1px solid var(--border-strong); background: var(--surface); padding: 10px 12px; font: 15px/1.45 var(--sans); color: var(--text); outline: none; }
@@ -1392,7 +1400,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   }
   let curSetId = store.get("zex.curSet", null);
   let setChipEl = null;
-  const ZEX_VERSION = "0.5.0";
+  const ZEX_VERSION = "0.5.1";
   let apiCfg = { available: false, enabled: false, token: "" };
   let apiTimer = 0;
 
@@ -3659,7 +3667,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     };
     const cloud = cloudSetup ? cloudSetupWin() : null;
     cloud?.classList.add("wide");
-    return h("div", { class: "conns pg" },
+    return h("div", { class: "conns pg links" },
       pageSky({ name: "Connections", title: "Connections", mark: "link",
         lede: "Zex talks to any server that speaks the typed-decision API (POST /v1/systemone). The active one is used by the Playground, Batch and History. Compare can mix two.",
         kpis: connKpis }),
