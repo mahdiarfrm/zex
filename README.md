@@ -25,7 +25,7 @@ Chat models answer in sentences you have to parse. Typed-decision models answer 
 
 - **Typed, not text.** Every answer is one of the options you wrote, with a probability. There is nothing to parse.
 - **Sure, or not sure.** Set a confidence bar. Answers above it are marked **AUTO**, the rest **REVIEW**.
-- **Bring your own model.** Run [Laya](https://github.com/NandhaKishorM/laya) locally with [Ollaya](https://ollaya.dev), point Zex at an [OpenJev](https://github.com/razorback16/openjev) server, or use a hosted API with your own key.
+- **Bring your own model.** Run [Laya](https://github.com/NandhaKishorM/laya) locally with [Ollaya](https://ollaya.dev), run bigger models on a cloud GPU from Colab or any GPU server, point Zex at an [OpenJev](https://github.com/razorback16/openjev) server, or use a hosted API with your own key.
 
 ## A closer look
 
@@ -62,6 +62,23 @@ To see it before you have a file of your own, click **Try a labeled sample** in 
 <img alt="A batch run through a route: where each request was finished, and the money saved" src="docs/screenshots/route-batch.png">
 
 Give a set a **route**: a free local model first, a stronger or paid one next, a person last. Every question starts at the first stage. Only the questions a stage isn't sure about go on to the next, and whatever is still unsure waits in Review. If a stage is down, the next one covers for it. Zex shows where each request was finished and what it cost, against sending everything to the strongest model. Run a labeled file through the route in Batch to see the accuracy and the savings before you switch it on.
+
+### Models, on this computer or on a cloud GPU
+
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/models-dark.png">
+  <img alt="Models: what Ollaya has installed on this computer, and Ollaya's catalog with a Download button for each model" src="docs/screenshots/models.png">
+</picture>
+
+**Models** lists what each Ollaya has installed and Ollaya's catalog of open decision models. Download one and watch its progress, remove one you no longer need, or make one the Playground's model.
+
+For models too big for your computer, start a **cloud GPU**: in **Connections**, click **+ Cloud GPU**. Open the ready notebook in Colab, or run one command on any Linux machine with an NVIDIA GPU:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/mahdiarfrm/zex/main/cloud/zex-gpu.sh | bash
+```
+
+It sets up Ollaya in `~/.zex-gpu`, downloads a model that fits the GPU, opens a private HTTPS tunnel and prints a pairing code. Paste the code into Zex and the GPU works like any other connection: in the Playground, in Compare, and as a stage of a route, where it gets only the questions the local model wasn't sure about. On a GPU cloud that runs container images, start Ollaya's image with the key Zex gives you and paste its address instead. When a session ends, start it again and paste the new code: the same connection is updated, so routes keep working. Colab's free tier may end sessions that serve requests from outside.
 
 ### Replay an edit before you save it
 
@@ -163,7 +180,7 @@ Get them from the [latest release](https://github.com/mahdiarfrm/zex/releases/la
 
 ## Get started
 
-1. **Run a model.** The quickest way is local: install [Ollaya](https://ollaya.dev) and run `ollaya pull laya`. Zex finds it at `http://localhost:11435`.
+1. **Run a model.** The quickest way is local: install [Ollaya](https://ollaya.dev), then download a model under **Models** (or run `ollaya pull laya`). Zex finds Ollaya at `http://localhost:11435`. For bigger models, add a cloud GPU under **Connections**.
 2. **Or connect one.** In **Connections**, add an OpenJev or jeff server by URL, or TypeSafe Jev or Vercel AI Gateway with your API key.
 3. **Ask.** On **Home**, paste a message, pick a question set and press **Run**. Or open the **Playground** and write your own questions:
 
@@ -182,7 +199,8 @@ Get them from the [latest release](https://github.com/mahdiarfrm/zex/releases/la
 - Zex has no account, no telemetry and no cloud of its own.
 - Your history, settings and API keys stay in the app's local storage on your computer.
 - A key is only ever sent to the server you added it for.
-- The local relay listens on `127.0.0.1` only, and it forwards decision-model API paths only.
+- The local relay listens on `127.0.0.1` only, and it forwards decision-model API paths only, plus Ollaya's model store (list, download, remove).
+- A cloud GPU runs on a machine you start. Its requests reach it through a Cloudflare quick tunnel, and a random key, which only its pairing code carries, keeps everyone else out.
 - The local API is off until you turn it on, answers on `127.0.0.1` only, and needs a token that you can replace at any time. Turning it off removes your sets and connection from its settings file.
 - Requests to the local API are logged on your computer only, so you can review them. Turn the log off or clear it on the Local API page.
 
@@ -196,6 +214,7 @@ flowchart LR
   UI -->|direct, when CORS allows| L["Local model<br/>Ollaya · Laya"]
   R --> L
   R --> C["Hosted APIs<br/>TypeSafe Jev · Vercel · OpenJev"]
+  R -->|tunnel, key| G["Cloud GPU<br/>Ollaya in Colab or on a server"]
 ```
 
 The interface is a single page (`web/index.html`) with no build step. Many hosted model APIs send no CORS headers, so a page can't call them directly, and a small local server relays those requests and serves the local API. The desktop app (`desktop/`, Go) embeds the page and the relay in one binary and shows them in a native window: WebKit on macOS, WebView2 on Windows, WebKitGTK on Linux. `server.py` is the same server in Python, for running from source.
@@ -215,7 +234,7 @@ sh assets/build_icons.sh    # regenerates the icons (needs librsvg and ImageMagi
 
 ```sh
 go test ./desktop/                                  # server, relay and local API
-ZEX_CONFIG_DIR=$(mktemp -d) python3 server.py --port 8766
+ZEX_CONFIG_DIR=$(mktemp -d) ZEX_CATALOG_URL=file://$PWD/tests/fixtures/catalog.json python3 server.py --port 8766
 # then, with Ollaya running, the browser click-through:
 "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" --headless=new \
   --force-prefers-reduced-motion --virtual-time-budget=400000 \
@@ -232,6 +251,7 @@ ZEX_CONFIG_DIR=$(mktemp -d) python3 server.py --port 8766
 web/        the app: one HTML file, its font, and the embed for the desktop build
 desktop/    the desktop app: local server, relay, native window and packaging (Go)
 server.py   the same server for running from source (Python)
+cloud/      the cloud GPU script and its Colab notebook
 assets/     icon source and generated icons
 tests/      browser click-through tests and a screenshot driver
 docs/       README images and badges

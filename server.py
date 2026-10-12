@@ -37,7 +37,11 @@ from functools import partial
 HERE = os.path.dirname(os.path.abspath(__file__))
 WEB = os.path.join(HERE, "web")
 TESTS = os.path.join(HERE, "tests")
-ALLOWED_PATH = re.compile(r"/(v1/(systemone|decisions|models)|api/(decide|tags|ps))/?$")
+# decisions and model lists, and on Ollaya the model store: details, downloads and removal
+ALLOWED_PATH = re.compile(r"/(v1/(systemone|decisions|models)|api/(decide|tags|ps|show|version|pull|delete))/?$")
+# Ollaya's catalog of models to download; the page reads it through /zex/catalog
+CATALOG_URL = os.environ.get("ZEX_CATALOG_URL") or "https://ollaya.dev/search.json"
+_catalog = {"at": 0.0, "data": b""}
 LOOPBACK = {"localhost", "127.0.0.1", "::1"}
 
 # Local model servers never go through a system HTTP proxy; remote ones may need it.
@@ -266,7 +270,7 @@ def call_model(conn: dict, model: str, state, questions) -> dict:
     body = json.dumps({"model": model, "state": state, "questions": questions}).encode()
     base = (conn.get("url") or "").rstrip("/")
     name = conn.get("name") or base
-    paths = ["/api/decide", "/v1/systemone"] if conn.get("kind") == "ollaya" else ["/v1/systemone"]
+    paths = ["/api/decide", "/v1/systemone"] if conn.get("kind") in ("ollaya", "cloud") else ["/v1/systemone"]
     for i, path in enumerate(paths):
         req = urllib.request.Request(base + path, data=body, method="POST")
         req.add_header("Content-Type", "application/json")
@@ -332,7 +336,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         t = urllib.parse.urlparse(target)
         if t.scheme not in ("http", "https") or not t.netloc or not ALLOWED_PATH.search(t.path):
             return self._json(400, {"error": "Zex relay: only decision-model API paths can be relayed", "target": target})
-        body = self._raw if self.command == "POST" else None
+        body = self._raw if self.command in ("POST", "DELETE") else None
         req = urllib.request.Request(target, data=body, method=self.command)
         req.add_header("Content-Type", self.headers.get("Content-Type", "application/json"))
         req.add_header("Accept", "application/json")
@@ -343,7 +347,18 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         opener = DIRECT if t.hostname in LOOPBACK else DEFAULT
         try:
             with opener.open(req, timeout=180) as r:
-                status, data, ctype = r.status, r.read(), r.headers.get("Content-Type", "application/json")
+                ctype = r.headers.get("Content-Type", "application/json")
+                if t.path.rstrip("/").endswith("/api/pull"):
+                    # a download reports its progress as it goes: pass each line on at once
+                    self.send_response(r.status)
+                    self.send_header("Content-Type", ctype)
+                    self.end_headers()
+                    for line in r:
+                        self.wfile.write(line)
+                        self.wfile.flush()
+                    self.close_connection = True
+                    return
+                status, data = r.status, r.read()
         except urllib.error.HTTPError as e:
             status, data, ctype = e.code, e.read(), e.headers.get("Content-Type", "application/json")
         except Exception as e:  # unreachable host, timeout, TLS, DNS
@@ -353,6 +368,53 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self.send_header("Content-Length", str(len(data)))
         self.end_headers()
         self.wfile.write(data)
+
+    # A stand-in Ollaya for tests/flows.html: a model list, downloads that report their progress
+    # line by line, and removal. Only this dev server has it; the app doesn't.
+    _fake_models = {"fake:small": 52_000_000}
+
+    def _fake_ollaya(self) -> None:
+        path = urllib.parse.urlparse(self.path).path[len("/tests/fake-ollaya"):]
+        have = Handler._fake_models
+        body = json.loads(self._raw or b"{}") if self.command in ("POST", "DELETE") else {}
+        if path == "/v1/models":
+            return self._json(200, {"models": [{"name": n} for n in sorted(have)]})
+        if path == "/api/tags":
+            return self._json(200, {"models": [{"name": n, "model": n, "size": z, "details": {"format": "onnx", "parameter_size": "22M"}} for n, z in sorted(have.items())]})
+        if path == "/api/ps":
+            return self._json(200, {"models": []})
+        if path == "/api/pull" and self.command == "POST":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/x-ndjson")
+            self.end_headers()
+            total = 40_000_000
+            for line in [{"status": "pulling manifest"}] + [{"status": "pulling 1a2b", "digest": "sha256:1a2b", "total": total, "completed": total * k // 5} for k in range(6)] + [{"status": "success"}]:
+                self.wfile.write((json.dumps(line) + "\n").encode())
+                self.wfile.flush()
+            have[body.get("model", "")] = total
+            self.close_connection = True
+            return
+        if path == "/api/delete" and self.command == "DELETE":
+            if have.pop(body.get("model", ""), None) is None:
+                return self._json(404, {"error": "model not found", "code": "MODEL_NOT_FOUND"})
+            return self._json(200, {})
+        return self._json(404, {"error": "not found"})
+
+    def _catalog(self) -> None:
+        if not self._from_page():
+            return
+        if not _catalog["data"] or time.time() - _catalog["at"] > 3600:
+            try:
+                with DEFAULT.open(urllib.request.Request(CATALOG_URL, headers={"User-Agent": "Zex/0.3"}), timeout=20) as r:
+                    _catalog.update(at=time.time(), data=r.read())
+            except Exception as e:
+                if not _catalog["data"]:
+                    return self._json(502, {"error": f"Zex couldn't load Ollaya's model catalog: {e}", "code": "UNREACHABLE"})
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.send_header("Content-Length", str(len(_catalog["data"])))
+        self.end_headers()
+        self.wfile.write(_catalog["data"])
 
     def _from_page(self) -> bool:
         if self.headers.get("X-Zex") != "1":
@@ -401,7 +463,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         path = urllib.parse.urlparse(self.path).path.rstrip("/")
         sets = cfg.get("sets") or []
         if path == "/api" and self.command == "GET":
-            return self._json(200, {"ok": True, "app": "zex", "version": "0.3.3", "sets": len(sets)})
+            return self._json(200, {"ok": True, "app": "zex", "version": "0.4.0", "sets": len(sets)})
         if path == "/api/sets" and self.command == "GET":
             return self._json(200, {"sets": [{"slug": s["slug"], "name": s["name"], "endpoint": "/api/sets/" + s["slug"],
                                               "questions": {k: (v or {}).get("type") for k, v in (s.get("questions") or {}).items()}} for s in sets]})
@@ -603,9 +665,21 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             return self._stats()
         if self.path.startswith("/zex/points"):
             return self._points()
+        if self.path.startswith("/zex/catalog"):
+            return self._catalog()
+        if self.path.startswith("/tests/fake-ollaya/"):
+            return self._fake_ollaya()
         if self.path == "/api" or self.path.startswith("/api/") or self.path.startswith("/api?"):
             return self._api()
         return super().do_GET()
+
+    def do_DELETE(self):
+        self._raw = self.rfile.read(min(int(self.headers.get("Content-Length") or 0), 16 << 20))
+        if self.path.startswith("/zex/proxy"):
+            return self._relay()
+        if self.path.startswith("/tests/fake-ollaya/"):
+            return self._fake_ollaya()
+        return self._json(405, {"error": "method not allowed"})
 
     def do_POST(self):
         # Read the body before anything can answer early: replying with unread request data
@@ -613,6 +687,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         self._raw = self.rfile.read(min(int(self.headers.get("Content-Length") or 0), 16 << 20))
         if self.path.startswith("/zex/proxy"):
             return self._relay()
+        if self.path.startswith("/tests/fake-ollaya/"):
+            return self._fake_ollaya()
         if self.path.startswith("/zex/api-config"):
             return self._api_config()
         if self.path.startswith("/zex/log/clear"):

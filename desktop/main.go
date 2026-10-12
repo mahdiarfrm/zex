@@ -18,7 +18,7 @@ import (
 	"zex/web"
 )
 
-var version = "0.3.3"
+var version = "0.4.0"
 
 var errNoWebView = errors.New("no web view available")
 

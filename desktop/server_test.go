@@ -93,3 +93,64 @@ func TestSaveNameIsSanitized(t *testing.T) {
 		t.Fatalf("saved to %s", p)
 	}
 }
+
+// A download streams its progress through the relay line by line, and removal (DELETE with a
+// body) goes through with the key.
+func TestRelayModelStore(t *testing.T) {
+	var gotAuth, gotBody, gotMethod string
+	up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/api/pull":
+			fl := w.(http.Flusher)
+			for _, line := range []string{`{"status":"pulling manifest"}`, `{"status":"pulling abc","total":10,"completed":4}`, `{"status":"success"}`} {
+				io.WriteString(w, line+"\n")
+				fl.Flush()
+			}
+		case "/api/delete":
+			b, _ := io.ReadAll(r.Body)
+			gotAuth, gotBody, gotMethod = r.Header.Get("Authorization"), string(b), r.Method
+			w.WriteHeader(200)
+		default:
+			w.WriteHeader(404)
+		}
+	}))
+	defer up.Close()
+	h := newHandler(web.FS, 18765)
+	page := map[string]string{"X-Zex": "1", "Origin": "http://127.0.0.1:18765", "X-Zex-Key": "k1"}
+	r := get(t, h, "POST", "/zex/proxy?u="+url.QueryEscape(up.URL+"/api/pull"), page, `{"model":"laya"}`)
+	if r.Code != 200 || strings.Count(r.Body.String(), "\n") != 3 || !strings.Contains(r.Body.String(), `"success"`) {
+		t.Fatalf("pull: %d %q", r.Code, r.Body)
+	}
+	r = get(t, h, "DELETE", "/zex/proxy?u="+url.QueryEscape(up.URL+"/api/delete"), page, `{"model":"laya"}`)
+	if r.Code != 200 || gotMethod != "DELETE" || gotAuth != "Bearer k1" || gotBody != `{"model":"laya"}` {
+		t.Fatalf("delete: %d %s %q %q", r.Code, gotMethod, gotAuth, gotBody)
+	}
+	if r := get(t, h, "POST", "/zex/proxy?u="+url.QueryEscape(up.URL+"/api/copy"), page, `{}`); r.Code != 400 {
+		t.Fatalf("other store paths stay closed: %d", r.Code)
+	}
+}
+
+func TestCatalog(t *testing.T) {
+	hits := 0
+	up := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		hits++
+		io.WriteString(w, `{"models":[{"name":"laya","tags":[{"name":"laya:en"}]}]}`)
+	}))
+	defer up.Close()
+	old := catalogURL
+	catalogURL, catalog.data = up.URL, nil
+	defer func() { catalogURL, catalog.data = old, nil }()
+	h := newHandler(web.FS, 18765)
+	if r := get(t, h, "GET", "/zex/catalog", nil, ""); r.Code != 403 {
+		t.Fatalf("catalog needs the page: %d", r.Code)
+	}
+	page := map[string]string{"X-Zex": "1"}
+	for i := 0; i < 2; i++ {
+		if r := get(t, h, "GET", "/zex/catalog", page, ""); r.Code != 200 || !strings.Contains(r.Body.String(), "laya:en") {
+			t.Fatalf("catalog: %d %s", r.Code, r.Body)
+		}
+	}
+	if hits != 1 {
+		t.Fatalf("catalog should be fetched once and kept, fetched %d times", hits)
+	}
+}

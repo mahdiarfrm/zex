@@ -296,12 +296,13 @@ func runSet(w http.ResponseWriter, r *http.Request, cfg apiConfig, slug string) 
 }
 
 // callModel sends one request to the connection, the same way the page does: Ollaya first
-// tries its own /api/decide, everything else gets POST /v1/systemone.
+// (on this computer or on a cloud GPU) tries its own /api/decide, everything else gets
+// POST /v1/systemone.
 func callModel(c apiConn, model string, state, questions json.RawMessage) (map[string]any, error) {
 	payload, _ := json.Marshal(map[string]any{"model": model, "state": state, "questions": questions})
 	base := strings.TrimRight(c.URL, "/")
 	paths := []string{"/v1/systemone"}
-	if c.Kind == "ollaya" {
+	if c.Kind == "ollaya" || c.Kind == "cloud" {
 		paths = []string{"/api/decide", "/v1/systemone"}
 	}
 	name := c.Name

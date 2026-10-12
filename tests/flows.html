@@ -6,9 +6,10 @@
 <iframe id="f" style="width:1280px;height:800px;border:0"></iframe>
 <script>
 // Click-through tests of the main flows (F01-F04) against the real page and a local Ollaya server.
-// Run headless Chrome with --force-prefers-reduced-motion: page changes use View Transitions,
-// which wait for a painted frame that headless virtual time never produces. Start the server
-// with ZEX_CONFIG_DIR set to a scratch folder, so the API tests don't touch your settings.
+// Run headless Chrome with --force-prefers-reduced-motion: the theme switch uses a View
+// Transition, which waits for a painted frame that headless virtual time never produces. Start
+// the server with ZEX_CONFIG_DIR set to a scratch folder, so the API tests don't touch your
+// settings, and ZEX_CATALOG_URL=file://<repo>/tests/fixtures/catalog.json for the Models tests.
 const out = document.getElementById("out");
 const results = [];
 const ok = (id, cond, note = "") => results.push(`${cond ? "PASS" : "FAIL"} ${id}${note ? "  " + note : ""}`);
@@ -368,6 +369,47 @@ async function goRoute(w, d, r) {
     await goRoute(w, d, "api"); await goRoute(w, d, "sets");
     ok("UI-7 going to another page shows it at once", !d.querySelector("#page").classList.contains("intro") && entering() === 0, `${entering()} entering`);
     [...triCard().querySelectorAll(".route .btn")].find((b) => b.textContent === "Cancel").click(); await sleep(50);
+
+    // Models, against the stand-in Ollaya this test server has at /tests/fake-ollaya, with the
+    // catalog from tests/fixtures/catalog.json (start the server with ZEX_CATALOG_URL set to it)
+    const cs0 = JSON.parse(w.localStorage.getItem("zex.conns") || "[]");
+    w.localStorage.setItem("zex.conns", JSON.stringify([...cs0.filter((c) => c.id !== "c-fake"), { id: "c-fake", kind: "ollaya", name: "Stand-in Ollaya", url: location.origin + "/tests/fake-ollaya", key: "" }]));
+    w = await load("/?theme=light#/models"); d = w.document;
+    const fakeWin = () => [...d.querySelectorAll(".mwin")].find((x) => /Stand-in Ollaya/.test(x.querySelector(".win-title").textContent));
+    await waitFor(() => fakeWin()?.querySelector(".mn b") && d.querySelector(".lib-fam"), 15000);
+    ok("MODELS-1 Models lists what each Ollaya has and the catalog to download from", /fake:small/.test(fakeWin()?.textContent || "") && d.querySelectorAll(".lib-fam").length >= 2 && /tiny:a/.test(d.querySelector(".lib")?.textContent || ""), fakeWin()?.textContent.slice(0, 100));
+    const to = d.querySelector(".lib-to select"); to.value = "c-fake"; to.dispatchEvent(new Event("change")); await sleep(100);
+    [...d.querySelectorAll(".lib-tag")].find((r) => r.querySelector(".mono").textContent === "tiny:a").querySelector(".pcell button").click();
+    await waitFor(() => d.querySelector('[data-pull="c-fake|tiny:a"] .pbar'), 3000);
+    const midway = d.querySelector('[data-pull="c-fake|tiny:a"]')?.textContent || "";
+    await waitFor(() => /INSTALLED/.test(d.querySelector('[data-pull="c-fake|tiny:a"]')?.textContent || ""), 15000);
+    ok("MODELS-2 a download shows its progress, then the model is installed", /% of 40 MB|starting/.test(midway) && /tiny:a/.test(fakeWin()?.textContent || ""), `${midway} → ${d.querySelector('[data-pull="c-fake|tiny:a"]')?.textContent}`);
+    const rm = () => [...fakeWin().querySelectorAll(".mrow")].find((r) => /tiny:a/.test(r.textContent))?.querySelector(".acts .text-btn:last-child");
+    rm().click(); await sleep(50);
+    const asked = rm()?.textContent;
+    rm().click();
+    await waitFor(() => !/tiny:a/.test(fakeWin()?.textContent || ""), 8000);
+    ok("MODELS-3 removing a model asks once more, then removes it", asked === "Remove tiny:a?" && !/tiny:a/.test(fakeWin()?.textContent || ""), asked);
+    type(d.querySelector(".lib-bar input"), "tiny");
+    ok("MODELS-4 the catalog can be searched", d.querySelectorAll(".lib-fam").length === 1 && /tiny/.test(d.querySelector(".lib-fam b")?.textContent || ""));
+
+    // a cloud GPU pairs from the code its script prints, and a new code updates the same connection
+    await goRoute(w, d, "connections");
+    [...d.querySelectorAll(".preset")].find((b) => /Cloud GPU/.test(b.textContent)).click(); await sleep(80);
+    const pairIn = () => d.querySelector('.cl-setup input[aria-label="Pairing code"]');
+    const connect = () => [...d.querySelectorAll(".cl-setup .btn")].find((b) => b.textContent === "Connect");
+    type(pairIn(), "not a code"); connect().click(); await sleep(80);
+    ok("CLOUD-1 a wrong pairing code is refused", /isn't a pairing code/.test(d.querySelector(".cl-setup .cerr")?.textContent || ""));
+    const code = (url) => "zex-gpu:" + b64({ v: 1, url, key: "k".repeat(48), where: "Colab", gpu: "Tesla T4", mem: 15360 });
+    type(pairIn(), "  Paste this into Zex:  " + code("https://first-session.trycloudflare.com") + "  "); connect().click(); await sleep(120);
+    const clouds = () => JSON.parse(w.localStorage.getItem("zex.conns")).filter((c) => c.kind === "cloud");
+    ok("CLOUD-2 a pairing code adds a cloud GPU connection with its address and key", clouds().length === 1 && clouds()[0].url === "https://first-session.trycloudflare.com" && clouds()[0].key.length === 48 && clouds()[0].name === "Tesla T4 on Colab" && !d.querySelector(".cl-setup"), JSON.stringify(clouds().map((c) => c.name)));
+    [...d.querySelectorAll(".conn")].find((x) => /Tesla T4 on Colab/.test(x.querySelector("input")?.value || "")).querySelectorAll(".btn").forEach((b) => b.textContent === "New code" && b.click()); await sleep(80);
+    type(pairIn(), code("https://second-session.trycloudflare.com")); connect().click(); await sleep(120);
+    ok("CLOUD-3 a new session's code updates the same connection", clouds().length === 1 && clouds()[0].url === "https://second-session.trycloudflare.com", JSON.stringify(clouds().map((c) => c.url)));
+    [...d.querySelectorAll(".cl-setup [role=tab]")].length || [...d.querySelectorAll(".preset")].find((b) => /Cloud GPU/.test(b.textContent)).click(); await sleep(80);
+    [...d.querySelectorAll(".cl-setup [role=tab]")].find((b) => b.textContent === "Container").click(); await sleep(80);
+    ok("CLOUD-4 the container option gives the image and a fresh key", /ghcr\.io\/ollaya-dev\/ollaya/.test(d.querySelector(".cl-setup")?.textContent || "") && /OLLAYA_API_KEY=[0-9a-f]{48}/.test(d.querySelector(".cl-setup")?.textContent || ""));
     w.localStorage.clear();
   } catch (e) {
     results.push("FAIL harness " + e.message);

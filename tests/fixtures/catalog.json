@@ -1,0 +1,7 @@
+{"models": [
+  {"name": "tiny", "rank": 1, "caps": ["decision", "fine-tuned"], "description": "A small stand-in family for the tests.", "search": "tiny tiny small test", "tags": [
+    {"name": "tiny:a", "summary": "The first stand-in model."},
+    {"name": "tiny:b", "summary": "The second stand-in model."}]},
+  {"name": "laya", "rank": 2, "caps": ["multilingual"], "description": "Open decision models from Convai Innovations.", "search": "laya laya multilingual", "tags": [
+    {"name": "laya:en", "summary": "English. Best for guardrails and email triage."}]}
+]}

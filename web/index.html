@@ -381,9 +381,10 @@ textarea.batch-input:focus { border-color: var(--accent); }
 
 /* ---------- pages: home and connections ---------- */
 .page { display: none; grid-column: 2 / -1; overflow: auto; min-width: 0; min-height: 0; background: var(--bg); }
-.app[data-route="home"] .page, .app[data-route="connections"] .page, .app[data-route="sets"] .page, .app[data-route="api"] .page, .app[data-route="review"] .page { display: block; }
+.app[data-route="home"] .page, .app[data-route="connections"] .page, .app[data-route="models"] .page, .app[data-route="sets"] .page, .app[data-route="api"] .page, .app[data-route="review"] .page { display: block; }
 .app[data-route="home"] .editor-col, .app[data-route="home"] .out-col,
 .app[data-route="connections"] .editor-col, .app[data-route="connections"] .out-col,
+.app[data-route="models"] .editor-col, .app[data-route="models"] .out-col,
 .app[data-route="sets"] .editor-col, .app[data-route="sets"] .out-col,
 .app[data-route="api"] .editor-col, .app[data-route="api"] .out-col,
 .app[data-route="review"] .editor-col, .app[data-route="review"] .out-col { display: none; }
@@ -491,6 +492,39 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .preset-grid { display: grid; border-top: 1px solid var(--border-strong); }
 .preset { text-align: left; padding: 10px 6px; border-bottom: 1px solid var(--border-strong); display: flex; flex-direction: column; gap: 2px; } .preset:hover { background: var(--surface-2); } .preset b { font-weight: 600; }
 .cerr { color: var(--danger); font: 12px var(--mono); margin-top: 6px; word-break: break-word; }
+/* cloud GPU setup */
+.cl-setup { grid-column: 1 / -1; }
+.cl-x { width: 22px; height: 18px; font: 18px/1 var(--pix); color: var(--bg); }
+.cl-lede { margin: 0 0 14px; max-width: 780px; color: var(--text-muted); }
+.cl-cols { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; }
+.cl-step, .cl-pair > span { display: block; font-size: 17px; margin-bottom: 8px; }
+.cl-cols .code-tabs { margin-bottom: 10px; }
+.cl-steps { margin: 0; padding-left: 20px; display: grid; gap: 6px; } .cl-steps .cl-open { height: 28px; margin-left: 6px; vertical-align: middle; }
+.cl-cmd { display: flex; align-items: center; gap: 8px; background: var(--surface-2); padding: 6px 8px; min-width: 0; margin: 4px 0; }
+.cl-cmd code { flex: 1; min-width: 0; font: 12px var(--mono); overflow-x: auto; white-space: nowrap; }
+.cl-kv { display: grid; grid-template-columns: 64px minmax(0, 1fr); align-items: center; gap: 2px 10px; font-size: 12.5px; color: var(--text-muted); margin: 8px 0; }
+.cl-pair { display: block; margin-bottom: 10px; } .cl-pair .fld { padding: 9px 10px; }
+.cl-setup .note { color: var(--text-muted); font-size: 12.5px; }
+/* models */
+.mwin .server-status { flex-wrap: wrap; margin-bottom: 10px; } .mwin .server-status .muted { color: var(--text-muted); font: 12px var(--mono); }
+.mlist { border-top: 1px solid var(--border-strong); }
+.mrow { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--border-strong); }
+.mn { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px; } .mn b { font-weight: 600; font-size: 13px; } .mn span { color: var(--text-muted); font-size: 12px; }
+.mrow .acts { display: flex; gap: 4px; align-items: center; }
+.mtag { font-size: 14px; line-height: 16px; padding: 0 5px; border: 1px solid var(--border-strong); color: var(--text-muted); white-space: nowrap; }
+.mtag.on { background: var(--text); color: var(--bg); border-color: var(--text); }
+.lib-win { margin-top: 26px; }
+.lib-bar { display: flex; gap: 12px; align-items: center; margin-bottom: 6px; } .lib-bar .fld { max-width: 380px; padding: 8px 10px; }
+.lib-to { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-muted); }
+.lib-fam { padding: 16px 0 6px; border-bottom: 1.5px solid var(--text); }
+.lib-h { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; } .lib-h b { font-size: 26px; font-weight: 400; line-height: 1; margin-right: 6px; }
+.lib-d { margin: 6px 0 8px; max-width: 900px; color: var(--text-muted); font-size: 13px; }
+.lib-tag { display: grid; grid-template-columns: minmax(0, 1fr) 230px; gap: 12px; align-items: center; padding: 7px 0; border-top: 1px solid var(--border); }
+.lt { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; min-width: 0; } .lt .mono { font-size: 13px; font-weight: 600; } .ls { flex-basis: 100%; color: var(--text-muted); font-size: 12.5px; }
+.pcell { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.pbar { flex: 1; height: 10px; border: 1.5px solid var(--text); background: var(--bg); } .pbar i { display: block; height: 100%; background: var(--text); transition: width .2s linear; }
+.ptxt { font-size: 15px; white-space: nowrap; color: var(--text-muted); } .pdone { font-size: 15px; color: var(--text-muted); }
+@media (max-width: 900px) { .cl-cols { grid-template-columns: minmax(0, 1fr); } .lib-tag { grid-template-columns: minmax(0, 1fr); } .pcell { justify-content: flex-start; } }
 @media (max-width: 1180px) {
   .h-prims { grid-template-columns: minmax(0, 1fr); } .spec { border-left: 0; border-top: 1px solid color-mix(in srgb, var(--bg) 25%, transparent); }
   .opt-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -971,7 +1005,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     <div class="sp-mark"><div class="halftone"></div></div>
     <div class="sp-name"><span style="--i:0">Z</span><span style="--i:1">e</span><span style="--i:2">x</span></div>
     <div class="win sp-log">
-      <div class="win-title">Zex.OS 0.3<span class="grow"></span>boot</div>
+      <div class="win-title">Zex.OS 0.4<span class="grow"></span>boot</div>
       <div class="win-body">
         <div class="sp-line" style="--d:0"><span>loading workbench</span><i></i><b class="ok">ok</b></div>
         <div class="sp-line" style="--d:1"><span>starting relay</span><i></i><b id="spRelay"></b></div>
@@ -1023,6 +1057,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     <a class="nav-item" data-route-link="review" href="#/review"><svg class="i"><use href="#i-eye"/></svg><span>Review</span><b class="nav-badge pix" id="reviewBadge" hidden></b></a>
     <a class="nav-item" data-route-link="api" href="#/api"><svg class="i"><use href="#i-code"/></svg><span>Local API</span></a>
     <a class="nav-item" data-route-link="connections" href="#/connections"><svg class="i"><use href="#i-plug"/></svg><span>Connections</span></a>
+    <a class="nav-item" data-route-link="models" href="#/models"><svg class="i"><use href="#i-box"/></svg><span>Models</span></a>
     <a class="nav-item ext-link" href="https://docs.typesafe.ai/introduction/quickstart" target="_blank" rel="noopener"><svg class="i"><use href="#i-book"/></svg><span>API format</span><svg class="i ext"><use href="#i-ext"/></svg></a>
     <div class="sb-spacer"></div>
     <a class="server-card win" href="#/connections" title="Connections">
@@ -1217,12 +1252,15 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   const runBtn = $("#run");
   const KINDS = {
     ollaya: { label: "Ollaya", url: "http://localhost:11435", key: false, models: [], note: "Runs open decision models such as Laya on your machine." },
+    cloud: { label: "Cloud GPU", url: "", key: true, models: [], note: "Ollaya on a rented GPU or in a Colab notebook, for models too big for this computer." },
     openjev: { label: "OpenJev", url: "http://127.0.0.1:8080", key: false, models: [], note: "Open-source decision server with the same API." },
     jeff: { label: "jeff", url: "http://localhost:8000", key: true, models: ["jev-latest"], note: "Self-hosted GLiFormer server. The key is one of your JEFF_API_KEYS." },
     typesafe: { label: "TypeSafe Jev", url: "https://api.typesafe.ai", key: true, models: ["jev-latest"], note: "TypeSafe's hosted Jev. Needs an API key." },
     vercel: { label: "Vercel AI Gateway", url: "https://ai-gateway.vercel.sh/typesafe", key: true, models: ["typesafe-ai/jev"], note: "Jev through Vercel's AI Gateway. Needs a gateway key." },
     custom: { label: "Custom server", url: "http://localhost:9000", key: true, models: [], note: "Any server that answers POST /v1/systemone." },
   };
+  // Ollaya, on this computer or on a cloud GPU: it has /api/decide and a model store
+  const runsOllaya = (c) => c.kind === "ollaya" || c.kind === "cloud";
   let conns = store.get("zex.conns", null) || [{ id: "c-ollaya", kind: "ollaya", name: KINDS.ollaya.label, url: KINDS.ollaya.url, key: "" }];
   let activeId = store.get("zex.active", conns[0].id);
   if (!conns.some((c) => c.id === activeId)) activeId = conns[0].id;
@@ -1637,6 +1675,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 
   function useConn(id) { activeId = id; saveConns(); syncModelSelect(); paintConnUI(); cmp.a = null; cmp.b = null; cmp.res = {}; if (route !== "playground") rerender(); }
   function addConn(kind) {
+    if (kind === "cloud") { cloudSetup = { tab: "colab" }; rerender(); $(".cl-setup")?.scrollIntoView({ block: "nearest" }); return; }
     const k = KINDS[kind];
     const c = { id: "c-" + Math.random().toString(36).slice(2, 8), kind, name: k.label, url: k.url, key: "" };
     conns.push(c); saveConns(); rerender(); checkConn(c);
@@ -1884,7 +1923,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("div", { class: "vstrip", "aria-hidden": "true" }, STRIP),
       h("div", { class: "ex-hero" },
         h("div", {},
-          h("span", { class: "tagline" }, "Zex.OS 0.3"),
+          h("span", { class: "tagline" }, "Zex.OS 0.4"),
           h("div", { class: "eyebrow" }, "Start here"),
           h("div", { class: "corners", style: "display:inline-block;margin-top:14px" }, h("i", { class: "tl" }), h("i", { class: "tr" }), h("i", { class: "bl" }), h("i", { class: "br" }),
             h("h2", {}, "Ask a model something"))),
@@ -2050,7 +2089,10 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 
   // ---------------------------------------------------------------- shared request helper
   function reachMsg(c, detail) {
-    return `Can't reach ${c.name} at ${c.url}.` + (c.kind === "ollaya" ? "\nIs Ollaya running? Open the Ollaya app or run: ollaya serve" : "\nCheck the URL and the key in Connections.") + (detail ? `\n\n${detail}` : "");
+    const hint = c.kind === "ollaya" ? "Is Ollaya running? Open the Ollaya app or run: ollaya serve"
+      : c.kind === "cloud" ? "The cloud GPU may have stopped. Start it again and paste its new code under Connections, + Cloud GPU."
+      : "Check the URL and the key in Connections.";
+    return `Can't reach ${c.name} at ${c.url}.\n${hint}` + (detail ? `\n\n${detail}` : "");
   }
   async function decide(body, c = activeConn()) {
     await relayReady;
@@ -2058,7 +2100,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const t0 = performance.now();
     let res = null;
     try {
-      if (c.kind === "ollaya") res = await apiFetch(c, "/api/decide", init);
+      if (runsOllaya(c)) res = await apiFetch(c, "/api/decide", init);
       if (!res || res.status === 404 || res.status === 405) res = await apiFetch(c, "/v1/systemone", init);
     } catch (e) { throw new Error(reachMsg(c, e.message)); }
     const rtt = performance.now() - t0;
@@ -3098,7 +3140,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   const page = $("#page");
   function routeFromHash() {
     if (location.hash.startsWith("#share/")) return "playground";
-    const m = location.hash.match(/^#\/(home|playground|connections|sets|api|review)\b/);
+    const m = location.hash.match(/^#\/(home|playground|connections|models|sets|api|review)\b/);
     return m ? m[1] : "home";
   }
   let route = routeFromHash();
@@ -3238,6 +3280,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     page.classList.toggle("intro", !!opts.intro);
     if (route === "home") { page.replaceChildren(renderHome()); animateHome(page.firstChild, opts.intro); refreshLive(); }
     else if (route === "connections") page.replaceChildren(renderConnections());
+    else if (route === "models") { page.replaceChildren(renderModels()); if (!opts.same) loadModels(); }
     else if (route === "sets") page.replaceChildren(renderSets());
     else if (route === "api") page.replaceChildren(renderApi());
     else if (route === "review") page.replaceChildren(renderReview());
@@ -3347,7 +3390,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("section", { class: "hm-sky" },
         h("div", { class: "hm-b64", "aria-hidden": "true" }, STRIP),
         h("div", { class: "hm-top" },
-          h("span", { class: "tagline cursor" }, "Zex.OS 0.3"), h("h1", {}, "Home"), h("span", { class: "grow" }),
+          h("span", { class: "tagline cursor" }, "Zex.OS 0.4"), h("h1", {}, "Home"), h("span", { class: "grow" }),
           h("span", { class: "zclock pix" }, `${fmtDate()} · ${fmtTime()}`)),
         (hmBriefEl = briefEl()),
         h("div", { class: "hm-mark" }, h("div", { class: "halftone" }), heroCanvas())),
@@ -3415,11 +3458,13 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
           h("div", { class: "server-status", style: "margin-top:10px" }, h("span", { class: st.cls, "data-cdot": c.id }), h("span", { "data-ctext": c.id }, st.text)),
           h("div", { class: "cerr", "data-cerr": c.id }, st.error || ""),
           h("div", { class: "chips", "data-cmodels": c.id }, modelChips(c.id)),
-          kind.note ? h("div", { class: "note" }, kind.note) : null,
+          c.kind === "cloud" ? h("div", { class: "note" }, `Ollaya on ${cloudWhere(c) || "a cloud GPU"}` + (c.pairedAt ? `, paired ${ago(c.pairedAt)}.` : ".") + " When the session stops, start it again and paste its new code.")
+            : kind.note ? h("div", { class: "note" }, kind.note) : null,
           h("div", { class: "btn-row" },
             c.id === activeId ? h("button", { class: "btn solid", type: "button", onclick: () => openMode("response") }, "Open Playground")
               : h("button", { class: "btn solid", type: "button", onclick: () => useConn(c.id) }, "Use"),
             h("button", { class: "btn", type: "button", onclick: () => checkConn(c) }, "Test"),
+            c.kind === "cloud" ? h("button", { class: "btn", type: "button", onclick: () => addConn("cloud") }, "New code") : null,
             conns.length > 1 ? h("button", { class: "btn", type: "button", onclick: () => removeConn(c.id) }, "Remove") : null)));
     };
     return h("div", { class: "conns" },
@@ -3431,10 +3476,253 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
           ? "Requests go through Zex's relay on 127.0.0.1, so cloud servers work too. Keys stay in this browser's storage and are sent only to the URL you set."
           : "Zex's relay isn't running, so only servers that allow this page directly (like Ollaya) will work. Start Zex with python3 server.py to reach the rest.")),
       h("div", { class: "c-grid" },
+        cloudSetup ? cloudSetupWin() : null,
         conns.map(editor),
         win("Zex.Link · add", "", h("div", { class: "preset-grid" }, Object.entries(KINDS).map(([k, v]) => h("button", { class: "preset", type: "button", onclick: () => addConn(k) }, h("b", {}, "+ " + v.label), h("span", {}, v.note)))))));
   }
 
+
+
+  // ---------------------------------------------------------------- cloud GPU
+  // cloud/zex-gpu.sh runs Ollaya on a GPU machine (a server, or a Colab notebook) behind a
+  // private tunnel, and prints a pairing code: "zex-gpu:" and base64url JSON with the address,
+  // the key, where it runs and its GPU. A new session pastes a new code over the same
+  // connection, so routes that use it keep working.
+  const GPU_SCRIPT = "https://raw.githubusercontent.com/mahdiarfrm/zex/main/cloud/zex-gpu.sh";
+  const GPU_NOTEBOOK = "https://colab.research.google.com/github/mahdiarfrm/zex/blob/main/cloud/zex-gpu.ipynb";
+  const OLLAYA_IMAGE = "ghcr.io/ollaya-dev/ollaya:0.12.1-cuda";
+  let cloudSetup = null; // { tab, code, url, key, error } while the setup window is open
+  const randomKey = () => [...crypto.getRandomValues(new Uint8Array(24))].map((b) => b.toString(16).padStart(2, "0")).join("");
+  function parsePairing(text) {
+    const m = /zex-gpu:([A-Za-z0-9_-]+)/.exec(text || "");
+    if (!m) return null;
+    try {
+      const b = m[1].replace(/-/g, "+").replace(/_/g, "/") + "===".slice((m[1].length + 3) % 4);
+      const p = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b), (ch) => ch.charCodeAt(0))));
+      return /^https:\/\/\S+$/.test(p.url || "") && p.key ? p : null;
+    } catch { return null; }
+  }
+  function pairCloud(p) {
+    let c = conns.find((x) => x.kind === "cloud" && (x.where || "") === (p.where || ""));
+    if (!c) { c = { id: "c-" + Math.random().toString(36).slice(2, 8), kind: "cloud", name: "", url: "", key: "" }; conns.push(c); }
+    Object.assign(c, { url: p.url.replace(/\/+$/, ""), key: p.key, where: p.where || "", gpu: p.gpu || "", mem: Number(p.mem) || 0, pairedAt: Date.now() });
+    if (!c.name) c.name = p.gpu ? `${p.gpu} on ${p.where || "a cloud GPU"}` : p.where ? `GPU on ${p.where}` : "Cloud GPU";
+    saveConns(); cloudSetup = null; rerender(); checkConn(c);
+    toast(`Connected to ${c.name}`);
+  }
+  const cloudWhere = (c) => [c.where, c.gpu, c.mem ? `${Math.round(c.mem / 1024)} GB` : ""].filter(Boolean).join(" · ");
+  function cloudSetupWin() {
+    const s = cloudSetup;
+    const tab = (id, label) => h("button", { role: "tab", type: "button", "aria-selected": String(s.tab === id), onclick: () => { s.tab = id; s.error = ""; rerender(); } }, label);
+    const copyRow = (text) => h("div", { class: "cl-cmd" }, h("code", {}, text),
+      h("button", { class: "text-btn xs bordered", type: "button", onclick: async () => { if (await copyText(text)) toast("Copied"); } }, "Copy"));
+    let how, pair;
+    if (s.tab === "container") {
+      s.key = s.key || randomKey();
+      how = [h("p", {}, "On a GPU cloud that runs container images (RunPod, Vast.ai and the like), start a container with Ollaya's image and these settings, and give it a public HTTPS address for port 11435."),
+        h("div", { class: "cl-kv" }, h("span", {}, "Image"), copyRow(OLLAYA_IMAGE), h("span", {}, "Variable"), copyRow(`OLLAYA_API_KEY=${s.key}`), h("span", {}, "Port"), copyRow("11435")),
+        h("p", { class: "note" }, "Use the -cuda12 image on drivers older than CUDA 13. The key keeps everyone else out: anyone with it can use and change this server.")];
+      const url = h("input", { class: "fld mono", placeholder: "https://…", value: s.url || "", "aria-label": "The container's public address", oninput: (e) => { s.url = e.target.value.trim(); } });
+      pair = [h("label", { class: "cl-pair" }, h("span", { class: "pix" }, "2. ITS PUBLIC ADDRESS"), url),
+        h("button", { class: "btn solid", type: "button", onclick: () => {
+          if (!/^https:\/\/\S+$/.test(s.url || "")) { s.error = "Paste the https:// address your GPU cloud gives port 11435."; rerender(); return; }
+          pairCloud({ url: s.url, key: s.key, where: new URL(s.url).hostname.split(".").slice(-2).join("."), gpu: "", mem: 0 });
+        } }, "Connect")];
+    } else {
+      how = s.tab === "colab"
+        ? [h("ol", { class: "cl-steps" },
+            h("li", {}, "Open the notebook in Colab. ", h("a", { class: "btn solid cl-open", href: GPU_NOTEBOOK, target: "_blank", rel: "noopener" }, "Open in Colab")),
+            h("li", {}, "Pick a GPU: Runtime, Change runtime type, then T4 or better."),
+            h("li", {}, "Run its cell. After a few minutes it prints a pairing code.")),
+           h("p", { class: "note" }, "Colab's free tier may end sessions that serve requests from outside. A paid plan, or a GPU server, stays up longer.")]
+        : [h("p", {}, "On a Linux machine with an NVIDIA GPU (RunPod, Lambda, Vast.ai or your own server), run this in its terminal. It sets up Ollaya in ~/.zex-gpu, downloads a model that fits the GPU, opens a private tunnel and prints a pairing code."),
+           copyRow(`curl -fsSL ${GPU_SCRIPT} | bash`),
+           h("p", { class: "note" }, "Add -s -- winnow:e4b after bash to choose the model, or -s -- stop to stop it.")];
+      const code = h("input", { class: "fld mono", placeholder: "zex-gpu:…", value: s.code || "", "aria-label": "Pairing code", oninput: (e) => { s.code = e.target.value; } });
+      pair = [h("label", { class: "cl-pair" }, h("span", { class: "pix" }, "2. PASTE THE PAIRING CODE"), code),
+        h("button", { class: "btn solid", type: "button", onclick: () => {
+          const p = parsePairing(s.code);
+          if (!p) { s.error = "That isn't a pairing code. Copy the whole line that starts with zex-gpu:"; rerender(); return; }
+          pairCloud(p);
+        } }, "Connect")];
+    }
+    return h("div", { class: "win shadow cl-setup" },
+      h("div", { class: "win-title" }, "Zex.Cloud", h("span", { class: "grow" }), h("button", { class: "cl-x", type: "button", "aria-label": "Close", onclick: () => { cloudSetup = null; rerender(); } }, "×")),
+      h("div", { class: "win-body" },
+        h("p", { class: "cl-lede" }, "Run models too big for this computer on a GPU in the cloud. Zex talks to it like any other connection, and a route can send it only the questions a local model isn't sure about."),
+        h("div", { class: "cl-cols" },
+          h("div", {}, h("span", { class: "pix cl-step" }, "1. START A GPU"),
+            h("div", { class: "code-tabs", role: "tablist", "aria-label": "Where the GPU runs" }, tab("colab", "Colab"), tab("server", "GPU server"), tab("container", "Container")), how),
+          h("div", {}, ...pair, s.error ? h("div", { class: "cerr" }, s.error) : null,
+            h("p", { class: "note" }, "A session that stops takes its address with it. Start it again and paste the new code: the same connection is updated.")))));
+  }
+
+  // ---------------------------------------------------------------- models
+  // What each Ollaya (on this computer or on a cloud GPU) has installed, and Ollaya's catalog to
+  // download more, with the progress of each download.
+  const ms = { list: {}, catalog: null, catalogError: "", target: null, q: "" };
+  const pulls = new Map(); // "connId|tag" → { c, tag, layers, status, error }
+  const ollayaConns = () => conns.filter(runsOllaya);
+  const fmtBytes = (n) => (n >= 1e9 ? `${(n / 1e9).toFixed(1)} GB` : n >= 1e6 ? `${Math.round(n / 1e6)} MB` : `${Math.max(1, Math.round(n / 1e3))} KB`);
+  const sameTag = (a, b) => a === b || a === b + ":latest" || a + ":latest" === b;
+  async function loadModels() {
+    await relayReady;
+    await Promise.all([
+      ...ollayaConns().map(async (c) => {
+        try {
+          const [t, p] = await Promise.all([apiFetch(c, "/api/tags"), apiFetch(c, "/api/ps").catch(() => null)]);
+          const td = await t.json().catch(() => ({})), pd = p ? await p.json().catch(() => ({})) : {};
+          if (!t.ok || td.code === "UNREACHABLE") throw new Error(td.code === "UNREACHABLE" ? reachMsg(c) : errMsg(td, t.status));
+          ms.list[c.id] = { models: td.models || [], loaded: (pd.models || []).map((m) => m.name || m.model) };
+        } catch (e) { ms.list[c.id] = { models: [], loaded: [], error: String(e.message || e).split("\n")[0] }; }
+      }),
+      ms.catalog ? null : zexGet("/zex/catalog").then((d) => { ms.catalog = (d.models || []).slice().sort((a, b) => (a.rank ?? 99) - (b.rank ?? 99)); ms.catalogError = ""; })
+        .catch((e) => { ms.catalogError = e.message; }),
+    ]);
+    if (route === "models") rerender();
+  }
+  // the model to suggest: Ollaya's recommended one on a GPU that holds it, the small laya elsewhere
+  const suggestedTag = (c) => (c?.kind === "cloud" && c.mem >= 10240 ? "winnow:e4b" : "laya:en");
+  function pullState(p) {
+    const ls = Object.values(p.layers), total = ls.reduce((m, l) => m + l[1], 0), done = ls.reduce((m, l) => m + l[0], 0);
+    return { total, done, frac: total ? done / total : 0 };
+  }
+  // a download's cell: its button, its progress or "Installed"; updated in place while it runs
+  function pullCell(c, tag) {
+    const key = c.id + "|" + tag, p = pulls.get(key), have = (ms.list[c.id]?.models || []).some((m) => sameTag(m.name, tag));
+    const cell = h("div", { class: "pcell", "data-pull": key, "data-phase": p ? "run" : have ? "have" : "idle" });
+    if (p) {
+      const st = pullState(p);
+      cell.append(h("div", { class: "pbar", role: "progressbar", "aria-label": `Downloading ${tag}`, "aria-valuenow": String(Math.round(st.frac * 100)) }, h("i", { style: `width:${st.frac * 100}%` })),
+        h("span", { class: "ptxt pix" }, st.total ? `${Math.round(st.frac * 100)}% of ${fmtBytes(st.total)}` : "starting…"),
+        h("button", { class: "text-btn xs", type: "button", onclick: () => p.ctl.abort() }, "Cancel"));
+    } else if (have) cell.append(h("span", { class: "pdone pix" }, "INSTALLED"));
+    else cell.append(h("button", { class: "btn", type: "button", onclick: () => pullModel(c, tag) }, "Download"));
+    return cell;
+  }
+  function paintPull(key) {
+    for (const el of document.querySelectorAll(`[data-pull="${CSS.escape(key)}"]`)) {
+      const [id, ...rest] = key.split("|"), c = conns.find((x) => x.id === id), p = pulls.get(key);
+      if (!c) continue;
+      // a running download only moves its bar and its numbers, so the Cancel button stays put
+      if (p && el.dataset.phase === "run") {
+        const st = pullState(p);
+        el.querySelector(".pbar i").style.width = `${st.frac * 100}%`;
+        el.querySelector(".pbar").setAttribute("aria-valuenow", String(Math.round(st.frac * 100)));
+        el.querySelector(".ptxt").textContent = st.total ? `${Math.round(st.frac * 100)}% of ${fmtBytes(st.total)}` : "starting…";
+      } else el.replaceWith(pullCell(c, rest.join("|")));
+    }
+  }
+  async function pullModel(c, tag) {
+    const key = c.id + "|" + tag;
+    if (pulls.has(key)) return;
+    const p = { c, tag, layers: {}, status: "", ctl: new AbortController() };
+    pulls.set(key, p); paintPull(key);
+    let raf = 0;
+    const later = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; paintPull(key); }); };
+    try {
+      const res = await apiFetch(c, "/api/pull", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: tag }), signal: p.ctl.signal });
+      if (!res.ok) throw new Error(errMsg(await res.json().catch(() => ({})), res.status));
+      const reader = res.body.getReader(), dec = new TextDecoder();
+      let buf = "", ok = false;
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buf += dec.decode(value, { stream: true });
+        for (let i; (i = buf.indexOf("\n")) >= 0; buf = buf.slice(i + 1)) {
+          const line = buf.slice(0, i).trim();
+          if (!line) continue;
+          const m = JSON.parse(line);
+          if (m.error) throw new Error(m.error);
+          if (m.digest && m.total) p.layers[m.digest] = [m.completed || 0, m.total];
+          if (m.status === "success") ok = true;
+          p.status = m.status || p.status; later();
+        }
+      }
+      if (!ok) throw new Error("The download stopped before it finished.");
+      toast(`${tag} is ready on ${c.name}`);
+    } catch (e) {
+      if (e.name !== "AbortError") toast(`Couldn't download ${tag}: ${String(e.message || e).split("\n")[0]}`);
+    }
+    cancelAnimationFrame(raf); pulls.delete(key);
+    await loadModels(); checkConn(c); paintPull(key);
+  }
+  async function removeModel(c, name, btn) {
+    if (btn.dataset.sure !== "1") {
+      btn.dataset.sure = "1"; btn.textContent = `Remove ${name}?`;
+      setTimeout(() => { if (btn.isConnected) { btn.dataset.sure = ""; btn.textContent = "Remove"; } }, 4000);
+      return;
+    }
+    btn.disabled = true;
+    try {
+      const r = await apiFetch(c, "/api/delete", { method: "DELETE", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ model: name }) });
+      if (!r.ok) throw new Error(errMsg(await r.json().catch(() => ({})), r.status));
+      toast(`Removed ${name} from ${c.name}`);
+    } catch (e) { toast(String(e.message || e).split("\n")[0]); }
+    await loadModels(); checkConn(c);
+  }
+  async function useModel(c, name) {
+    model = name; activeId = c.id; saveConns(); saveAll();
+    await checkConn(c);
+    paintConnUI(); if (route === "models") rerender();
+    toast(`The Playground uses ${name} on ${c.name}`);
+  }
+  function installedWin(c) {
+    const L = ms.list[c.id], st = statusLine(c.id), loaded = new Set(L?.loaded || []);
+    const rows = !L ? h("div", { class: "empty-hint" }, "Loading…")
+      : L.error ? h("div", { class: "cerr" }, L.error)
+      : !L.models.length ? h("div", { class: "empty-hint" }, "No models yet. Download one from the library below.")
+      : h("div", { class: "mlist" }, L.models.slice().sort((a, b) => a.name.localeCompare(b.name)).map((m) => {
+          const d = m.details || {}, bits = [d.parameter_size, d.format === "router" ? "routes between models" : d.format, d.quantization_level].filter(Boolean).join(" · ");
+          return h("div", { class: "mrow" },
+            h("div", { class: "mn" }, h("b", { class: "mono" }, m.name), h("span", {}, [bits, fmtBytes(m.size || 0)].filter(Boolean).join(" · "))),
+            loaded.has(m.name) ? h("span", { class: "mtag pix", title: "Loaded in memory now" }, "LOADED") : null,
+            h("div", { class: "acts" },
+              activeId === c.id && model === m.name ? h("span", { class: "mtag pix on" }, "IN USE") : h("button", { class: "text-btn xs bordered", type: "button", onclick: () => useModel(c, m.name) }, "Use"),
+              h("button", { class: "text-btn xs", type: "button", onclick: (e) => removeModel(c, m.name, e.currentTarget) }, "Remove")));
+        }));
+    return h("div", { class: "win shadow mwin" },
+      h("div", { class: "win-title" }, c.name, h("span", { class: "grow" }), c.kind === "cloud" ? "CLOUD GPU" : "THIS COMPUTER"),
+      h("div", { class: "win-body" },
+        h("div", { class: "server-status" }, h("span", { class: st.cls }), h("span", {}, st.short), h("span", { class: "muted" }, c.kind === "cloud" ? cloudWhere(c) : c.url)),
+        rows));
+  }
+  function libraryList(target) {
+    const q = ms.q.trim().toLowerCase(), sug = suggestedTag(target);
+    const fams = (ms.catalog || []).filter((f) => !q || (f.search || f.name).toLowerCase().includes(q));
+    if (!fams.length) return h("div", { class: "empty-hint" }, q ? `Nothing matches “${ms.q}”.` : "The catalog is empty.");
+    return h("div", { class: "lib" }, fams.map((f) => h("div", { class: "lib-fam" },
+      h("div", { class: "lib-h" }, h("b", { class: "pix" }, f.name), (f.caps || []).map((x) => h("span", { class: "mchip" }, x))),
+      h("p", { class: "lib-d" }, f.description),
+      (f.tags || []).map((t) => h("div", { class: "lib-tag" },
+        h("div", { class: "lt" }, h("span", { class: "mono" }, t.name), t.name === sug ? h("span", { class: "mtag pix on", title: target?.kind === "cloud" ? "Ollaya's recommended model, and this GPU holds it" : "Small and fast on any computer" }, "SUGGESTED") : null,
+          h("span", { class: "ls" }, t.summary || "")),
+        target ? pullCell(target, t.name) : null)))));
+  }
+  function renderModels() {
+    const cs = ollayaConns();
+    if (!cs.some((c) => c.id === ms.target)) ms.target = (cs.find((c) => c.id === activeId) || cs.find((c) => c.kind === "ollaya") || cs[0])?.id || null;
+    const target = cs.find((c) => c.id === ms.target);
+    const head = h("section", { class: "c-head" },
+      h("span", { class: "tagline" }, "Zex.Models 0.1"),
+      h("h1", { class: "giant sm" }, words("Models")),
+      h("p", {}, "Models run in Ollaya, on this computer or on a cloud GPU. Download one here, then pick it in the Playground, in a set's route or in Compare."));
+    if (!cs.length) return h("div", { class: "conns models" }, head,
+      h("div", { class: "c-grid" }, win("Zex.Models", "", h("div", {},
+        h("p", {}, "Models are downloaded into Ollaya. Add it on this computer, or start one on a cloud GPU."),
+        h("div", { class: "btn-row" }, h("button", { class: "btn solid", type: "button", onclick: () => { addConn("ollaya"); go("models"); } }, "+ Ollaya on this computer"),
+          h("button", { class: "btn", type: "button", onclick: () => { cloudSetup = { tab: "colab" }; go("connections"); } }, "+ Cloud GPU"))))));
+    const listEl = h("div", {}, ms.catalog ? libraryList(target) : ms.catalogError ? h("div", { class: "cerr" }, ms.catalogError) : h("div", { class: "empty-hint" }, "Loading the catalog…"));
+    const search = h("input", { class: "fld", type: "search", placeholder: "Search: multilingual, vision, gguf…", value: ms.q, "aria-label": "Search the models",
+      oninput: (e) => { ms.q = e.target.value; listEl.replaceChildren(ms.catalog ? libraryList(target) : ""); } });
+    const toSel = cs.length > 1 ? h("label", { class: "lib-to" }, h("span", {}, "Download to"),
+      h("select", { class: "chip-select", "aria-label": "Download to", onchange: (e) => { ms.target = e.target.value; rerender(); } }, cs.map((c) => h("option", { value: c.id, selected: c.id === ms.target || undefined }, c.name)))) : null;
+    return h("div", { class: "conns models" }, head,
+      h("div", { class: "c-grid" }, cs.map(installedWin)),
+      h("div", { class: "win shadow lib-win" },
+        h("div", { class: "win-title" }, "Zex.Library", h("span", { class: "grow" }), "FROM OLLAYA.DEV"),
+        h("div", { class: "win-body" }, h("div", { class: "lib-bar" }, search, toSel), listEl)));
+  }
 
   // ---------------------------------------------------------------- review queue
   // Answers the model wasn't sure about wait here for a person; a share of the sure ones come

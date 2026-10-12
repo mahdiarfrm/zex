@@ -10,17 +10,29 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"sync"
 	"time"
 )
 
 // The same relay as server.py: forwards a request to a decision-model API path, only when
 // it comes from the Zex page, so cloud servers that send no CORS headers still work.
 var (
-	allowedPath = regexp.MustCompile(`/(v1/(systemone|decisions|models)|api/(decide|tags|ps))/?$`)
+	// decisions and model lists, and on Ollaya the model store: details, downloads and removal
+	allowedPath = regexp.MustCompile(`/(v1/(systemone|decisions|models)|api/(decide|tags|ps|show|version|pull|delete))/?$`)
 	loopback    = map[string]bool{"localhost": true, "127.0.0.1": true, "::1": true}
 	// Local model servers never go through a system proxy; remote ones may need it.
 	direct = &http.Client{Timeout: 180 * time.Second, Transport: &http.Transport{Proxy: nil}}
 	remote = &http.Client{Timeout: 180 * time.Second, Transport: &http.Transport{Proxy: http.ProxyFromEnvironment}}
+	// A download can take many minutes, so only its first answer has a deadline.
+	directLong = &http.Client{Transport: &http.Transport{Proxy: nil, ResponseHeaderTimeout: 180 * time.Second}}
+	remoteLong = &http.Client{Transport: &http.Transport{Proxy: http.ProxyFromEnvironment, ResponseHeaderTimeout: 180 * time.Second}}
+	// Ollaya's catalog of models to download; the page reads it through /zex/catalog.
+	catalogURL = "https://ollaya.dev/search.json"
+	catalog    struct {
+		sync.Mutex
+		at   time.Time
+		data []byte
+	}
 )
 
 func newHandler(site fs.FS, port int) http.Handler {
@@ -48,6 +60,8 @@ func newHandler(site fs.FS, port int) http.Handler {
 			handleStats(w, r, origins)
 		case r.URL.Path == "/zex/points":
 			handlePoints(w, r, origins)
+		case r.URL.Path == "/zex/catalog":
+			handleCatalog(w, r, origins)
 		case r.URL.Path == "/api" || strings.HasPrefix(r.URL.Path, "/api/"):
 			handleAPI(w, r)
 		case r.Method == http.MethodGet || r.Method == http.MethodHead:
@@ -67,7 +81,7 @@ func relay(w http.ResponseWriter, r *http.Request, origins map[string]bool) {
 		writeJSON(w, 403, map[string]any{"error": "Zex relay: origin " + o + " not allowed"})
 		return
 	}
-	if r.Method != http.MethodGet && r.Method != http.MethodPost {
+	if r.Method != http.MethodGet && r.Method != http.MethodPost && r.Method != http.MethodDelete {
 		writeJSON(w, 405, map[string]any{"error": "method not allowed"})
 		return
 	}
@@ -78,7 +92,7 @@ func relay(w http.ResponseWriter, r *http.Request, origins map[string]bool) {
 		return
 	}
 	var body io.Reader
-	if r.Method == http.MethodPost {
+	if r.Method != http.MethodGet {
 		body = r.Body
 	}
 	req, err := http.NewRequestWithContext(r.Context(), r.Method, target, body)
@@ -96,9 +110,15 @@ func relay(w http.ResponseWriter, r *http.Request, origins map[string]bool) {
 	if key := r.Header.Get("X-Zex-Key"); key != "" {
 		req.Header.Set("Authorization", "Bearer "+key)
 	}
+	long := strings.HasSuffix(strings.TrimRight(t.Path, "/"), "/api/pull")
 	client := remote
-	if loopback[t.Hostname()] {
+	switch {
+	case loopback[t.Hostname()] && long:
+		client = directLong
+	case loopback[t.Hostname()]:
 		client = direct
+	case long:
+		client = remoteLong
 	}
 	res, err := client.Do(req)
 	if err != nil {
@@ -112,7 +132,56 @@ func relay(w http.ResponseWriter, r *http.Request, origins map[string]bool) {
 	}
 	w.Header().Set("Content-Type", rt)
 	w.WriteHeader(res.StatusCode)
-	io.Copy(w, res.Body)
+	// pass each piece on as it arrives, so a download's progress shows while it runs
+	flusher, _ := w.(http.Flusher)
+	buf := make([]byte, 32<<10)
+	for {
+		n, err := res.Body.Read(buf)
+		if n > 0 {
+			if _, werr := w.Write(buf[:n]); werr != nil {
+				return
+			}
+			if flusher != nil {
+				flusher.Flush()
+			}
+		}
+		if err != nil {
+			return
+		}
+	}
+}
+
+// handleCatalog serves Ollaya's model catalog, fetched at most once an hour. The page can't
+// fetch it itself: ollaya.dev sends no CORS headers.
+func handleCatalog(w http.ResponseWriter, r *http.Request, origins map[string]bool) {
+	if !fromPage(w, r, origins) {
+		return
+	}
+	catalog.Lock()
+	defer catalog.Unlock()
+	if catalog.data == nil || time.Since(catalog.at) > time.Hour {
+		req, _ := http.NewRequestWithContext(r.Context(), http.MethodGet, catalogURL, nil)
+		req.Header.Set("User-Agent", "Zex/"+version)
+		res, err := remote.Do(req)
+		if err == nil {
+			data, rerr := io.ReadAll(io.LimitReader(res.Body, 8<<20))
+			res.Body.Close()
+			switch {
+			case rerr != nil:
+				err = rerr
+			case res.StatusCode != 200 || !json.Valid(data):
+				err = fmt.Errorf("HTTP %d", res.StatusCode)
+			default:
+				catalog.data, catalog.at = data, time.Now()
+			}
+		}
+		if catalog.data == nil {
+			writeJSON(w, 502, map[string]any{"error": fmt.Sprintf("Zex couldn't load Ollaya's model catalog: %v", err), "code": "UNREACHABLE"})
+			return
+		}
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.Write(catalog.data)
 }
 
 func writeJSON(w http.ResponseWriter, status int, v any) {
