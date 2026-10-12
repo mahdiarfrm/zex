@@ -106,12 +106,12 @@ Each review is a label. Zex uses the labels to show how often the model is right
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="docs/screenshots/atlas-dark.png">
-  <img alt="The Atlas: every request of the week as a dot on a globe, the route as flowing particles, confidence, savings and accuracy" src="docs/screenshots/atlas.png">
+  <img alt="Last 7 Days: every request of the week as a square on a globe of dots, the route, confidence, savings and accuracy" src="docs/screenshots/atlas.png">
 </picture>
 
 Home opens with an **Overview**: a short report of what needs you (an accuracy alert, answers waiting for review) or how the week went, with the button to act on it, and the week's numbers. Zex warns you when accuracy falls below your aim, when it slips from the week before, and when requests start failing.
 
-Further down, the **Atlas** draws the week. Every request is a dot on a turning globe, higher where the model was surer. The route plays as particles flowing to the stage that finished them, next to the spread of confidence, the money the route saved and the accuracy trend.
+Further down, **Last 7 Days** draws the week in the same dot shapes as the desk. Every request is a square on a turning globe, higher where the model was surer. The route plays as requests flowing to the stage that finished them, next to the spread of confidence, the money the route saved and the accuracy trend.
 
 ## More
 

@@ -275,6 +275,14 @@ async function goRoute(w, d, r) {
     await waitFor(() => /3 REQUESTS/.test(d.querySelector('.hm-atlas [data-at="count"]')?.textContent || ""), 15000);
     ok("ATLAS-1 the atlas draws the week: globe, route, confidence, savings and trend", ["cv-globe", "cv-flow", "cv-hist", "cv-saved"].every((c) => d.querySelector(".hm-atlas canvas." + c)) && !!d.querySelector(".hm-atlas .at-trend-svg"));
     ok("ATLAS-2 every request is a dot on the globe", /3 REQUESTS/.test(d.querySelector('.hm-atlas [data-at="count"]')?.textContent || "") && d.querySelector('.hm-atlas [data-at="empty"]').hidden, d.querySelector('.hm-atlas [data-at="count"]')?.textContent);
+    ok("ATLAS-3 Last 7 Days draws the globe as a lit sphere of dots, as on the desk", (() => {
+      const cv = d.querySelector(".hm-atlas .cv-globe"), px = cv.getContext("2d").getImageData(0, 0, cv.width, cv.height).data;
+      let n = 0; for (let i = 3; i < px.length; i += 4) if (px[i]) n++;
+      return d.querySelector(".hm-atlas .at-title")?.textContent.replace(/\s+/g, " ").trim() === "Last 7 Days" && n > 2000;
+    })(), d.querySelector(".hm-atlas .at-title")?.textContent);
+    const gCell = d.querySelector(".hm-atlas .at-globe"), gH = gCell.getBoundingClientRect().height;
+    d.querySelector(".hm-atlas .cv-globe").height = 4000; await sleep(60);
+    ok("ATLAS-4 the globe's pixel size never stretches its cell", Math.abs(gCell.getBoundingClientRect().height - gH) < 2, `${gH} → ${gCell.getBoundingClientRect().height}`);
     ok("REVIEW-8 the sidebar counts what is waiting", Number(d.querySelector("#reviewBadge")?.textContent || 0) >= 1 && !d.querySelector("#reviewBadge").hidden);
     await w.fetch("/zex/log/clear", { method: "POST", headers: page, body: "{}" });
     await goRoute(w, d, "api");

@@ -867,22 +867,22 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .meta.warn { color: var(--danger); }
 
 /* ---------- the atlas ---------- */
-.hm-atlas { --at-bg: #0b0a0d; --at-line: rgba(243, 138, 162, .22); background: var(--at-bg); color: #f4f1ee; padding: 34px 28px 36px; position: relative; overflow: hidden; }
-.hm-atlas::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(243, 138, 162, .12) 1px, transparent 1.3px); background-size: 6px 6px; -webkit-mask-image: linear-gradient(180deg, #000, transparent 70%); mask-image: linear-gradient(180deg, #000, transparent 70%); pointer-events: none; }
+.hm-atlas { --at-bg: #0b0a0d; --at-line: #3e262e; background: var(--at-bg); color: #f4f1ee; padding: 34px 28px 36px; position: relative; overflow: hidden; }
+.hm-atlas::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(#22151a 1px, transparent 1.3px); background-size: 6px 6px; pointer-events: none; }
 .at-head { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 24px; align-items: end; margin-bottom: 22px; }
 .at-head .tagline { grid-column: 1 / -1; justify-self: start; background: #f38aa2; color: #160a0f; }
 .at-title { margin: 6px 0 0; font-size: clamp(38px, 4.4vw, 72px); line-height: 1.02; letter-spacing: -.05em; font-weight: 650; }
 .at-lede { grid-column: 1; margin: 0; max-width: 620px; color: rgba(244, 241, 238, .72); font-size: 14.5px; }
 .at-legend { grid-column: 2; grid-row: 2 / 4; display: flex; gap: 14px; flex-wrap: wrap; justify-content: flex-end; font-size: 12px; color: rgba(244, 241, 238, .72); }
-.at-legend span { display: inline-flex; align-items: center; gap: 6px; } .at-legend i { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
-.lg-auto i { background: #f38aa2; } .lg-wait i { border: 1.5px solid #f4f1ee; } .lg-spot i { background: #2dd4bf; } .lg-ok i { background: #f4f1ee; } .lg-fix i { background: #ffb02e; }
+.at-legend span { display: inline-flex; align-items: center; gap: 6px; } .at-legend i { width: 9px; height: 9px; display: inline-block; }
+.lg-auto i { background: #f38aa2; } .lg-wait i { border: 1.5px solid #f4f1ee; } .lg-spot i { background: #9fd8c4; } .lg-ok i { background: #f4f1ee; } .lg-fix i { background: #f2cf6e; }
 .at-grid { position: relative; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto auto auto; gap: 14px; }
-.at-cell { position: relative; border: 1px solid var(--at-line); background: rgba(255, 255, 255, .02); padding: 10px 12px 12px; min-width: 0; }
+.at-cell { position: relative; border: 1px solid var(--at-line); background: var(--at-bg); padding: 10px 12px 12px; min-width: 0; }
 .at-t { display: flex; align-items: center; gap: 8px; font-size: 16px; letter-spacing: .04em; color: #f38aa2; }
 .at-t .grow { flex: 1; } .at-t [data-at] { color: rgba(244, 241, 238, .55); }
 .at-t .at-sub { color: rgba(244, 241, 238, .55); font-size: 14px; }
 .at-globe { grid-row: 1 / 3; display: flex; flex-direction: column; }
-.cv-globe { width: 100%; flex: 1; min-height: 400px; cursor: grab; touch-action: none; display: block; }
+.cv-globe { width: 100%; flex: 1 1 0; height: 0; min-height: 400px; cursor: grab; touch-action: none; display: block; }
 .cv-globe:active { cursor: grabbing; }
 .at-poles { position: absolute; right: 14px; top: 44px; bottom: 26px; display: flex; flex-direction: column; justify-content: space-between; font-size: 14px; color: rgba(244, 241, 238, .45); text-align: right; pointer-events: none; }
 .at-tip { position: absolute; z-index: 3; display: flex; flex-direction: column; gap: 2px; min-width: 170px; padding: 7px 9px; background: #160a0f; border: 1px solid #f38aa2; box-shadow: 4px 4px 0 #f38aa2; font-size: 12px; pointer-events: none; }
@@ -900,19 +900,19 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .cv-hist { width: 100%; height: 150px; display: block; margin-top: 6px; }
 .at-axis { display: flex; justify-content: space-between; font-size: 14px; color: rgba(244, 241, 238, .45); }
 .at-saved { display: flex; flex-direction: column; }
-.cv-saved { width: 100%; height: 120px; display: block; }
+.cv-saved { width: 100%; height: 150px; display: block; }
 .at-big { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 2px; }
-.at-big b { font-size: 44px; font-weight: 400; line-height: 1; background: linear-gradient(90deg, #9be7ff, #f5a8ff, #fff2a1); -webkit-background-clip: text; background-clip: text; color: transparent; padding-top: .04em; }
+.at-big b { font-size: 44px; font-weight: 400; line-height: 1; color: #f38aa2; padding-top: .04em; }
 .at-big span { font-size: 11.5px; color: rgba(244, 241, 238, .6); max-width: 240px; }
 .at-trend { grid-column: 1 / -1; }
 .at-trend-svg { width: 100%; height: auto; display: block; margin-top: 6px; }
-.at-trend-svg .vol { fill: rgba(243, 138, 162, .25); }
+.at-trend-svg .vol { fill: #5a3340; }
 .at-trend-svg path { fill: none; stroke-width: 2; } .at-trend-svg path.acc { stroke: #f38aa2; stroke-dasharray: 1 5; stroke-linecap: round; stroke-width: 3; } .at-trend-svg path.agr { stroke: #f4f1ee; stroke-dasharray: 5 4; }
 .at-trend-svg rect.acc { fill: #f38aa2; } .at-trend-svg rect.agr { fill: #f4f1ee; }
 .at-trend-svg .lab { font-family: var(--pix); font-size: 14px; fill: rgba(244, 241, 238, .45); }
 .at-key { display: flex; gap: 14px; flex-wrap: wrap; font-size: 11.5px; color: rgba(244, 241, 238, .6); margin-top: 4px; }
 .at-key span::before { content: ""; display: inline-block; width: 8px; height: 8px; margin-right: 6px; vertical-align: middle; }
-.at-key .acc::before { background: #f38aa2; } .at-key .agr::before { background: #f4f1ee; } .at-key .vol::before { background: rgba(243, 138, 162, .35); border-radius: 50%; }
+.at-key .acc::before { background: #f38aa2; } .at-key .agr::before { background: #f4f1ee; } .at-key .vol::before { background: #5a3340; border-radius: 50%; }
 @media (max-width: 1180px) { .at-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .at-globe { grid-row: auto; grid-column: 1 / -1; } .cv-globe { min-height: 360px; } .at-flow, .at-trend { grid-column: 1 / -1; } }
 @media (max-width: 900px) { .hm-atlas { padding: 26px 16px; } .at-grid { grid-template-columns: minmax(0, 1fr); } .at-head { grid-template-columns: minmax(0, 1fr); } .at-legend { grid-column: 1; grid-row: auto; justify-content: flex-start; } .at-poles { display: none; } }
 
@@ -3035,27 +3035,60 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   let route = routeFromHash();
   function go(r) { if (location.hash === "#/" + r) { route = r; rerender(); } else location.hash = "#/" + r; }
   window.addEventListener("hashchange", () => { route = routeFromHash(); withTransition(applyRoute); });
-  // 3D dot shapes on the desk: point clouds on spinning globes and a tumbling torus.
-  // A dot is drawn when its shade (from a fixed light) beats its own random threshold,
-  // so shadow sides fill in and the dots visibly travel as the shapes turn.
+  // 3D dot shapes, on the desk and in Last 7 Days: point clouds on globes and tori, seven numbers
+  // a point (x y z, its normal, a random threshold). A dot is drawn when its shade from a fixed
+  // light beats its threshold, so the shading is in how dense the dots are, and the dots
+  // visibly travel as a shape turns.
+  const LX = -0.52, LY = -0.62, LZ = 0.59; // light from the upper left, toward the viewer
+  const dotGlobe = (n, rnd) => { const a = []; for (let i = 0; i < n; i++) { const y = 1 - (2 * (i + 0.5)) / n, r = Math.sqrt(1 - y * y), th = i * 2.399963; const x = Math.cos(th) * r, z = Math.sin(th) * r; a.push(x, y, z, x, y, z, rnd()); } return a; };
+  const dotTorus = (n, rnd) => {
+    const a = [], R = 0.72, r = 0.28;
+    while (a.length < n * 7) {
+      const u = rnd() * 6.2832, v = rnd() * 6.2832;
+      if (rnd() > (R + r * Math.cos(v)) / (R + r)) continue;
+      const c = R + r * Math.cos(v);
+      a.push(c * Math.cos(u), c * Math.sin(u), r * Math.sin(v), Math.cos(u) * Math.cos(v), Math.sin(u) * Math.cos(v), Math.sin(v), rnd());
+    }
+    return a;
+  };
+  // a colour as one pixel of an ImageData buffer (RGBA bytes, little-endian)
+  const inkRGBA = (hex, a = 1) => { const v = parseInt(hex.replace("#", ""), 16); return ((Math.round(a * 255) << 24) | ((v & 255) << 16) | (((v >> 8) & 255) << 8) | (v >> 16)) >>> 0; };
+  // one square dot, in device pixels, into a buffer L = { buf, cw, ch, ds }
+  function pixDot(L, x, y, c) {
+    const X = x | 0, Y = y | 0, ds = L.ds, cw = L.cw, buf = L.buf;
+    if (X < 0 || Y < 0 || X + ds > cw || Y + ds > L.ch) return;
+    for (let j = 0; j < ds; j++) { const o = (Y + j) * cw + X; for (let i = 0; i < ds; i++) buf[o + i] = c; }
+  }
+  // Draws a shape into L at device pixel (ox, oy) with radius S, turned by ay around Y, then
+  // tipped by ax around X. Dark ink fills the shadow side, as on the pink desk; onDark, light
+  // ink fills the lit side instead, which reads the same on a dark ground. ink is a pixel, or a
+  // function of where the dot lands on the shape (x, y from -1 to 1) that gives one, or 0 to skip.
+  function stipple(L, p, ox, oy, S, ay, ax, ink, onDark = false) {
+    const cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax), each = typeof ink === "function";
+    const { buf, cw, ch, ds } = L;
+    for (let i = 0; i < p.length; i += 7) {
+      // turn around Y, then tip around X; the same for the normal
+      const nx = p[i + 3] * cy + p[i + 5] * sy, nz1 = -p[i + 3] * sy + p[i + 5] * cy;
+      const ny = p[i + 4] * cx - nz1 * sx, nz = p[i + 4] * sx + nz1 * cx;
+      if (nz < 0) continue;
+      const lit = Math.max(0, nx * LX + ny * LY + nz * LZ);
+      if (p[i + 6] > (onDark ? Math.pow(lit, 1.3) * 0.9 + 0.06 : Math.pow(1 - lit, 1.5) * 0.93 + 0.04)) continue;
+      const x = p[i] * cy + p[i + 2] * sy, z1 = -p[i] * sy + p[i + 2] * cy, y = p[i + 1] * cx - z1 * sx;
+      const c = each ? ink(x, y) : ink;
+      if (!c) continue;
+      const X = (ox + x * S) | 0, Y = (oy + y * S) | 0;
+      if (X < 0 || Y < 0 || X + ds > cw || Y + ds > ch) continue;
+      for (let j = 0; j < ds; j++) { const o = (Y + j) * cw + X; for (let k = 0; k < ds; k++) buf[o + k] = c; }
+    }
+  }
+
+  // the desk: two globes and a tumbling torus that drift and lean toward the pointer
   function withDeskDots(desk) {
     const cv = h("canvas", { class: "hm-dots", "aria-hidden": "true" });
     let W = 0, H = 0, shapes = [], dust = [], px = 0, py = 0, last = -1e9, visible = true, img = null, buf = null;
     const t0 = performance.now();
     let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    // each point: x y z (on a unit-ish shape), nx ny nz (normal), threshold
-    const globe = (n) => { const a = []; for (let i = 0; i < n; i++) { const y = 1 - (2 * (i + 0.5)) / n, r = Math.sqrt(1 - y * y), th = i * 2.399963; const x = Math.cos(th) * r, z = Math.sin(th) * r; a.push(x, y, z, x, y, z, rnd()); } return a; };
-    const torus = (n) => {
-      const a = [], R = 0.72, r = 0.28;
-      while (a.length < n * 7) {
-        const u = rnd() * 6.2832, v = rnd() * 6.2832;
-        if (rnd() > (R + r * Math.cos(v)) / (R + r)) continue;
-        const c = R + r * Math.cos(v);
-        a.push(c * Math.cos(u), c * Math.sin(u), r * Math.sin(v), Math.cos(u) * Math.cos(v), Math.sin(u) * Math.cos(v), Math.sin(v), rnd());
-      }
-      return a;
-    };
-    const LX = -0.52, LY = -0.62, LZ = 0.59; // light from the upper left, toward the viewer
+    const globe = (n) => dotGlobe(n, rnd), torus = (n) => dotTorus(n, rnd);
     const build = () => {
       W = desk.clientWidth; H = desk.clientHeight;
       const dpr = Math.min(2, devicePixelRatio || 1);
@@ -3073,11 +3106,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       });
       dust = Array.from({ length: Math.round((W * H) / 2600) }, () => [rnd() * W, rnd() * H, rnd()]);
     };
-    const inkOf = () => {
-      const m = /^#?([0-9a-f]{6})$/i.exec(getComputedStyle(desk).getPropertyValue("--desk-ink").trim());
-      const v = m ? parseInt(m[1], 16) : 0x111111;
-      return ((255 << 24) | ((v & 255) << 16) | (((v >> 8) & 255) << 8) | (v >> 16)) >>> 0; // RGBA bytes, little-endian
-    };
+    const inkOf = () => { const m = /^#?([0-9a-f]{6})$/i.exec(getComputedStyle(desk).getPropertyValue("--desk-ink").trim()); return inkRGBA(m ? m[1] : "111111"); };
     const draw = (now) => {
       if (!cv.isConnected) return;
       if (!reduceMotion) requestAnimationFrame(draw);
@@ -3088,30 +3117,13 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       const cw = cv.width, ch = cv.height, dpr = cw / W, ctx = cv.getContext("2d");
       if (!img) { img = ctx.createImageData(cw, ch); buf = new Uint32Array(img.data.buffer); }
       buf.fill(0);
-      const ink = inkOf(), ds = Math.max(2, Math.round(1.6 * dpr)), t = (now - t0) / 1000;
-      const dot = (x, y) => {
-        const X = x | 0, Y = y | 0;
-        if (X < 0 || Y < 0 || X + ds > cw || Y + ds > ch) return;
-        for (let j = 0; j < ds; j++) { const o = (Y + j) * cw + X; for (let i = 0; i < ds; i++) buf[o + i] = ink; }
-      };
+      const L = { buf, cw, ch, ds: Math.max(2, Math.round(1.6 * dpr)) }, ink = inkOf(), t = (now - t0) / 1000;
       for (const sh of shapes) {
         const ay = t * sh.spin + px * 1.2, ax = sh.tilt + (sh.tumble ? t * sh.spin * 0.7 : 0) + py * 0.8;
-        const cy = Math.cos(ay), sy = Math.sin(ay), cx = Math.cos(ax), sx = Math.sin(ax);
-        const S = sh.R * dpr;
         const ox = (sh.x * W + Math.sin(t * 0.45 + sh.ph) * 12 + px * 26) * dpr, oy = (sh.y * H + Math.cos(t * 0.38 + sh.ph) * 10 + py * 18) * dpr;
-        const p = sh.pts;
-        for (let i = 0; i < p.length; i += 7) {
-          // turn around Y, then tip around X; the same for the normal
-          const nx = p[i + 3] * cy + p[i + 5] * sy, nz1 = -p[i + 3] * sy + p[i + 5] * cy;
-          const ny = p[i + 4] * cx - nz1 * sx, nz = p[i + 4] * sx + nz1 * cx;
-          if (nz < 0) continue;
-          const lit = nx * LX + ny * LY + nz * LZ;
-          if (p[i + 6] > Math.pow(1 - Math.max(0, lit), 1.5) * 0.93 + 0.04) continue;
-          const x = p[i] * cy + p[i + 2] * sy, z1 = -p[i] * sy + p[i + 2] * cy;
-          dot(ox + x * S, oy + (p[i + 1] * cx - z1 * sx) * S);
-        }
+        stipple(L, sh.pts, ox, oy, sh.R * dpr, ay, ax, ink);
       }
-      for (const [x, y, k] of dust) if ((k * 10 + t * 0.5) % 1 < 0.6) dot(x * dpr, y * dpr);
+      for (const [x, y, k] of dust) if ((k * 10 + t * 0.5) % 1 < 0.6) pixDot(L, x * dpr, y * dpr, ink);
       ctx.putImageData(img, 0, 0);
     };
     desk.addEventListener("pointermove", (e) => { const r = desk.getBoundingClientRect(); px = (e.clientX - r.left) / r.width - 0.5; py = (e.clientY - r.top) / r.height - 0.5; });
@@ -3568,9 +3580,30 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   // Every request of the last 7 days is a dot on a slowly turning globe: around it by time, up
   // it by how sure the model was. Next to it, the route as flowing particles, the spread of
   // confidence, the money a route saved and the accuracy trend.
-  const AT = { pink: "#f38aa2", teal: "#2dd4bf", white: "#f4f1ee", red: "#ff5a52", amber: "#ffb02e" };
+  // Last 7 Days uses flat, opaque colours: no gradients, no glow
+  const AT = { pink: "#f38aa2", mint: "#9fd8c4", white: "#f4f1ee", coral: "#e5735f", butter: "#f2cf6e", bg: "#0b0a0d", ringBack: "#33433f", tick: "#3a2129" };
   let atlas = null;
-  const fibSphere = (n) => Array.from({ length: n }, (_, i) => { const y = 1 - (2 * (i + 0.5)) / n, r = Math.sqrt(1 - y * y), th = i * 2.399963; return [Math.cos(th) * r, y, Math.sin(th) * r]; });
+  const ATI = { body: inkRGBA("#a35d6e"), pink: inkRGBA(AT.pink), cream: inkRGBA(AT.white), dim: inkRGBA("#57504f"), dust: inkRGBA("#3a2129"), line: inkRGBA("#5a3340") };
+  // point clouds for the atlas, as dense as the desk's (denser when small, so a small shape still
+  // reads); rebuilt when a size changes
+  function atlasShape(S, key, kind, R) {
+    const c = S.shp[key];
+    if (c && c.kind === kind && Math.abs(c.R - R) < 4) return c.pts;
+    let seed = 29 + key.length * 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    const pts = (kind === "globe" ? dotGlobe : dotTorus)(Math.min(26000, Math.round(R * R * (kind === "globe" ? 0.62 : 0.5) * (R < 70 ? 1.6 : 1))), rnd);
+    // a ring is a torus laid flat, so turning it spins it around its own axis
+    if (kind === "ring") for (let i = 0; i < pts.length; i += 7) { [pts[i + 1], pts[i + 2]] = [pts[i + 2], pts[i + 1]]; [pts[i + 4], pts[i + 5]] = [pts[i + 5], pts[i + 4]]; }
+    S.shp[key] = { kind, R, pts };
+    return pts;
+  }
+  // a device-pixel buffer the size of a fitted canvas, kept between frames
+  function atlasBuf(S, key, fc) {
+    const cw = fc.ctx.canvas.width, ch = fc.ctx.canvas.height;
+    let L = S.bufs[key];
+    if (!L || L.cw !== cw || L.ch !== ch) { const img = fc.ctx.createImageData(cw, ch); L = S.bufs[key] = { img, buf: new Uint32Array(img.data.buffer), cw, ch }; }
+    L.dpr = cw / fc.w; L.ds = Math.max(2, Math.round(1.6 * L.dpr)); L.buf.fill(0);
+    return L;
+  }
   function fitCanvas(cv) {
     const dpr = Math.min(2, devicePixelRatio || 1), w = cv.clientWidth, hh = cv.clientHeight;
     if (!w || !hh) return null;
@@ -3619,8 +3652,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const el = h("section", { class: "hm-atlas", "aria-label": "The last 7 days, drawn in dots" },
       h("div", { class: "at-head" },
         h("span", { class: "tagline" }, "Zex.Atlas"),
-        h("h2", { class: "at-title" }, words("The Week In Dots.")),
-        h("p", { class: "at-lede" }, "Every request from the last 7 days is a dot. Higher on the globe means the model was surer, and brighter means newer. The bright ring is the AUTO line."),
+        h("h2", { class: "at-title" }, words("Last 7 Days")),
+        h("p", { class: "at-lede" }, "Every request is a square on the globe, and the nearer side faces you. Higher means the model was surer. The mint ring is the AUTO line."),
         h("div", { class: "at-legend" }, [["auto", "on its own"], ["wait", "waiting"], ["spot", "spot check"], ["ok", "reviewed"], ["fix", "corrected"]].map(([k, t]) => h("span", { class: "lg-" + k }, h("i"), t)))),
       h("div", { class: "at-grid" },
         h("div", { class: "at-cell at-globe" }, h("div", { class: "at-t pix" }, "ATLAS.GLOBE", h("span", { class: "grow" }), h("span", { "data-at": "count" })),
@@ -3636,7 +3669,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
           h("div", { class: "at-big" }, h("b", { class: "pix", "data-at": "saved" }, "$0"), h("span", { "data-at": "savedsub" }, ""))),
         h("div", { class: "at-cell at-trend" }, h("div", { class: "at-t pix" }, "ATLAS.TREND", h("span", { class: "grow" }), "14 DAYS"), h("div", { class: "at-svg", "data-at": "trend" }))));
     const S = atlas = { el, d: null, last: 0, visible: true, ry: 0, rx: -0.38, drag: null, vel: 0.18, parts: [], spawn: 0, t0: performance.now(), hover: null, proj: [],
-      globe: el.querySelector(".cv-globe"), flow: el.querySelector(".cv-flow"), hist: el.querySelector(".cv-hist"), saved: el.querySelector(".cv-saved"), tip: el.querySelector(".at-tip"), sat: fibSphere(700) };
+      globe: el.querySelector(".cv-globe"), flow: el.querySelector(".cv-flow"), hist: el.querySelector(".cv-hist"), saved: el.querySelector(".cv-saved"), tip: el.querySelector(".at-tip"), shp: {}, bufs: {},
+      dust: Array.from({ length: 120 }, (_, i) => [hashUnit(i + 3), hashUnit(i + 211), hashUnit(i + 419)]) };
     S.globe.addEventListener("pointerdown", (e) => { S.drag = { x: e.clientX, ry: S.ry, t: performance.now() }; S.globe.setPointerCapture(e.pointerId); });
     S.globe.addEventListener("pointerup", () => { S.drag = null; });
     S.globe.addEventListener("pointermove", (e) => {
@@ -3672,12 +3706,13 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     S.savedShare = share;
     q("saved").textContent = d.base > 0 ? money(saved) : d.pts.length ? "$0" : "–";
     q("savedsub").textContent = d.base > 0 ? `saved this week, ${Math.round(share * 100)}% less than sending everything to the last stage` : d.pts.length ? "Add a route with a cost per stage to see what it saves." : "Savings from routes show up here.";
-    q("trend").replaceChildren(trendSvg(d.trend));
+    q("trend").replaceChildren(trendSvg(d.trend, q("trend").clientWidth || 1120));
     if (reduceMotion) atlasDraw(0, performance.now() / 1000);
   }
   const atNodeX = (i, n) => 0.16 + (i / Math.max(1, n - 1)) * 0.74;
-  function trendSvg(days) {
-    const W = 560, H = 150, L = 6, R = 6, T = 14, B = 22, n = Math.max(1, days.length);
+  // drawn at the width it is shown at, so the dots and labels keep their size
+  function trendSvg(days, width) {
+    const W = Math.max(320, Math.round(width)), H = 150, L = 6, R = 6, T = 14, B = 22, n = Math.max(1, days.length);
     const x = (i) => L + (i / Math.max(1, n - 1)) * (W - L - R), y = (v) => T + (1 - v) * (H - T - B);
     const ns = "http://www.w3.org/2000/svg", el = (tag, a, txt) => { const e = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(a)) e.setAttribute(k, v); if (txt != null) e.textContent = txt; return e; };
     const svg = el("svg", { viewBox: `0 0 ${W} ${H}`, class: "at-trend-svg", role: "img", "aria-label": "Requests, accuracy and agreement per day" });
@@ -3705,62 +3740,53 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
   function atlasDraw(dt, t) {
     const S = atlas, d = S?.d;
     if (!d) return;
-    // ---- globe
+    // ---- globe: a lit sphere of dots, as on the desk, with a square for each request
     const g = fitCanvas(S.globe);
     if (g) {
       const { ctx, w, h: hh } = g, R = Math.min(w * 0.43, hh * 0.42), cx = w / 2, cy = hh / 2 + 4;
       if (!S.drag) { S.vel += (0.16 - S.vel) * Math.min(1, dt * 0.8); S.ry += S.vel * dt; }
+      const L = atlasBuf(S, "globe", g), D = L.dpr;
+      for (const [x, y, k] of S.dust) if ((k * 10 + t * 0.5) % 1 < 0.6) pixDot(L, x * L.cw, y * L.ch, ATI.dust);
+      // the shape's y runs down the screen and the requests' up, so it tips the other way
+      stipple(L, atlasShape(S, "globe", "globe", R), cx * D, cy * D, R * D, S.ry, -S.rx, ATI.body, true);
+      ctx.putImageData(L.img, 0, 0);
       const cY = Math.cos(S.ry), sY = Math.sin(S.ry), cX = Math.cos(S.rx), sX = Math.sin(S.rx);
       const proj = (lat, lon) => {
         const x = Math.cos(lat) * Math.sin(lon), y = Math.sin(lat), z = Math.cos(lat) * Math.cos(lon);
         const x1 = x * cY + z * sY, z1 = -x * sY + z * cY, y2 = y * cX - z1 * sX, z2 = y * sX + z1 * cX;
         return [cx + x1 * R, cy - y2 * R, z2];
       };
-      const glow = ctx.createRadialGradient(cx - R * 0.3, cy - R * 0.35, R * 0.1, cx, cy, R * 1.15);
-      glow.addColorStop(0, "rgba(243,138,162,.16)"); glow.addColorStop(1, "rgba(243,138,162,0)");
-      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(cx, cy, R * 1.15, 0, Math.PI * 2); ctx.fill();
-      const dot = (x, y, r, color, a) => { ctx.globalAlpha = a; ctx.fillStyle = color; ctx.fillRect(x - r, y - r, r * 2, r * 2); };
-      for (let la = -60; la <= 60; la += 30) for (let k = 0; k < 96; k++) { const [x, y, z] = proj((la * Math.PI) / 180, (k / 96) * Math.PI * 2); dot(x, y, 0.8, AT.pink, z > 0 ? 0.28 : 0.08); }
-      for (let lo = 0; lo < 12; lo++) for (let k = 1; k < 40; k++) { const [x, y, z] = proj(-Math.PI / 2 + (k / 40) * Math.PI, (lo / 12) * Math.PI * 2); dot(x, y, 0.7, AT.pink, z > 0 ? 0.2 : 0.06); }
       const ring = (thr - 0.5) * Math.PI * 0.94;
-      for (let k = 0; k < 140; k++) { const [x, y, z] = proj(ring, (k / 140) * Math.PI * 2 + t * 0.05); dot(x, y, z > 0 ? 1.4 : 0.9, AT.teal, z > 0 ? 0.95 : 0.25); }
-      const colors = [AT.pink, AT.white, AT.teal, AT.white, AT.amber, AT.red];
-      const front = [];
-      ctx.globalAlpha = 1;
-      for (const p of d.pts) {
-        const [x, y, z] = proj(p.lat, p.lon);
-        if (z < 0) { dot(x, y, 1.1, colors[p.code], 0.18); continue; }
-        front.push({ x, y, z, p });
+      for (let k = 0; k < 140; k++) {
+        const [x, y, z] = proj(ring, (k / 140) * Math.PI * 2 + t * 0.05), r = z > 0 ? 1.5 : 1;
+        ctx.fillStyle = z > 0 ? AT.mint : AT.ringBack; ctx.fillRect(x - r, y - r, r * 2, r * 2);
       }
+      const colors = [AT.pink, AT.white, AT.mint, AT.white, AT.butter, AT.coral], front = [];
+      for (const p of d.pts) { const [x, y, z] = proj(p.lat, p.lon); if (z > 0) front.push({ x, y, z, p }); }
       front.sort((a, b) => a.z - b.z);
       for (const f of front) {
-        const r = 1.6 + f.z * 1.9 + (S.hover === f.p ? 2.5 : 0);
-        ctx.globalAlpha = (0.55 + f.z * 0.45) * (1 - f.p.age * 0.55);
-        if (f.p.code === 1) { ctx.strokeStyle = AT.white; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(f.x, f.y, r + 0.6, 0, Math.PI * 2); ctx.stroke(); }
-        else { ctx.fillStyle = colors[f.p.code]; ctx.beginPath(); ctx.arc(f.x, f.y, r, 0, Math.PI * 2); ctx.fill(); }
+        // a dark edge keeps each square apart from the dots behind it; nearer is bigger
+        const r = 1.8 + f.z * 1.7 + (S.hover === f.p ? 2.5 : 0);
+        ctx.fillStyle = AT.bg; ctx.fillRect(f.x - r - 1.5, f.y - r - 1.5, r * 2 + 3, r * 2 + 3);
+        if (f.p.code === 1) { ctx.strokeStyle = AT.white; ctx.lineWidth = 1.3; ctx.strokeRect(f.x - r + 0.65, f.y - r + 0.65, r * 2 - 1.3, r * 2 - 1.3); }
+        else { ctx.fillStyle = colors[f.p.code]; ctx.fillRect(f.x - r, f.y - r, r * 2, r * 2); }
       }
-      ctx.globalAlpha = 1;
       S.proj = front;
     }
-    // ---- route flow: morphing dotted shapes and particles in real proportions
+    // ---- route: each stage a turning dot shape, as on the desk (a globe for a model, a ring for
+    // the person), sized by its share, and requests flowing to the stage that finished them
     const fl = fitCanvas(S.flow);
     if (fl) {
       const { ctx, w, h: hh } = fl, n = d.stages.length, y0 = hh * 0.42, srcX = w * 0.04;
-      const xs = d.stages.map((_, i) => atNodeX(i, n) * w), r = Math.min(hh * 0.27, (w * 0.74) / Math.max(1, n - 1) * 0.3);
-      ctx.fillStyle = AT.pink;
-      for (let x = srcX; x < xs[n - 1]; x += 7) { ctx.globalAlpha = 0.3; ctx.fillRect(x - 1, y0 - 1, 2, 2); }
+      const xs = d.stages.map((_, i) => atNodeX(i, n) * w), r = Math.min(hh * 0.3, (w * 0.74) / Math.max(1, n - 1) * 0.3);
+      const L = atlasBuf(S, "flow", fl), D = L.dpr;
+      for (let x = srcX; x < xs[n - 1]; x += 7) pixDot(L, x * D, y0 * D, ATI.line);
       d.stages.forEach((st, i) => {
-        const sides = 3 + (i % 4), m = (Math.sin(t * 0.7 + i * 1.3) + 1) / 2, spin = t * 0.25 * (i % 2 ? -1 : 1), dots = 54;
-        const poly = (k, s) => { const seg = Math.floor(s * k), f = s * k - seg, a1 = spin + (seg / k) * Math.PI * 2, a2 = spin + ((seg + 1) / k) * Math.PI * 2;
-          return [Math.cos(a1) * (1 - f) + Math.cos(a2) * f, Math.sin(a1) * (1 - f) + Math.sin(a2) * f]; };
-        const rr = r * (0.75 + 0.25 * Math.sqrt(st.share || 0.05));
-        ctx.fillStyle = st.person ? AT.white : AT.pink;
-        for (let k = 0; k < dots; k++) {
-          const sP = k / dots, [ax, ay] = poly(sides, sP), [bx, by] = poly(sides + 1, sP);
-          ctx.globalAlpha = 0.85; ctx.fillRect(xs[i] + (ax * (1 - m) + bx * m) * rr - 1.2, y0 + (ay * (1 - m) + by * m) * rr - 1.2, 2.4, 2.4);
-        }
-        ctx.globalAlpha = 0.18; ctx.beginPath(); ctx.arc(xs[i], y0, rr * 0.55, 0, Math.PI * 2); ctx.fill();
+        const rr = r * (0.62 + 0.38 * Math.sqrt(st.share || 0)), y = y0 + Math.sin(t * 0.9 + i * 1.7) * 3;
+        if (st.person) stipple(L, atlasShape(S, "stage" + i, "ring", rr), xs[i] * D, y * D, rr * D, t * 0.55, 0.55 + Math.sin(t * 0.4) * 0.15, ATI.cream, true);
+        else stipple(L, atlasShape(S, "stage" + i, "globe", rr), xs[i] * D, y * D, rr * D, t * 0.45 * (i % 2 ? -1 : 1), 0.42, ATI.pink, true);
       });
+      ctx.putImageData(L.img, 0, 0);
       if (!reduceMotion && d.pts.length) {
         S.spawn += dt;
         while (S.spawn > 0.07) {
@@ -3774,13 +3800,11 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       for (const p of S.parts) {
         const tx = xs[p.target];
         if (p.x < tx) p.x = Math.min(tx, p.x + p.v * dt); else p.life -= dt * 2.2;
-        const near = Math.max(0, 1 - Math.abs(p.x - tx) / 40);
-        ctx.globalAlpha = Math.max(0, p.life) * 0.95;
+        // a request shrinks away as it reaches its stage
+        const near = Math.max(0, 1 - Math.abs(p.x - tx) / 40), y = y0 + p.dy * (1 - near), r = 2 * Math.max(0, Math.min(1, p.life));
         ctx.fillStyle = d.stages[p.target].person ? AT.white : AT.pink;
-        ctx.beginPath(); ctx.arc(p.x, y0 + p.dy * (1 - near), 2.2, 0, Math.PI * 2); ctx.fill();
-        ctx.globalAlpha *= 0.35; ctx.fillRect(p.x - 9, y0 + p.dy * (1 - near) - 1, 6, 2);
+        ctx.fillRect(p.x - r, y - r, r * 2, r * 2);
       }
-      ctx.globalAlpha = 1;
     }
     // ---- confidence: columns of dots
     const hi = fitCanvas(S.hist);
@@ -3793,28 +3817,22 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         const ka = Math.round((b.auto / max) * 11 * grow), ko = Math.round((b.other / max) * 11 * grow), x = i * cw + cw / 2;
         for (let j = 0; j < ka + ko; j++) {
           const y = hh - 8 - j * step;
-          ctx.globalAlpha = 0.92;
           if (j < ka) { ctx.fillStyle = AT.pink; ctx.beginPath(); ctx.arc(x, y, Math.min(4, cw * 0.28), 0, Math.PI * 2); ctx.fill(); }
           else { ctx.strokeStyle = AT.white; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(x, y, Math.min(3.4, cw * 0.24), 0, Math.PI * 2); ctx.stroke(); }
         }
-        if (!ka && !ko) { ctx.globalAlpha = 0.25; ctx.fillStyle = AT.pink; ctx.fillRect(x - 1, hh - 9, 2, 2); }
+        if (!ka && !ko) { ctx.fillStyle = AT.tick; ctx.fillRect(x - 1, hh - 9, 2, 2); }
       });
-      ctx.globalAlpha = 1;
     }
-    // ---- saved: a turning sphere of dots, filled to the share saved
+    // ---- saved: a lit sphere of dots, filled to the share of money saved. The fill is shaded
+    // like the desk's shapes, densest on the shadow side, so it sits in the sphere like liquid.
     const sv = fitCanvas(S.saved);
     if (sv) {
-      const { ctx, w, h: hh } = sv, R = Math.min(w, hh) * 0.36, cx = w / 2, cy = hh / 2, a = t * 0.4, level = 1 - 2 * (S.savedShare || 0);
-      const cA = Math.cos(a), sA = Math.sin(a);
-      for (const [x, y, z] of S.sat) {
-        const x1 = x * cA + z * sA, z1 = -x * sA + z * cA;
-        if (z1 < -0.2) continue;
-        const wet = y > level;
-        ctx.globalAlpha = (wet ? 0.95 : 0.28) * (0.5 + z1 * 0.5);
-        ctx.fillStyle = wet ? AT.pink : AT.white;
-        ctx.fillRect(cx + x1 * R - 1.3, cy + y * R - 1.3, 2.6, 2.6);
-      }
-      ctx.globalAlpha = 1;
+      const { ctx, w, h: hh } = sv, R = Math.min(w, hh) * 0.43, cx = w / 2, cy = hh / 2;
+      const L = atlasBuf(S, "saved", sv), D = L.dpr, share = S.savedShare || 0, level = 1 - 2 * share, pts = atlasShape(S, "saved", "globe", R);
+      const wet = (x, y) => share > 0 && y > level + Math.sin(x * 5 + t * 1.8) * 0.04;
+      stipple(L, pts, cx * D, cy * D, R * D, t * 0.4, 0.3, (x, y) => (wet(x, y) ? 0 : ATI.dim), true);
+      stipple(L, pts, cx * D, cy * D, R * D, t * 0.4, 0.3, (x, y) => (wet(x, y) ? ATI.pink : 0));
+      ctx.putImageData(L.img, 0, 0);
     }
   }
 
