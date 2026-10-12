@@ -55,6 +55,8 @@ If the file also has a column with the answer you expect, Zex measures how often
 
 Pick the accuracy you need, and Zex suggests the threshold that automates the most while staying above it. One click saves that threshold to the set.
 
+To see it before you have a file of your own, click **Try a labeled sample** in Batch (or **Try a sample batch** on Home): 24 support tickets with the team and refund answers a person gave.
+
 ### Send the cheap model first
 
 <img alt="A batch run through a route: where each request was finished, and the money saved" src="docs/screenshots/route-batch.png">
@@ -112,6 +114,8 @@ Each review is a label. Zex uses the labels to show how often the model is right
 Home opens with an **Overview**: a short report of what needs you (an accuracy alert, answers waiting for review) or how the week went, with the button to act on it, and the week's numbers. Zex warns you when accuracy falls below your aim, when it slips from the week before, and when requests start failing.
 
 Further down, **Last 7 Days** draws the week in dotted wireframes. The Zex Z turns behind the title, filled to the share of requests answered without a person. Each day is a tower with a block for every request, colored by what happened to it; point at a day for its numbers. Below are the route, with requests flowing to the stage that finished them, the spread of confidence, the money the route saved and the accuracy trend.
+
+Last 7 Days counts the requests sent to the local API, so one request is enough to fill a block. Runs in the Playground and in Batch don't count. While the week is empty, it offers to turn the API on and then to send a few sample requests.
 
 ## More
 

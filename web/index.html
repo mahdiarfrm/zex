@@ -900,7 +900,9 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
 .at-tip { position: absolute; z-index: 3; display: flex; flex-direction: column; gap: 2px; min-width: 180px; padding: 7px 9px; background: var(--at-bg); border: 1px solid var(--at-pink); box-shadow: 4px 4px 0 var(--at-pink); font-size: 12px; pointer-events: none; }
 .at-tip b { font-weight: 600; } .at-tip span { color: var(--at-mid); }
 .at-empty { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 26px; color: var(--at-pink); pointer-events: none; text-align: center; }
-.at-empty small { font-family: var(--sans); font-size: 12.5px; color: var(--at-mid); }
+.at-empty small { font-family: var(--sans); font-size: 12.5px; color: var(--at-mid); max-width: 320px; }
+.at-go { pointer-events: auto; margin-top: 10px; } .at-go:empty { display: none; }
+.at-go .btn { background: var(--at-ink); color: var(--at-bg); border-color: var(--at-ink); font-family: var(--sans); }
 .at-flow { grid-column: 2 / 4; }
 .cv-flow { width: 100%; height: 150px; display: block; }
 .at-nodes { position: relative; height: 62px; margin-top: -12px; }
@@ -1250,6 +1252,33 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     "Your outage cost us a full day of orders. We're moving to another vendor.",
     "Is there a discount for annual billing?",
   ];
+  // A small labeled file for Support triage: each ticket has the team and refund answer a
+  // person gave, so a first batch also shows the accuracy check.
+  const SAMPLE_FILE = `id,message,team,refund_requested
+1,"You charged my card twice for the March invoice. Please refund the extra payment.",billing,yes
+2,"The dashboard won't load since this morning, just a spinning wheel.",technical,no
+3,"I can't log in. The password reset email never arrives.",account,no
+4,"Why did my plan price go up without any notice? I want the difference back.",billing,yes
+5,"Exporting to CSV fails with error 500 every time.",technical,no
+6,"Please change the email on my account to my new work address.",account,no
+7,"I was billed after I cancelled. Refund it or I'm disputing the charge.",billing,yes
+8,"The mobile app crashes when I upload a photo.",technical,no
+9,"Two-factor codes stopped working after I got a new phone.",account,no
+10,"Can I get an invoice with our company VAT number on it?",billing,no
+11,"Search returns nothing even for documents I just created.",technical,no
+12,"Someone else logged into my account. Lock it now.",account,no
+13,"I paid for the annual plan but I'm still being charged monthly. Fix it and refund me.",billing,yes
+14,"Notifications are delayed by hours on Android.",technical,no
+15,"How do I add a teammate to my workspace?",account,no
+16,"Your trial converted to paid without a reminder. I want my money back.",billing,yes
+17,"The API returns 429 even though we're far under our limit.",technical,no
+18,"I need to close my account and delete all my data.",account,no
+19,"The receipt shows the wrong currency. Please reissue it in euros.",billing,no
+20,"Pages take 20 seconds to load since the last update.",technical,no
+21,"I'm locked out after too many attempts. Please unlock me.",account,no
+22,"Charged three times for one order. This is unacceptable, refund all but one.",billing,yes
+23,"Dark mode makes the charts unreadable.",technical,no
+24,"Can you merge my two accounts into one?",account,no`;
   let batchText = store.get("zex.batch", SAMPLE_BATCH.join("\n"));
   let batch = { running: false, paused: false, done: 0, total: 0, cursor: 0, items: [], results: [], questions: null, setId: null, error: null, evalThr: {} };
   let cmp = { a: null, b: null, running: false, res: {} };   // a, b = "connId::model"
@@ -2202,6 +2231,11 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     }
     renderOut();
   }
+  async function loadSampleFile() {
+    stateMode = "text"; stateText = SAMPLE_BATCH[0]; questionsText = pretty(CASES[0].questions);
+    saveAll(); renderState(); renderQuestions();
+    await loadBatchFile(new File([SAMPLE_FILE], "sample-tickets.csv", { type: "text/csv" }));
+  }
   function batchItems(keys) {
     const items = batchSrc === "file" && bfile
       ? bfile.rows.map((r) => ({ text: String(r[bfile.textCol] ?? "").trim(), row: r, expected: Object.fromEntries(keys.filter((k) => bfile.expect[k]).map((k) => [k, r[bfile.expect[k]]])) }))
@@ -2354,7 +2388,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
         icon("i-layers"), h("b", { class: "pix" }, "DROP A FILE HERE"), h("span", {}, "CSV, TSV, Excel, JSONL, JSON or plain text, one message per row"), h("span", { class: "dz-or" }, "or click to choose one"));
       dz.addEventListener("click", choose);
       dz.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); choose(); } });
-      return dz;
+      return h("div", {}, dz, h("div", { class: "btn-row" }, h("button", { class: "btn", type: "button", onclick: loadSampleFile }, "Try a labeled sample"),
+        h("span", { class: "meta" }, "24 support tickets with the team and refund answers a person gave, to see the accuracy check.")));
     }
     const g = guessExpect(bfile.columns, questions);
     for (const k of keys) if (bfile.expect[k] === undefined && g[k]) bfile.expect[k] = g[k];
@@ -2456,7 +2491,8 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const labeled = keys.filter((k) => batch.items.some((it) => hasValue(it.expected[k])));
     if (!labeled.length) {
       return evalShell("accuracy", h("div", { class: "eval-empty" }, h("b", {}, "How often is the model right?"),
-        h("p", {}, "Run a file that has a column with the answer you expect, and pick that column under Expected answers. Zex measures accuracy for each question and suggests the threshold that keeps it above your aim.")));
+        h("p", {}, "Run a file that has a column with the answer you expect, and pick that column under Expected answers. Zex measures accuracy for each question and suggests the threshold that keeps it above your aim."),
+        h("div", { class: "btn-row" }, h("button", { class: "btn", type: "button", onclick: loadSampleFile }, "Try a labeled sample"))));
     }
     return evalPanel({ keys: labeled, qs: batch.questions, set, stats: Object.fromEntries(labeled.map((k) => [k, evalStats(k, batch.questions[k])])),
       key: evalKey, onKey: (k) => { evalKey = k; fillBatch(); }, preview: batch.evalThr, after: fillBatch });
@@ -3254,11 +3290,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const st = statsFromHistory();
     const tile = (n, ic, t, d, onclick) => h("button", { class: "opt-tile", type: "button", onclick }, h("span", { class: "num" }, n), icon(ic), h("span", { class: "t" }, t), h("span", { class: "d" }, d));
     const loadLesson = (l) => { stateMode = "text"; stateText = l.state; questionsText = pretty(l.questions); last = null; lastError = null; examplesOpen = true; saveAll(); renderState(); renderQuestions(); openMode("response"); };
-    const sampleBatch = () => {
-      batchText = SAMPLE_BATCH.join("\n"); store.set("zex.batch", batchText); batchSrc = "paste"; store.set("zex.batchSrc", "paste");
-      stateMode = "text"; stateText = SAMPLE_BATCH[0]; questionsText = pretty(CASES[0].questions);
-      saveAll(); renderState(); renderQuestions(); openMode("batch");
-    };
+    const sampleBatch = async () => { await loadSampleFile(); openMode("batch"); };
     const barcode = (p) => h("div", { class: "barcode", "aria-hidden": "true" }, Array.from({ length: 44 }, (_, i) => h("i", { class: i < Math.round(p * 44) ? "" : "off" })));
     const dotm = (probs) => h("div", { class: "dotm", "aria-hidden": "true" }, probs.flatMap((p) => Array.from({ length: 10 }, (_, i) => h("i", { class: i < Math.round(p * 10) ? "on" : "" }))));
     const dist = (probs) => h("div", { class: "dist", "aria-hidden": "true" }, probs.map((p, i) => h("div", {}, h("span", {}, String(i)), h("span", { class: "tr" }, h("i", { style: `width:${p * 100}%` })), h("span", {}, pct(p)))));
@@ -3808,7 +3840,7 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
       h("div", { class: "at-grid" },
         h("div", { class: "at-cell at-week" }, tab("ATLAS.WEEK", h("span", { "data-at": "count" })),
           cv("cv-week", "Seven towers, one per day, with a block per request"), h("div", { class: "at-tip", hidden: true }),
-          h("div", { class: "at-empty pix", "data-at": "empty", hidden: true }, "NO REQUESTS YET", h("small", {}, "Turn on the local API and every request lands here as a block.")),
+          h("div", { class: "at-empty pix", "data-at": "empty", hidden: true }, "NO REQUESTS YET", h("small", {}, "Requests sent to the local API land here, one block each. Playground and Batch runs don't."), h("div", { class: "at-go", "data-at": "go" })),
           h("div", { class: "at-legend" }, AT_CODES.map(([, t, c]) => h("span", { class: "lg-" + c }, h("i"), t))),
           h("p", { class: "at-cap", "data-at": "per" })),
         h("div", { class: "at-cell at-flow" }, tab("ATLAS.ROUTE", h("span", { "data-at": "flowname" })),
@@ -3851,6 +3883,9 @@ a.server-card:hover .win-title { background: var(--accent); color: var(--on-acce
     const d = S.d = atlasData(), q = (k) => S.el.querySelector(`[data-at="${k}"]`);
     q("count").textContent = `${fmtN(d.pts.length)} REQUESTS`;
     q("empty").hidden = d.pts.length > 0;
+    const target = sets.find((x) => x.slug === "support-triage")?.slug || sets[0]?.slug;
+    q("go").replaceChildren(d.pts.length ? "" : !apiCfg.enabled ? h("button", { class: "btn", type: "button", onclick: () => go("api") }, "Turn on the local API")
+      : target ? h("button", { class: "btn", type: "button", onclick: (e) => sendSamples(target, e.currentTarget) }, `Send ${SAMPLE_BATCH.length} sample requests to ${setName(target)}`) : "");
     q("fill").textContent = d.pts.length ? `Filled to ${pct(d.autoShare)}, the share of this week's requests answered without a person. Drag it to turn it.` : "It fills up with the share of requests answered without a person. Drag it to turn it.";
     q("per").textContent = d.pts.length ? (d.per > 1 ? `One block is about ${fmtN(d.per)} requests.` : "One block is one request.") + " Point at a day for its numbers." : "";
     q("flowname").textContent = d.flowName.toUpperCase();

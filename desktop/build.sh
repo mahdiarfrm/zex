@@ -10,7 +10,7 @@
 # (it links WebKitGTK: apt install libgtk-3-dev libwebkit2gtk-4.1-dev). Windows cross-compiles anywhere.
 set -e
 cd "$(dirname "$0")/.."
-VERSION=0.3.2
+VERSION=0.3.3
 BUNDLE_ID=${BUNDLE_ID:-app.zex.desktop}
 what=${1:-all}
 mkdir -p dist

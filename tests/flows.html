@@ -226,6 +226,17 @@ async function goRoute(w, d, r) {
     drop(d.querySelector(".b-win"), new w.File([await (await fetch("/tests/fixtures/tickets.xlsx")).arrayBuffer()], "tickets.xlsx"));
     await waitFor(() => /tickets\.xlsx/.test(d.querySelector(".bf-bar")?.textContent || ""), 3000);
     ok("FILE-3 an Excel file reads", /3 rows/.test(d.querySelector(".bf-bar")?.textContent || "") && d.querySelector(".b-map select")?.value === "message" && /twice, refund it/.test(d.querySelector(".b-prev")?.textContent || ""), d.querySelector(".bf-bar")?.textContent);
+    [...d.querySelectorAll(".bf-bar .text-btn")].find((b) => b.textContent === "Remove").click(); await sleep(50);
+    [...d.querySelectorAll(".b-win .btn")].find((b) => b.textContent === "Try a labeled sample").click();
+    await waitFor(() => /sample-tickets\.csv/.test(d.querySelector(".bf-bar")?.textContent || ""), 5000);
+    const smap = Object.fromEntries([...d.querySelectorAll(".b-map .mrow")].map((r) => [r.querySelector(".ml").textContent, r.querySelector("select").value]));
+    ok("FILE-4 the labeled sample loads with its expected answers matched", /24 rows/.test(d.querySelector(".bf-bar")?.textContent || "") && smap["Text to read"] === "message" && smap.team === "team" && smap.refund_requested === "refund_requested", JSON.stringify(smap));
+    [...d.querySelectorAll(".bf-bar .text-btn")].find((b) => b.textContent === "Remove").click(); await sleep(50);
+    drop(d.querySelector(".b-win"), new w.File([await (await fetch("/tests/fixtures/tickets.xlsx")).arrayBuffer()], "tickets.xlsx"));
+    await waitFor(() => /tickets\.xlsx/.test(d.querySelector(".bf-bar")?.textContent || ""), 3000);
+    await goRoute(w, d, "home");
+    await waitFor(() => d.querySelector('.hm-atlas [data-at="go"] .btn'), 5000);
+    ok("ATLAS-6 an empty week says where requests come from, with a way to send some", !d.querySelector('.hm-atlas [data-at="empty"]').hidden && /local API/.test(d.querySelector('.hm-atlas [data-at="empty"]').textContent) && d.querySelector('.hm-atlas [data-at="go"] .btn')?.textContent === "Turn on the local API", d.querySelector('.hm-atlas [data-at="go"]')?.textContent);
 
     // local API
     await goRoute(w, d, "api");
